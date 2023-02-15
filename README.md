@@ -1,4 +1,4 @@
-# laa-crown-court-contribution
+#laa-crown-court-contribution
 This is a Java based Spring Boot application hosted on [MOJ Cloud Platform](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/concepts/about-the-cloud-platform.html).
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
