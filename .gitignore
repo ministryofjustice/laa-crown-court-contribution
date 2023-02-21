@@ -1,4 +1,4 @@
-crown-court-proceeding/.gradle
+crown-court-contribution/.gradle
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
