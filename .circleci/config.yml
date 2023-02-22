@@ -85,9 +85,9 @@ jobs:
       - run:
           name: Install Dependencies
           command: ./gradlew build -x test
-#      - run:
-#          name: Run SonarQube
-#          command: ./gradlew sonarqube -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.organization=${SONAR_ORG}
+      #      - run:
+      #          name: Run SonarQube
+      #          command: ./gradlew sonarqube -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.organization=${SONAR_ORG}
       - save_cache:
           paths:
             - ~/.gradle/wrapper
@@ -161,9 +161,9 @@ jobs:
       - aws-ecr/build-image:
           repo: laa-crime-apps-team/laa-crown-court-contribution-dev-ecr
           tag: "${CIRCLE_SHA1}"
-#      - snyk/scan:
-#          docker-image-name: "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
-#          <<: *snyk_options
+  #      - snyk/scan:
+  #          docker-image-name: "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
+  #          <<: *snyk_options
 
   build_and_push_image:
     executor: aws-ecr/default
@@ -249,41 +249,41 @@ workflows:
           requires:
             - build_and_push_image
 
-#      - hold_install_on_test:
-#          type: approval
-#          requires:
-#            - build_and_push_image
-#
-#      - deploy-test:
-#          requires:
-#            - hold_install_on_test
-#
-#      - hold_install_on_uat:
-#          type: approval
-#          requires:
-#            - build_and_push_image
-#
-#      - deploy-uat:
-#          requires:
-#            - hold_install_on_uat
-#
-#      - hold_install_on_staging:
-#          type: approval
-#          requires:
-#            - build_and_push_image
-#
-#      - deploy-staging:
-#          requires:
-#            - hold_install_on_staging
-#
-#      - hold_install_on_prod:
-#          type: approval
-#          requires:
-#            - build_and_push_image
-#
-#      - deploy-prod:
-#          requires:
-#            - hold_install_on_prod
+  #      - hold_install_on_test:
+  #          type: approval
+  #          requires:
+  #            - build_and_push_image
+  #
+  #      - deploy-test:
+  #          requires:
+  #            - hold_install_on_test
+  #
+  #      - hold_install_on_uat:
+  #          type: approval
+  #          requires:
+  #            - build_and_push_image
+  #
+  #      - deploy-uat:
+  #          requires:
+  #            - hold_install_on_uat
+  #
+  #      - hold_install_on_staging:
+  #          type: approval
+  #          requires:
+  #            - build_and_push_image
+  #
+  #      - deploy-staging:
+  #          requires:
+  #            - hold_install_on_staging
+  #
+  #      - hold_install_on_prod:
+  #          type: approval
+  #          requires:
+  #            - build_and_push_image
+  #
+  #      - deploy-prod:
+  #          requires:
+  #            - hold_install_on_prod
 
   build-deploy-branch:
     jobs:
@@ -293,9 +293,9 @@ workflows:
               ignore:
                 - main
 
-#      - scan_app:
-#          requires:
-#            - build
+      #      - scan_app:
+      #          requires:
+      #            - build
 
       - test_and_assemble:
           requires:
@@ -317,7 +317,6 @@ workflows:
       - deploy-dev:
           requires:
             - hold_install_on_dev
-
 #      - hold_install_on_test:
 #          type: approval
 #          requires:
