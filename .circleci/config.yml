@@ -77,7 +77,7 @@ commands:
 # JOBS
 # ------------------
 jobs:
-  build:
+  build_and_scan_app:
     executor: build-executor
     steps:
       - checkout:
@@ -104,16 +104,6 @@ jobs:
           root: .
           paths:
             - build
-
-  scan_app:
-    docker:
-      - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-crown-court-contribution/crown-court-contribution
-    steps:
-      - checkout:
-          path: ~/laa-crown-court-contribution
-      - attach_workspace:
-          at: .
       - snyk/scan:
           <<: *snyk_options
 
@@ -229,31 +219,27 @@ workflows:
 
   build-deploy-master:
     jobs:
-      - build:
+      - build_and_scan_app:
           filters:
             branches:
               only:
                 - main
 
-      - scan_app:
-          requires:
-            - build
-
       - test_and_assemble:
           requires:
-            - scan_app
+            - build_and_scan_app
 
       - build_and_scan_image:
           requires:
             - test_and_assemble
 
-      - build_and_push_image:
+      - push_image:
           requires:
             - build_and_scan_image
 
       - deploy-dev:
           requires:
-            - build_and_push_image
+            - push_image
 
   #      - hold_install_on_test:
   #          type: approval
@@ -293,32 +279,28 @@ workflows:
 
   build-deploy-branch:
     jobs:
-      - build:
+      - build_and_scan_app:
           filters:
             branches:
               ignore:
                 - main
 
-      - scan_app:
-          requires:
-            - build
-
       - test_and_assemble:
           requires:
-            - scan_app
+            - build_and_scan_app
 
       - build_and_scan_image:
           requires:
             - test_and_assemble
 
-      - build_and_push_image:
+      - push_image:
           requires:
             - build_and_scan_image
 
       - hold_install_on_dev:
           type: approval
           requires:
-            - build_and_push_image
+            - push_image
 
       - deploy-dev:
           requires:
