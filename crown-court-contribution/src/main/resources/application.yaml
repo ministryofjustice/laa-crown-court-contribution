@@ -1,1 +1,10 @@
+server:
+  port: 8087
 
+management:
+  server:
+    port: 8096
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

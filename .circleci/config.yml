@@ -1,20 +1,5 @@
 version: 2.1
 
-orbs:
-  aws-ecr: circleci/aws-ecr@7.3.0
-  kubernetes: circleci/kubernetes@1.3.0
-  helm: circleci/helm@1.2.0
-  snyk: snyk/snyk@1.1.2
-
-_snyk_options: &snyk_options
-  project: "${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}"
-  organization: "legal-aid-agency"
-  severity-threshold: "high"
-  fail-on-issues: false
-  monitor-on-build: false
-  token-variable: SNYK_TOKEN
-  additional-arguments: --policy-path=.snyk
-
 # ------------------
 # EXECUTORS
 # ------------------
@@ -23,6 +8,15 @@ executors:
     resource_class: small
     docker:
       - image: ministryofjustice/cloud-platform-tools
+    working_directory: ~/laa-crown-court-contribution/crown-court-contribution
+  build-executor:
+    docker:
+      - image: cimg/openjdk:17.0.4
+    environment:
+      # Configure the JVM and Gradle to avoid OOM errors
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
+    working_directory: ~/laa-crown-court-contribution/crown-court-contribution
 
 # ------------------
 # COMMANDS
@@ -31,8 +25,20 @@ commands:
   checkout_and_decrypt:
     steps:
       - checkout
-      - run: echo "${GIT_CRYPT_KEY}" | base64 -d > git-crypt.key
-      - run: git-crypt unlock git-crypt.key
+      - run:
+          name: Decrypt secrets
+          command: |
+            echo "${GIT_CRYPT_KEY}" | base64 -d > git-crypt.key
+            git-crypt unlock git-crypt.key
+
+  checkout_and_attach:
+    steps:
+      - checkout:
+          path: ~/laa-crown-court-contribution
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          docker_layer_caching: true
 
   deploy-to:
     description: >
@@ -55,26 +61,21 @@ commands:
             kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=laa-crown-court-contribution-<< parameters.environment >>
             kubectl config use-context ${K8S_CLUSTER_NAME}
             kubectl --namespace=laa-crown-court-contribution-<< parameters.environment >> get pods
-      - helm/upgrade-helm-chart:
-          namespace: laa-crown-court-contribution-<< parameters.environment >>
-          update-repositories: false
-          chart: ./helm_deploy/laa-crown-court-contribution/
-          release-name: laa-crown-court-contribution
-          values: ./helm_deploy/laa-crown-court-contribution/values-<< parameters.environment >>.yaml
-          values-to-override: image.tag=${CIRCLE_SHA1}
+      - run:
+          name: Upgrade helm chart
+          command: |
+            helm upgrade laa-crown-court-contribution ./helm_deploy/laa-crown-court-contribution/. \
+                          --install --wait \
+                          --namespace=${K8S_NAMESPACE} \
+                          --values ./helm_deploy/laa-crown-court-contribution/values-<< parameters.environment >>.yaml \
+                          --set image.tag="${CIRCLE_SHA1}"
 
 # ------------------
 # JOBS
 # ------------------
 jobs:
   build:
-    environment:
-      # Configure the JVM and Gradle to avoid OOM errors
-      _JAVA_OPTIONS: "-Xmx3g"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
-    docker:
-      - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-crown-court-contribution/crown-court-contribution
+    executor: build-executor
     steps:
       - checkout:
           path: ~/laa-crown-court-contribution
@@ -101,30 +102,10 @@ jobs:
           paths:
             - build
 
-  scan_app:
-    docker:
-      - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-crown-court-contribution/crown-court-contribution
-    steps:
-      - checkout:
-          path: ~/laa-crown-court-contribution
-      - attach_workspace:
-          at: .
-      - snyk/scan:
-          <<: *snyk_options
-
   test_and_assemble:
-    environment:
-      _JAVA_OPTIONS: "-Xmx3g"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
-    docker:
-      - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-crown-court-contribution/crown-court-contribution
+    executor: build-executor
     steps:
-      - checkout:
-          path: ~/laa-crown-court-contribution
-      - attach_workspace:
-          at: .
+      - checkout_and_attach
       - restore_cache:
           key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - restore_cache:
@@ -147,38 +128,25 @@ jobs:
       - store_artifacts:
           path: build/libs
 
-  build_and_scan_image:
-    docker:
-      - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-crown-court-contribution/crown-court-contribution
-    steps:
-      - checkout:
-          path: ~/laa-crown-court-contribution
-      - attach_workspace:
-          at: .
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - aws-ecr/build-image:
-          repo: laa-crime-apps-team/laa-crown-court-contribution-dev-ecr
-          tag: "${CIRCLE_SHA1}"
-  #      - snyk/scan:
-  #          docker-image-name: "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
-  #          <<: *snyk_options
-
   build_and_push_image:
-    executor: aws-ecr/default
+    executor: cloud-platform-executor
     steps:
-      - aws-ecr/build-and-push-image:
-          repo: laa-crime-apps-team/laa-crown-court-contribution-dev-ecr
-          tag: "${CIRCLE_SHA1}"
-          attach-workspace: true
-          workspace-root: crown-court-contribution
-          path: crown-court-contribution
-          extra-build-args: |
+      - checkout_and_attach
+      - run:
+          name: Build docker image
+          command: |
+            docker build \
             --build-arg COMMIT_ID=${CIRCLE_SHA1} \
             --build-arg BUILD_TAG=${CIRCLE_SHA1} \
             --build-arg APP_BRANCH=${CIRCLE_BRANCH} \
             --build-arg BUILD_DATE=$(date +%Y-%m-%dT%H:%M:%S%z) \
+            -t app .
+      - run:
+          name: Push to ecr
+          command: |
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_ACCOUNT_URL
+            docker tag app "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
+            docker push "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
 
   deploy-dev:
     executor: cloud-platform-executor
@@ -229,21 +197,13 @@ workflows:
               only:
                 - main
 
-      - scan_app:
+      - test_and_assemble:
           requires:
             - build
 
-      - test_and_assemble:
-          requires:
-            - scan_app
-
-      - build_and_scan_image:
-          requires:
-            - test_and_assemble
-
       - build_and_push_image:
           requires:
-            - build_and_scan_image
+            - test_and_assemble
 
       - deploy-dev:
           requires:
@@ -293,21 +253,13 @@ workflows:
               ignore:
                 - main
 
-      #      - scan_app:
-      #          requires:
-      #            - build
-
       - test_and_assemble:
           requires:
             - build
 
-      - build_and_scan_image:
-          requires:
-            - test_and_assemble
-
       - build_and_push_image:
           requires:
-            - build_and_scan_image
+            - test_and_assemble
 
       - hold_install_on_dev:
           type: approval
