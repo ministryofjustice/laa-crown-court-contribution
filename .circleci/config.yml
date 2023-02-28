@@ -66,7 +66,7 @@ commands:
           command: |
             helm upgrade laa-crown-court-contribution ./helm_deploy/laa-crown-court-contribution/. \
                           --install --wait \
-                          --namespace=${K8S_NAMESPACE} \
+                          --namespace=laa-crown-court-contribution-<< parameters.environment >> \
                           --values ./helm_deploy/laa-crown-court-contribution/values-<< parameters.environment >>.yaml \
                           --set image.tag="${CIRCLE_SHA1}"
 
@@ -155,33 +155,33 @@ jobs:
           environment: dev
           token: ${CIRCLE_CI_TOKEN_DEV}
 
-#  deploy-test:
-#    executor: cloud-platform-executor
-#    steps:
-#      - deploy-to:
-#          environment: test
-#          token: ${CIRCLE_CI_TOKEN_TEST}
-#
-#  deploy-uat:
-#    executor: cloud-platform-executor
-#    steps:
-#      - deploy-to:
-#          environment: uat
-#          token: ${CIRCLE_CI_TOKEN_UAT}
-#
-#  deploy-staging:
-#    executor: cloud-platform-executor
-#    steps:
-#      - deploy-to:
-#          environment: staging
-#          token: ${CIRCLE_CI_TOKEN_STAGING}
-#
-#  deploy-prod:
-#    executor: cloud-platform-executor
-#    steps:
-#      - deploy-to:
-#          environment: prod
-#          token: ${CIRCLE_CI_TOKEN_PROD}
+  deploy-test:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: test
+          token: ${CIRCLE_CI_TOKEN_TEST}
+
+  deploy-uat:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: uat
+          token: ${CIRCLE_CI_TOKEN_UAT}
+
+  deploy-staging:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: staging
+          token: ${CIRCLE_CI_TOKEN_STAGING}
+
+  deploy-prod:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: prod
+          token: ${CIRCLE_CI_TOKEN_PROD}
 
 # ------------------
 # WORKFLOWS
@@ -209,41 +209,41 @@ workflows:
           requires:
             - build_and_push_image
 
-  #      - hold_install_on_test:
-  #          type: approval
-  #          requires:
-  #            - build_and_push_image
-  #
-  #      - deploy-test:
-  #          requires:
-  #            - hold_install_on_test
-  #
-  #      - hold_install_on_uat:
-  #          type: approval
-  #          requires:
-  #            - build_and_push_image
-  #
-  #      - deploy-uat:
-  #          requires:
-  #            - hold_install_on_uat
-  #
-  #      - hold_install_on_staging:
-  #          type: approval
-  #          requires:
-  #            - build_and_push_image
-  #
-  #      - deploy-staging:
-  #          requires:
-  #            - hold_install_on_staging
-  #
-  #      - hold_install_on_prod:
-  #          type: approval
-  #          requires:
-  #            - build_and_push_image
-  #
-  #      - deploy-prod:
-  #          requires:
-  #            - hold_install_on_prod
+      - hold_install_on_test:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-test:
+          requires:
+            - hold_install_on_test
+
+      - hold_install_on_uat:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-uat:
+          requires:
+            - hold_install_on_uat
+
+      - hold_install_on_staging:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-staging:
+          requires:
+            - hold_install_on_staging
+
+      - hold_install_on_prod:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-prod:
+          requires:
+            - hold_install_on_prod
 
   build-deploy-branch:
     jobs:
@@ -269,29 +269,30 @@ workflows:
       - deploy-dev:
           requires:
             - hold_install_on_dev
-#      - hold_install_on_test:
-#          type: approval
-#          requires:
-#            - build_and_push_image
-#
-#      - deploy-test:
-#          requires:
-#            - hold_install_on_test
-#
-#      - hold_install_on_uat:
-#          type: approval
-#          requires:
-#            - build_and_push_image
-#
-#      - deploy-uat:
-#          requires:
-#            - hold_install_on_uat
-#
-#      - hold_install_on_staging:
-#          type: approval
-#          requires:
-#            - build_and_push_image
-#
-#      - deploy-staging:
-#          requires:
-#            - hold_install_on_staging
+
+      - hold_install_on_test:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-test:
+          requires:
+            - hold_install_on_test
+
+      - hold_install_on_uat:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-uat:
+          requires:
+            - hold_install_on_uat
+
+      - hold_install_on_staging:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-staging:
+          requires:
+            - hold_install_on_staging
