@@ -1,15 +1,15 @@
 # laa-crown-court-contribution
+
 This is a Java based Spring Boot application hosted on [MOJ Cloud Platform](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/concepts/about-the-cloud-platform.html).
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/ministryofjustice/laa-crown-court-contribution/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/ministryofjustice/laa-crown-court-contribution/tree/main)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-
 ## Contents
 
 - [Getting started](#getting-started)
-    - [Developer setup](#developer-setup)
-    - [Decrypting docker-compose.override.yml](#decrypting-docker-composeoverrideyml)
+  - [Developer setup](#developer-setup)
+  - [Decrypting docker-compose.override.yml](#decrypting-docker-composeoverrideyml)
 - [Running locally](#running-locally)
 - [Database](#database)
 - [CI/CD](#cicd)
