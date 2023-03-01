@@ -9,7 +9,6 @@ management:
       exposure:
         include: health,info,metrics,prometheus
 
-
 spring:
   datasource:
     url: jdbc:postgresql://${DATASOURCE_HOST_PORT}/${DATASOURCE_DBNAME}
