@@ -1,13 +1,15 @@
 # laa-crown-court-contribution
+
 This is a Java based Spring Boot application hosted on [MOJ Cloud Platform](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/concepts/about-the-cloud-platform.html).
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/ministryofjustice/laa-crown-court-contribution/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/ministryofjustice/laa-crown-court-contribution/tree/main)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Contents
 
 - [Getting started](#getting-started)
-    - [Developer setup](#developer-setup)
-    - [Decrypting docker-compose.override.yml](#decrypting-docker-composeoverrideyml)
+  - [Developer setup](#developer-setup)
+  - [Decrypting docker-compose.override.yml](#decrypting-docker-composeoverrideyml)
 - [Running locally](#running-locally)
 - [Database](#database)
 - [CI/CD](#cicd)
@@ -48,9 +50,9 @@ Once this has been merged you can decrypt your local copy of the repository by r
 Clone Repository
 
 ```sh
-git clone git@github.com:ministryofjustice/laa-crime-means-assessment.git
+git clone git@github.com:ministryofjustice/laa-crown-court-contribution.git
 
-cd crime-means-assessment
+cd crown-court-contribution
 ```
 
 The project is build using [Gradle](https://gradle.org/). This also includes plugins for generating IntelliJ configuration.
@@ -74,7 +76,7 @@ docker-compose build
 docker-compose up
 ```
 
-laa-crime-means-assessment application will be running on http://localhost:8080
+laa-crown-court-contribution application will be running on http://localhost:8080
 
 ## Database
 
@@ -85,7 +87,7 @@ All CRUD operations in the MAATDB are run via the [MAAT-API](https://github.com/
 
 ## CI/CD
 
-We have configured a CircleCI code pipelines. You can [log in](https://app.circleci.com/pipelines/github/ministryofjustice/laa-crime-means-assessment) from here to access the pipeline.
+We have configured a CircleCI code pipelines. You can [log in](https://app.circleci.com/pipelines/github/ministryofjustice/laa-crown-court-contribution) from here to access the pipeline.
 
 To make any changes,create a branch and submit the PR. Once the PR is submitted the branch deployment is kicked off under the new branch name.
 On successful build, the image is pushed to AWS ECR and requires approval to deploy to dev.
