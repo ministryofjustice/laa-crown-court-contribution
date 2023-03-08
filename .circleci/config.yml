@@ -86,7 +86,7 @@ commands:
 # JOBS
 # ------------------
 jobs:
-  build:
+  build_and_scan_app:
     executor: build-executor
     steps:
       - checkout:
@@ -212,7 +212,7 @@ workflows:
 
   build-deploy-master:
     jobs:
-      - build:
+      - build_and_scan_app:
           filters:
             branches:
               only:
@@ -220,20 +220,24 @@ workflows:
 
       - test_and_assemble:
           requires:
-            - build
+            - build_and_scan_app
 
       - build_and_push_image:
           requires:
             - test_and_assemble
 
-      - deploy-dev:
+      - scan_image:
           requires:
             - build_and_push_image
+
+      - deploy-dev:
+          requires:
+            - scan_image
 
       - hold_install_on_test:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-test:
           requires:
@@ -242,7 +246,7 @@ workflows:
       - hold_install_on_uat:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-uat:
           requires:
@@ -251,7 +255,7 @@ workflows:
       - hold_install_on_staging:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-staging:
           requires:
@@ -260,7 +264,7 @@ workflows:
       - hold_install_on_prod:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-prod:
           requires:
@@ -268,7 +272,7 @@ workflows:
 
   build-deploy-branch:
     jobs:
-      - build:
+      - build_and_scan_app:
           filters:
             branches:
               ignore:
@@ -276,11 +280,15 @@ workflows:
 
       - test_and_assemble:
           requires:
-            - build
+            - build_and_scan_app
 
       - build_and_push_image:
           requires:
             - test_and_assemble
+
+      - scan_image:
+          requires:
+            - build_and_push_image
 
       - hold_install_on_dev:
           type: approval
@@ -294,7 +302,7 @@ workflows:
       - hold_install_on_test:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-test:
           requires:
@@ -303,7 +311,7 @@ workflows:
       - hold_install_on_uat:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-uat:
           requires:
@@ -312,7 +320,7 @@ workflows:
       - hold_install_on_staging:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-staging:
           requires:
