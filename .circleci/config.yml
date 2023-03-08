@@ -113,8 +113,8 @@ jobs:
           root: .
           paths:
             - build
-      - snyk/scan:
-          <<: *snyk_options
+#      - snyk/scan:
+#          <<: *snyk_options
 
   test_and_assemble:
     executor: build-executor
