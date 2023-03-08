@@ -1,5 +1,17 @@
 version: 2.1
 
+orbs:
+  snyk: snyk/snyk@1.4.0
+
+_snyk_options: &snyk_options
+  project: "${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}"
+  organization: "legal-aid-agency"
+  severity-threshold: "high"
+  fail-on-issues: false
+  monitor-on-build: false
+  token-variable: SNYK_TOKEN
+  additional-arguments: --policy-path=.snyk
+
 # ------------------
 # EXECUTORS
 # ------------------
@@ -101,6 +113,8 @@ jobs:
           root: .
           paths:
             - build
+      - snyk/scan:
+          <<: *snyk_options
 
   test_and_assemble:
     executor: build-executor
@@ -147,6 +161,13 @@ jobs:
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_ACCOUNT_URL
             docker tag app "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
             docker push "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
+
+  scan_image:
+    executor: build-executor
+    steps:
+      - snyk/scan:
+          docker-image-name: "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
+          <<: *snyk_options
 
   deploy-dev:
     executor: cloud-platform-executor
@@ -264,7 +285,7 @@ workflows:
       - hold_install_on_dev:
           type: approval
           requires:
-            - build_and_push_image
+            - scan_image
 
       - deploy-dev:
           requires:
