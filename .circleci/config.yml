@@ -313,14 +313,22 @@ workflows:
           requires:
             - build
 
-      - build_and_push_image:
+      - build_image:
           requires:
             - test_and_assemble
+
+      - scan_image:
+          requires:
+            - build_image
+
+      - push_image:
+          requires:
+            - scan_image
 
       - hold_install_on_dev:
           type: approval
           requires:
-            - build_and_push_image
+            - push_image
 
       - deploy-dev:
           requires:
