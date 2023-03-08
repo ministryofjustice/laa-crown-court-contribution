@@ -164,6 +164,7 @@ jobs:
   scan_image:
     executor: build-executor
     steps:
+      - checkout_and_attach
       - snyk/scan:
           docker-image-name: "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
           <<: *snyk_options
