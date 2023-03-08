@@ -161,7 +161,7 @@ jobs:
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_ACCOUNT_URL
             docker tag app "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
             docker push "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
-            - snyk/scan:
+      - snyk/scan:
           docker-image-name: "$AWS_ECR_ACCOUNT_URL/crime-apps/laa-crime-means-assessment-dev-ecr:${CIRCLE_SHA1}"
           <<: *snyk_options
 
