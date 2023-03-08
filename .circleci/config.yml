@@ -155,22 +155,15 @@ jobs:
             --build-arg APP_BRANCH=${CIRCLE_BRANCH} \
             --build-arg BUILD_DATE=$(date +%Y-%m-%dT%H:%M:%S%z) \
             -t app .
-#      - snyk/scan:
-#          docker-image-name: app
-#          <<: *snyk_options
+      - snyk/scan:
+          docker-image-name: app
+          <<: *snyk_options
       - run:
           name: Push to ecr
           command: |
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_ACCOUNT_URL
             docker tag app "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
             docker push "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
-
-  scan_image:
-    executor: build-executor
-    steps:
-      - checkout_and_attach
-      - snyk/scan:
-          <<: *snyk_options
 
   deploy-dev:
     executor: cloud-platform-executor
@@ -284,10 +277,6 @@ workflows:
       - build_and_push_image:
           requires:
             - test_and_assemble
-
-      - scan_image:
-          requires:
-            - build_and_push_image
 
       - hold_install_on_dev:
           type: approval
