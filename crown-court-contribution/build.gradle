@@ -13,17 +13,37 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
 }
+def versions = [
+		sentryVersion                      : '6.15.0',
+		lombokVersion                      : '1.18.24'
+]
+
+dependencyManagement {
+	dependencies {
+		dependencySet(group: 'io.sentry', version: versions.sentryVersion) {
+			entry 'sentry-spring-boot-starter'
+			entry 'sentry-logback'
+			entry 'sentry-spring-boot-starter-jakarta'
+		}
+	}
+}
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
 	implementation 'org.postgresql:postgresql'
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+jacoco {
+	toolVersion = "0.8.8"
 }
 
 test {
