@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum CorrespondenceTypes {
 
     CONTRIBUTION_NOTICE("CONTRIBUTION_NOTICE", "Contribution Notice", "Rhybudd Cyfrannu"),
-    INCOME_EVIDENCE_1("INCOME_EVIDENCE_1", "Income Evidence Request", "Cais am dystiolaeth o Incwm"),
+    INCOME_EVIDENCE_1("INCOME EVIDENCE 1", "Income Evidence Request", "Cais am dystiolaeth o Incwm"),
     INCOME_EVIDENCE_2("INCOME EVIDENCE 2", "Income Evidence Reminder", "Tystiolaeth o Incwm -  Llythyr Atgoffa"),
     CAPITAL_EVIDENCE("CAPITAL EVIDENCE", "Capital Evidence Request", "Cais am dystiolaeth o Gyfalaf"),
     INCOME_SANCTION("INCOME_SANCTION", "Income Sanction letter", "Sancsiwn Incwm"),
