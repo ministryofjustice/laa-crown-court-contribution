@@ -15,7 +15,8 @@ java {
 }
 def versions = [
 		sentryVersion                      : '6.15.0',
-		lombokVersion                      : '1.18.24'
+		lombokVersion                      : '1.18.24',
+		commonsLang3Version                : '3.10'
 ]
 
 dependencyManagement {
@@ -36,6 +37,8 @@ dependencies {
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
 	implementation 'org.postgresql:postgresql'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: versions.commonsLang3Version
+
 	compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
 	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
 
