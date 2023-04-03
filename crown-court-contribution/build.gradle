@@ -1,112 +1,106 @@
 plugins {
-	id 'java'
-	id 'jacoco'
-	id 'org.springframework.boot' version '3.0.5'
-	id 'io.spring.dependency-management' version '1.1.0'
-	id "org.sonarqube" version "4.0.0.2929"
-	id 'info.solidsoft.pitest' version '1.9.11'
+    id 'java'
+    id 'jacoco'
+    id 'org.springframework.boot' version '3.0.5'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "org.sonarqube" version "4.0.0.2929"
+    id 'info.solidsoft.pitest' version '1.9.11'
 }
 
 group = 'uk.gov.justice.laa.crime'
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 def versions = [
-		sentryVersion                      : '6.15.0',
-		lombokVersion                      : '1.18.24',
-		commonsLang3Version                : '3.10'
+        sentryVersion      : '6.15.0',
+        lombokVersion      : '1.18.24',
+        commonsLang3Version: '3.10'
 ]
 
 dependencyManagement {
-	dependencies {
-		dependencySet(group: 'io.sentry', version: versions.sentryVersion) {
-			entry 'sentry-spring-boot-starter'
-			entry 'sentry-logback'
-			entry 'sentry-spring-boot-starter-jakarta'
-		}
-	}
+    dependencies {
+        dependencySet(group: 'io.sentry', version: versions.sentryVersion) {
+            entry 'sentry-spring-boot-starter'
+            entry 'sentry-logback'
+            entry 'sentry-spring-boot-starter-jakarta'
+        }
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-	implementation 'org.postgresql:postgresql'
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: versions.commonsLang3Version
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    implementation 'org.postgresql:postgresql'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: versions.commonsLang3Version
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
-
-	implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
-	implementation group: 'org.springframework', name: 'spring-jms'
-
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
-	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
-
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
+    implementation group: 'org.springframework', name: 'spring-jms'
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 jacoco {
-	toolVersion = "0.8.8"
+    toolVersion = "0.8.8"
 }
 
 test {
-	useJUnitPlatform()
-	finalizedBy jacocoTestReport
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
-	dependsOn test
-	reports {
-		xml.required = true
-		html.required = true
-	}
-	afterEvaluate {
-		classDirectories.setFrom(files(classDirectories.files.collect {
-			fileTree(dir: it, exclude: [
-							'**/entity/**',
-							'**/dto/**',
-							'**/config/**'
-					])
-		}))
-	}
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/entity/**',
+                    '**/dto/**',
+                    '**/config/**'
+            ])
+        }))
+    }
 }
 
 pitest {
-	targetClasses = ['uk.gov.justice.laa.crime.contribution.*','uk.gov.justice.laa.crime.contribution.controller.*','uk.gov.justice.laa.crime.contribution.validation.*']
-	excludedClasses = ['uk.gov.justice.laa.crime.contribution.dto.*', 'uk.gov.justice.laa.crime.contribution.mapper.*', 'uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication']
-	threads = 5
-	outputFormats = ['XML', 'HTML']
-	timestampedReports = false
-	mutationThreshold = 60
+    targetClasses = ['uk.gov.justice.laa.crime.contribution.*', 'uk.gov.justice.laa.crime.contribution.controller.*', 'uk.gov.justice.laa.crime.contribution.validation.*']
+    excludedClasses = ['uk.gov.justice.laa.crime.contribution.dto.*', 'uk.gov.justice.laa.crime.contribution.mapper.*', 'uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication']
+    threads = 5
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
+    mutationThreshold = 60
 }
 
 tasks['sonarqube'].dependsOn test
 
 sonarqube {
-	properties {
-		property "sonar.exclusions", "**/entity/**.java , **/model/**.java , **/dto/**.java , **/config/**.java, **/jms/**.java,**/exception/**.java,**/handler/**.java"
-		property "sonar.coverage.exclusions", "**/CrownCourtContributionApplication.java"
-		property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-		property "sonar.projectKey", "ministryofjustice_laa-crown-court-contribution"
-		property "sonar.organization", "ministryofjustice"
-		property "sonar.host.url", "https://sonarcloud.io"
-		property "sonar.projectName", "Crime Apps :: crown-court-contribution"
-		property "sonar.pitest.mode", "reuseReport"
-		property "sonar.pitest.reportsDirectory", "build/reports/pitest"
-	}
+    properties {
+        property "sonar.exclusions", "**/entity/**.java , **/model/**.java , **/dto/**.java , **/config/**.java, **/jms/**.java,**/exception/**.java,**/handler/**.java"
+        property "sonar.coverage.exclusions", "**/CrownCourtContributionApplication.java"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.projectKey", "ministryofjustice_laa-crown-court-contribution"
+        property "sonar.organization", "ministryofjustice"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.projectName", "Crime Apps :: crown-court-contribution"
+        property "sonar.pitest.mode", "reuseReport"
+        property "sonar.pitest.reportsDirectory", "build/reports/pitest"
+    }
 }
