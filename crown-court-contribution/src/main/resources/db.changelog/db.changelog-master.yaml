@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changeset/01-crown-court-contribution-create-schema.sql
+  - include:
+      file: db/changelog/changeset/02-contribution-rules-insert.sql
