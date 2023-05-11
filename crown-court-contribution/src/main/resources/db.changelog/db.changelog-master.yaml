@@ -3,3 +3,7 @@ databaseChangeLog:
       file: db/changelog/changeset/01-crown-court-contribution-create-schema.sql
   - include:
       file: db/changelog/changeset/02-contribution-rules-insert.sql
+  - include:
+      file: db/changelog/changeset/03-correspondence-rules-table-create.sql
+  - include:
+      file: db/changelog/changeset/04-correspondence-rules-table-data-insert.sql
