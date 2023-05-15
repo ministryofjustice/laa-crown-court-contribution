@@ -19,7 +19,7 @@
     }
   },
   "extends": {
-    "$ref": "BaseContributionRequest.json"
+    "$ref": "ContributionRequest.json"
   },
   "additionalProperties": false,
   "required": ["repId", "applId", "userCreated"]
