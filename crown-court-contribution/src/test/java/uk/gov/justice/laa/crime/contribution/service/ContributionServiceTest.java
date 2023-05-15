@@ -68,7 +68,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAFailContinuePassportResultAndPassInitResult_whenGetAssessmentResultIsInvoked_thenReturnPass() {
+    void givenAFailContinuePassportResult_whenGetAssessmentResultIsInvoked_thenReturnPass() {
         AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
         request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
         AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
@@ -86,7 +86,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAFailContinuePassportAndPassHardShip_whenGetAssessmentResultIsInvoked_thenReturnPass() {
+    void givenAFailContinuePassportAndHardShipIsFail_whenGetAssessmentResultIsInvoked_thenReturnPass() {
         AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
         request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
         request.setInitResult(Constants.FAIL);
@@ -96,18 +96,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAFailContinuePassportAndInitResultIsPass_whenGetAssessmentResultIsInvoked_thenReturnFail() {
-        AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
-        request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
-        request.setInitResult(Constants.INIT);
-        request.setFullResult(Constants.FAIL);
-        request.setHardshipResult(Constants.FAIL);
-        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-        assertThat(response.getMeansResult()).isNull();
-    }
-
-    @Test
-    void givenAFailContinuePassportAndFailResult_whenGetAssessmentResultIsInvoked_thenReturnFail() {
+    void givenAFailContinuePassportAndAssessmentResultIsFail_whenGetAssessmentResultIsInvoked_thenReturnFail() {
         AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
         request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
         request.setInitResult(Constants.FAIL);
@@ -118,7 +107,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAFailContinuePassportAndEmptyHardship_whenGetAssessmentResultIsInvoked_thenReturnFail() {
+    void givenAFailContinuePassportAndHardshipIsEmpty_whenGetAssessmentResultIsInvoked_thenReturnFail() {
         AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
         request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
         request.setInitResult(Constants.FAIL);
@@ -129,7 +118,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAFailContinuePassportAndFullInitResult_whenGetAssessmentResultIsInvoked_thenReturnFail() {
+    void givenAFailContinuePassportAndInitResultIsFull_whenGetAssessmentResultIsInvoked_thenReturnFail() {
         AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
         request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
         request.setInitResult(Constants.FULL);
@@ -151,7 +140,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAInitResultIsHardshipAndFailResult_whenGetAssessmentResultIsInvoked_thenReturnFail() {
+    void givenAInitResultIsHardshipAndAssessmentResultIsFail_whenGetAssessmentResultIsInvoked_thenReturnFail() {
         AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
         request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
         request.setInitResult(Constants.HARDSHIP_APPLICATION);
@@ -181,6 +170,17 @@ class ContributionServiceTest {
         request.setHardshipResult(null);
         AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
         assertThat(response.getMeansResult()).isEqualTo(Constants.FAIL);
+    }
+
+    @Test
+    void givenAFailContinuePassportAndInitResultIsPass_whenGetAssessmentResultIsInvoked_thenReturnFail() {
+        AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
+        request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
+        request.setInitResult(Constants.INIT);
+        request.setFullResult(Constants.FAIL);
+        request.setHardshipResult(Constants.FAIL);
+        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
+        assertThat(response.getMeansResult()).isNull();
     }
 
     @Test
