@@ -3,7 +3,7 @@ server:
 
 management:
   server:
-    port: 8098
+    port: 8096
   endpoints:
     web:
       exposure:
