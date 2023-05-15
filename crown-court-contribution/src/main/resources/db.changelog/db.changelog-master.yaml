@@ -2,8 +2,14 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/01-crown-court-contribution-create-schema.sql
   - include:
-      file: db/changelog/changeset/02-contribution-rules-insert.sql
+      file: db/changelog/changeset/02-correspondence-templates-table-create.sql
   - include:
-      file: db/changelog/changeset/03-correspondence-rules-table-create.sql
+      file: db/changelog/changeset/03-correspondence-templates-table-data-insert.sql
   - include:
-      file: db/changelog/changeset/04-correspondence-rules-table-data-insert.sql
+      file: db/changelog/changeset/04-correspondence-rules-table-create.sql
+  - include:
+      file: db/changelog/changeset/05-correspondence-rules-table-data-insert.sql
+  - include:
+      file: db/changelog/changeset/06-contribution-rules-table-create.sql
+  - include:
+      file: db/changelog/changeset/07-contribution-rules-insert.sql
