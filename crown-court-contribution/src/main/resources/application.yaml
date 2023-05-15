@@ -42,7 +42,6 @@ services:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
       find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
 
-
 sentry:
   dsn: ${SENTRY_DSN}
   environment: ${SENTRY_ENV}

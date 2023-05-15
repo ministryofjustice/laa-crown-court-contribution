@@ -41,7 +41,7 @@
     },
     "transferStatus": {
       "type": "string",
-      "enum" : ["ERRATA", "QUARANTINE", "REQUESTED", "SENT", "MANUAL", "RECEIVED"],
+      "enum": ["ERRATA", "QUARANTINE", "REQUESTED", "SENT", "MANUAL", "RECEIVED"],
       "description": "The transfer status of the contribution record"
     },
     "dateUpliftApplied": {
