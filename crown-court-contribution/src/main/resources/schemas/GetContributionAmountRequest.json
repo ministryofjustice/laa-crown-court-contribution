@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "GetContributionAmountRequest.json",
+  "type": "object",
+  "title": "Get Contribution Appeal Amount Request",
+  "description": "Data contract for updating contribution records via the Court Data API",
+  "properties": {
+    "caseType": {
+      "type": "string",
+      "description": "The case type"
+    },
+    "appealType": {
+      "type": "string",
+      "description": "The appeal type"
+    },
+    "outcome": {
+      "type": "string",
+      "description": "The appeal outcome"
+    },
+    "assessmentResult": {
+      "type": "string",
+      "description": "The associated assessment result"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["caseType", "appealType", "outcome", "assessmentResult"]
+}
