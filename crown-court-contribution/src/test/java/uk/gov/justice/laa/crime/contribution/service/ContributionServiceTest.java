@@ -162,6 +162,17 @@ class ContributionServiceTest {
     }
 
     @Test
+    void givenAInitResultIsHardshipApplicationAndHardshipResultIsInit_whenGetAssessmentResultIsInvoked_thenNullIsReturn() {
+        AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
+        request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
+        request.setInitResult(Constants.HARDSHIP_APPLICATION);
+        request.setFullResult(Constants.FAIL);
+        request.setHardshipResult(Constants.INIT);
+        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
+        assertThat(response.getMeansResult()).isNull();
+    }
+
+    @Test
     void givenAInitResultIsHardshipAndEmptyHardshipResult_whenGetAssessmentResultIsInvoked_thenReturnFail() {
         AssessmentRequestDTO request = TestModelDataBuilder.getAssessmentRequestDTO();
         request.setPassportResult(TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE);
