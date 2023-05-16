@@ -34,12 +34,16 @@ class ContributionServiceTest {
                         Constants.PASS, Constants.FULL, Constants.PASS), Constants.FULL),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, null, null,
                         Constants.PASS, null, Constants.PASS), Constants.INIT.concat(Constants.PASS)),
+                Arguments.of(new AssessmentRequestDTO(Constants.PASS, null, null,
+                        null, null, Constants.PASS), Constants.NONE),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, Constants.PASS,
                         Constants.PASS, Constants.FULL, Constants.PASS), Constants.PASSPORT),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, Constants.FAIL,
                         Constants.PASS, Constants.FULL, Constants.PASS), Constants.FAILPORT),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        Constants.FAIL, Constants.FULL, Constants.PASS), Constants.PASS),
+                        Constants.PASS, Constants.PASS, Constants.PASS), Constants.PASS),
+                Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                        Constants.FAIL, Constants.PASS, Constants.PASS), Constants.PASS),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
                         Constants.FAIL, Constants.FAIL, Constants.PASS), Constants.PASS),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
@@ -49,7 +53,9 @@ class ContributionServiceTest {
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
                         Constants.FULL, Constants.FAIL, Constants.FAIL), Constants.FAIL),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        Constants.FULL, Constants.FAIL, Constants.FAIL), Constants.FAIL),
+                        Constants.FULL, Constants.FAIL, null), Constants.FAIL),
+                Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                        Constants.HARDSHIP_APPLICATION, Constants.FAIL, Constants.FAIL), Constants.FAIL),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
                         Constants.HARDSHIP_APPLICATION, Constants.FAIL, null), Constants.FAIL)
 
@@ -58,13 +64,17 @@ class ContributionServiceTest {
 
     private static Stream<Arguments> getAssessmentRequestForNullMeansResult() {
         return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        Constants.INIT, Constants.FAIL, Constants.FAIL), Constants.FAIL),
-                Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        Constants.INIT, Constants.INIT, Constants.INIT)),
-                Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        Constants.INIT, Constants.INIT, null))
-        );
+               
+
+                        Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                                Constants.INIT, Constants.FAIL, Constants.FAIL)),
+                        Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                                Constants.HARDSHIP_APPLICATION, Constants.FAIL, Constants.TEMP)),
+                        Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                                Constants.INIT, Constants.INIT, Constants.INIT)),
+                        Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                                Constants.INIT, Constants.INIT, null))
+                );
     }
 
     @ParameterizedTest()
