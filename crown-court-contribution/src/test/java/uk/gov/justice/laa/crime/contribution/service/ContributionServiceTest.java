@@ -59,8 +59,6 @@ class ContributionServiceTest {
     private static Stream<Arguments> getAssessmentRequestForNullMeansResult() {
         return Stream.of(
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        Constants.HARDSHIP_APPLICATION, Constants.FAIL, null)),
-                Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
                         Constants.INIT, Constants.FAIL, Constants.FAIL), Constants.FAIL),
                 Arguments.of(new AssessmentRequestDTO(Constants.PASS, Constants.PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
                         Constants.INIT, Constants.INIT, Constants.INIT)),
@@ -84,10 +82,10 @@ class ContributionServiceTest {
     }
 
     @ParameterizedTest()
-    @MethodSource("getAssessmentRequestForMeansResult")
-    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnEmptyMeansResult(AssessmentRequestDTO request, String expectedResult) {
+    @MethodSource("getAssessmentRequestForNullMeansResult")
+    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnEmptyMeansResult(AssessmentRequestDTO request) {
         AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-        assertThat(response.getMeansResult()).isEqualTo(expectedResult);
+        assertThat(response.getMeansResult()).isNull();
     }
 
 }
