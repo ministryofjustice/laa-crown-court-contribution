@@ -12,12 +12,12 @@ public class TestModelDataBuilder {
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
 
         return AssessmentRequestDTO.builder()
-                .passportResult(Constants.PASS)
+                .iojResult(Constants.PASS)
                 .decisionResult(Constants.PASS)
-                .hardshipResult(Constants.PASS)
+                .passportResult(Constants.PASS)
                 .initResult(Constants.PASS)
                 .fullResult(Constants.FULL)
-                .iojResult(Constants.PASS)
+                .hardshipResult(Constants.PASS)
                 .build();
     }
 }
