@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContributionDTO {
+public class Contribution {
 
     private Integer id;
     private Integer applId;

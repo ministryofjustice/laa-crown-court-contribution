@@ -50,10 +50,11 @@ public class ServicesConfiguration {
         public static class CorrespondenceStateEndpoints {
 
             @NotNull
-            private String findUrl;
+            private String baseUrl;
 
             @NotNull
-            private String baseUrl;
+            private String findUrl;
+
         }
     }
 }

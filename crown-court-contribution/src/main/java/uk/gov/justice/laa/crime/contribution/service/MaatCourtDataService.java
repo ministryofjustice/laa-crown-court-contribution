@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.contribution.model.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.contribution.model.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -25,9 +22,9 @@ public class MaatCourtDataService {
     private final ServicesConfiguration configuration;
     private static final String RESPONSE_STRING = "Response from Court Data API: {}";
 
-    public ContributionDTO findContribution(Integer repId, String laaTransactionId) {
-        ContributionDTO response = maatAPIClient.get(
-                ContributionDTO.class,
+    public Contribution findContribution(Integer repId, String laaTransactionId) {
+        Contribution response = maatAPIClient.get(
+                Contribution.class,
                 configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 repId
@@ -36,10 +33,10 @@ public class MaatCourtDataService {
         return response;
     }
 
-    public ContributionDTO createContribution(CreateContributionRequest request, String laaTransactionId) {
-        ContributionDTO response = maatAPIClient.post(
+    public Contribution createContribution(CreateContributionRequest request, String laaTransactionId) {
+        Contribution response = maatAPIClient.post(
                 request,
-                ContributionDTO.class,
+                Contribution.class,
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
@@ -47,10 +44,10 @@ public class MaatCourtDataService {
         return response;
     }
 
-    public ContributionDTO updateContribution(UpdateContributionRequest request, String laaTransactionId) {
-        ContributionDTO response = maatAPIClient.put(
+    public Contribution updateContribution(UpdateContributionRequest request, String laaTransactionId) {
+        Contribution response = maatAPIClient.put(
                 request,
-                ContributionDTO.class,
+                Contribution.class,
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
@@ -64,6 +61,39 @@ public class MaatCourtDataService {
                 configuration.getMaatApi().getContributionEndpoints().getGetAppealAmountUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                request.getCaseType(), request.getAppealType(), request.getOutcome(), request.getAssessmentResult()
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
+    public CorrespondenceState findCorrespondenceState(Integer repId, String laaTransactionId) {
+        CorrespondenceState response = maatAPIClient.get(
+                CorrespondenceState.class,
+                configuration.getMaatApi().getCorrespondenceStateEndpoints().getFindUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
+    public CorrespondenceState createCorrespondenceState(CorrespondenceState state, String laaTransactionId) {
+        CorrespondenceState response = maatAPIClient.post(
+                state,
+                CorrespondenceState.class,
+                configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
+    public CorrespondenceState updateCorrespondenceState(CorrespondenceState state, String laaTransactionId) {
+        CorrespondenceState response = maatAPIClient.put(
+                state,
+                CorrespondenceState.class,
+                configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
         log.info(RESPONSE_STRING, response);
         return response;
