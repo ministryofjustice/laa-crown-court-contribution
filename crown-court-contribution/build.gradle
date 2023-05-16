@@ -49,7 +49,8 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
     implementation group: 'org.springframework', name: 'spring-jms'
-	compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
+    implementation "org.liquibase:liquibase-core"
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombokVersion
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
