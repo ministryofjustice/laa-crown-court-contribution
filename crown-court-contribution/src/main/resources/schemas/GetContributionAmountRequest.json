@@ -6,20 +6,24 @@
   "description": "Data contract for updating contribution records via the Court Data API",
   "properties": {
     "caseType": {
-      "type": "string",
-      "description": "The case type"
+      "type": "object",
+      "description": "The case type",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType"
     },
     "appealType": {
       "type": "string",
-      "description": "The appeal type"
+      "description": "The appeal type",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType"
     },
     "outcome": {
-      "type": "string",
-      "description": "The appeal outcome"
+      "type": "object",
+      "description": "The appeal outcome",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome"
     },
     "assessmentResult": {
-      "type": "string",
-      "description": "The associated assessment result"
+      "type": "object",
+      "description": "The associated assessment result",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealAssessmentResult"
     }
   },
   "additionalProperties": false,

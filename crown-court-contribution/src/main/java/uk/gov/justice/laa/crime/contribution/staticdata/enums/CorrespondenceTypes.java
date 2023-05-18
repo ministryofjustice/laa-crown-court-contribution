@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
 public enum CorrespondenceTypes {
 
     CONTRIBUTION_NOTICE("CONTRIBUTION_NOTICE", "Contribution Notice", "Rhybudd Cyfrannu"),
@@ -32,5 +32,4 @@ public enum CorrespondenceTypes {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Correspondence Types with value: %s does not exist.", code)));
     }
-
 }

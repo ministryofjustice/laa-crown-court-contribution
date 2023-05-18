@@ -60,7 +60,7 @@ public class MaatCourtDataService {
                 BigDecimal.class,
                 configuration.getMaatApi().getContributionEndpoints().getGetAppealAmountUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
-               request.getCaseType(), request.getAppealType(), request.getOutcome(), request.getAssessmentResult()
+                request.getCaseType(), request.getAppealType(), request.getOutcome(), request.getAssessmentResult()
         );
         log.info(RESPONSE_STRING, response);
         return response;

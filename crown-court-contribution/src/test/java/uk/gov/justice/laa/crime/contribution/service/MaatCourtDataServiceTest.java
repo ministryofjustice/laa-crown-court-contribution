@@ -10,6 +10,10 @@ import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealAssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
 
 import java.math.BigDecimal;
 
@@ -58,13 +62,21 @@ class MaatCourtDataServiceTest {
     @Test
     void givenValidParams_whenGetContributionAppealAmountIsInvoked_thenResponseIsReturned() {
         GetContributionAmountRequest expected = new GetContributionAmountRequest()
-                .withCaseType("APPEAL CC")
-                .withAppealType("ACN")
-                .withOutcome("SUCCESSFUL")
-                .withAssessmentResult("PASS");
+                .withCaseType(CaseType.APPEAL_CC)
+                .withAppealType(AppealType.ACN)
+                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
+                .withAssessmentResult(AppealAssessmentResult.PASS);
+
         maatCourtDataService.getContributionAppealAmount(expected, LAA_TRANSACTION_ID);
+
         verify(maatCourtDataClient).get(
-                eq(BigDecimal.class), anyString(), anyMap(), anyString(), anyString(), anyString(), anyString()
+                eq(BigDecimal.class),
+                anyString(),
+                anyMap(),
+                any(CaseType.class),
+                any(AppealType.class),
+                any(CrownCourtAppealOutcome.class),
+                any(AppealAssessmentResult.class)
         );
     }
 
