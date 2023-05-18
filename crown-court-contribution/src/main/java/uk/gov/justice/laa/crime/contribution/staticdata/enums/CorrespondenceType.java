@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @Getter
 @AllArgsConstructor
-public enum CorrespondenceTypes {
+public enum CorrespondenceType {
 
     CONTRIBUTION_NOTICE("CONTRIBUTION_NOTICE", "Contribution Notice", "Rhybudd Cyfrannu"),
     INCOME_EVIDENCE_1("INCOME EVIDENCE 1", "Income Evidence Request", "Cais am dystiolaeth o Incwm"),
@@ -24,11 +24,11 @@ public enum CorrespondenceTypes {
     private final String description;
     private final String welshDescription;
 
-    public static CorrespondenceTypes getFrom(String code) {
+    public static CorrespondenceType getFrom(String code) {
         if (StringUtils.isBlank(code)) return null;
 
-        return Stream.of(CorrespondenceTypes.values())
-                .filter(correspondenceTypes -> correspondenceTypes.code.equals(code))
+        return Stream.of(CorrespondenceType.values())
+                .filter(correspondenceType -> correspondenceType.code.equals(code))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Correspondence Types with value: %s does not exist.", code)));
     }
