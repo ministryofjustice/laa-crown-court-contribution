@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "AppealContributionResponse.json",
+  "type": "object",
+  "title": "Appeal Contribution Response",
+  "description": "Response data following calculation of appeal contributions",
+  "properties": {
+
+  },
+  "additionalPropeties": false,
+  "required": []
+}
