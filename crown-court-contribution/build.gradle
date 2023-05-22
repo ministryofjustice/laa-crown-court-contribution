@@ -29,6 +29,7 @@ repositories {
 }
 
 dependencies {
+
     implementation platform("io.sentry:sentry-bom:$versions.sentryVersion")
     implementation platform(SpringBootPlugin.BOM_COORDINATES)
     annotationProcessor platform(SpringBootPlugin.BOM_COORDINATES)
@@ -61,6 +62,7 @@ dependencies {
     testImplementation "org.pitest:pitest:$versions.pitest"
     testImplementation "com.squareup.okhttp3:okhttp:$versions.okhttpVersion"
     testImplementation "com.squareup.okhttp3:mockwebserver:$versions.mockwebserverVersion"
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.2'
 }
 
 jacoco {
