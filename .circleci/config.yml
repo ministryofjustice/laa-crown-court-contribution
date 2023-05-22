@@ -24,34 +24,12 @@ executors:
   build-executor:
     docker:
       - image: cimg/openjdk:17.0.4
-    environment:
-      # Configure the JVM and Gradle to avoid OOM errors
-      _JAVA_OPTIONS: "-Xmx3g"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
     working_directory: ~/laa-crown-court-contribution/crown-court-contribution
 
 # ------------------
 # COMMANDS
 # ------------------
 commands:
-  checkout_and_decrypt:
-    steps:
-      - checkout
-      - run:
-          name: Decrypt secrets
-          command: |
-            echo "${GIT_CRYPT_KEY}" | base64 -d > git-crypt.key
-            git-crypt unlock git-crypt.key
-
-  checkout_and_attach:
-    steps:
-      - checkout:
-          path: ~/laa-crown-court-contribution
-      - attach_workspace:
-          at: .
-      - setup_remote_docker:
-          docker_layer_caching: true
-
   deploy-to:
     description: >
       Deploy image to the specified environment
@@ -63,7 +41,12 @@ commands:
         description: CircleCI Service account token
         type: string
     steps:
-      - checkout_and_decrypt
+      - checkout
+      - run:
+          name: Decrypt secrets
+          command: |
+            echo "${GIT_CRYPT_KEY}" | base64 -d > git-crypt.key
+            git-crypt unlock git-crypt.key
       - run:
           name: Authenticate with cluster
           command: |
@@ -86,7 +69,7 @@ commands:
 # JOBS
 # ------------------
 jobs:
-  build_and_scan_app:
+  build_and_scan:
     executor: build-executor
     steps:
       - checkout:
@@ -96,8 +79,8 @@ jobs:
       - restore_cache:
           key: v1-gradle-cache-{{ checksum "build.gradle" }}
       - run:
-          name: Install Dependencies
-          command: ./gradlew build -x test
+          name: Build
+          command: ./gradlew clean build
       - run:
           name: Run SonarQube
           command: ./gradlew sonarqube -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.organization=${SONAR_ORG}
@@ -113,39 +96,26 @@ jobs:
           root: .
           paths:
             - build
-      - snyk/scan:
-          <<: *snyk_options
-
-  test_and_assemble:
-    executor: build-executor
-    steps:
-      - checkout_and_attach
-      - restore_cache:
-          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-      - restore_cache:
-          key: v1-gradle-cache-{{ checksum "build.gradle" }}
-      - run:
-          name: Run tests
-          command: ./gradlew test
-      - run:
-          name: Generate code coverage report
-          command: ./gradlew jacocoTestReport
       - store_test_results:
           path: build/test-results/test
       - store_artifacts:
           path: build/test-results/test
       - store_artifacts:
           path: build/reports/jacoco/test/html
-      - run:
-          name: Assemble JAR
-          command: ./gradlew assemble
       - store_artifacts:
           path: build/libs
+      - snyk/scan:
+          <<: *snyk_options
 
   build_scan_and_push_image:
     executor: build-executor
     steps:
-      - checkout_and_attach
+      - checkout:
+          path: ~/laa-crown-court-contribution
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Build docker image
           command: |
@@ -164,7 +134,6 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-            which aws
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_ACCOUNT_URL
             docker push "$AWS_ECR_ACCOUNT_URL/laa-crime-apps-team/laa-crown-court-contribution-dev-ecr:${CIRCLE_SHA1}"
 
@@ -211,19 +180,15 @@ workflows:
 
   build-deploy-master:
     jobs:
-      - build_and_scan_app:
+      - build_and_scan:
           filters:
             branches:
               only:
                 - main
 
-      - test_and_assemble:
-          requires:
-            - build_and_scan_app
-
       - build_scan_and_push_image:
           requires:
-            - test_and_assemble
+            - build_and_scan
 
       - deploy-dev:
           requires:
@@ -267,19 +232,15 @@ workflows:
 
   build-deploy-branch:
     jobs:
-      - build_and_scan_app:
+      - build_and_scan:
           filters:
             branches:
               ignore:
                 - main
 
-      - test_and_assemble:
-          requires:
-            - build_and_scan_app
-
       - build_scan_and_push_image:
           requires:
-            - test_and_assemble
+            - build_and_scan
 
       - hold_install_on_dev:
           type: approval

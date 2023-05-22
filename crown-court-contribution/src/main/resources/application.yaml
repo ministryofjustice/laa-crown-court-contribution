@@ -30,6 +30,18 @@ spring:
     properties:
       hibernate.temp.use_jdbc_metadata_defaults: false
 
+services:
+  maat-api:
+    base-url: ${MAAT_API_BASE_URL}
+    assessments-domain: /api/internal/v1/assessment
+    contribution-endpoints:
+      base-url: ${services.maat-api.assessments-domain}/contributions
+      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+      get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal
+    correspondence-state-endpoints:
+      base-url: ${services.maat-api.assessments-domain}/correspondence-state
+      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+
 sentry:
   dsn: ${SENTRY_DSN}
   environment: ${SENTRY_ENV}
