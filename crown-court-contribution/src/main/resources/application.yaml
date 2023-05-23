@@ -30,6 +30,18 @@ spring:
     properties:
       hibernate.temp.use_jdbc_metadata_defaults: false
 
+  security:
+    oauth2:
+      client:
+        provider:
+          maat-api:
+            token-uri: ${MAAT_API_OAUTH_URL}
+        registration:
+          maat-api:
+            client-id: ${MAAT_API_OAUTH_CLIENT_ID}
+            client-secret: ${MAAT_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+
 services:
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
