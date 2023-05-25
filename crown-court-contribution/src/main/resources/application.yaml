@@ -54,6 +54,15 @@ services:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
       find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
 
+springdoc:
+  packagesToScan: uk.gov.justice.laa.crime.contribution
+  api-docs:
+    path: open-api/api-docs
+
+  swagger-ui:
+    path: open-api/swagger-ui.html
+    operationsSorter: method
+
 sentry:
   dsn: ${SENTRY_DSN}
   environment: ${SENTRY_ENV}
