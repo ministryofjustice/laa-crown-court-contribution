@@ -13,4 +13,5 @@ public class AssessmentResponseDTO {
 
     private String iojResult;
     private String meansResult;
+
 }
