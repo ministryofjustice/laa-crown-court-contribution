@@ -1,9 +1,11 @@
 package uk.gov.justice.laa.crime.contribution.validation;
 
+import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 
 import java.util.Optional;
 
+@Component
 public class AppealContributionValidator {
 
     public Optional<Void> validate(AppealContributionRequest appealContributionRequest) {

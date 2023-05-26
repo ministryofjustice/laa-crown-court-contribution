@@ -5,7 +5,7 @@
   "title": "Appeal Contribution Request",
   "description": "Request data for calculating contributions following an appeal",
   "properties": {
-    "applId": {
+    a: {
       "type": "integer",
       "description": "The associated application ID"
     },
