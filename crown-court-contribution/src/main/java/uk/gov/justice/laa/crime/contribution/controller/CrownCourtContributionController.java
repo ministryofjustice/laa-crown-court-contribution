@@ -18,6 +18,7 @@ import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.AppealContributionService;
+import uk.gov.justice.laa.crime.contribution.validation.AppealContributionValidator;
 
 @Slf4j
 @RestController
@@ -26,6 +27,7 @@ import uk.gov.justice.laa.crime.contribution.service.AppealContributionService;
 public class CrownCourtContributionController {
 
     private final AppealContributionService appealContributionService;
+    private final AppealContributionValidator appealContributionValidator;
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Calculate appeal contributions")
@@ -56,9 +58,9 @@ public class CrownCourtContributionController {
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = AppealContributionRequest.class)
             )
-    ) @Valid @RequestBody AppealContributionRequest requestData) {
-        // Convert request object to DTO, why???
-        // validate the received request data check my data structures with Matt first though
-        return ResponseEntity.ok(appealContributionService.calculateContribution());
+    ) @Valid @RequestBody AppealContributionRequest appealContributionRequest) {
+        log.info("Received request to calculate appeal contributions for ID {}", appealContributionRequest.getApplId());
+        appealContributionValidator.validate(appealContributionRequest);
+        return ResponseEntity.ok(appealContributionService.calculateContribution(appealContributionRequest));
     }
 }

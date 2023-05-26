@@ -5,10 +5,18 @@
   "title": "Appeal Contribution Request",
   "description": "Request data for calculating contributions following an appeal",
   "properties": {
-    "outcome": {
+    "applId": {
+      "type": "integer",
+      "description": "The associated application ID"
+    },
+    "repId": {
+      "type": "integer",
+      "description": "The representation order ID"
+    },
+    "caseType": {
       "type": "object",
-      "description": "The appeal outcome",
-      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome"
+      "description": "The case type",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType"
     },
     "appealType": {
       "type": "string",
@@ -19,71 +27,35 @@
       "type": "number",
       "description": "The monthly contribution amount"
     },
-    "passportAssessment": {
+    "userCreated": {
+      "type": "string",
+      "description": "The user creating the record"
+    },
+    "lastOutcome": {
       "type": "object",
-      "description": "Passport assessment details",
+      "description": "The most recent outcome from the courts",
       "properties": {
-        "status": {
+        "outcome": {
           "type": "object",
-          "description": "The assessment status",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus"
+          "description": "The appeal outcome",
+          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome"
         },
-        "result": {
-          "type": "object",
-          "description": "The assessment result",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult"
+        "dateSet": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date that the outcome was decided"
         }
       }
     },
-    "initialAssessment": {
-      "type": "object",
-      "description": "Initial assessment details",
-      "properties": {
-        "status": {
-          "type": "object",
-          "description": "The assessment status",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus"
-        },
-        "result": {
-          "type": "object",
-          "description": "The assessment result",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult"
-        }
-      }
-    },
-    "fullAssessment": {
-      "type": "object",
-      "description": "Full assessment details",
-      "properties": {
-        "status": {
-          "type": "object",
-          "description": "The assessment status",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus"
-        },
-        "result": {
-          "type": "object",
-          "description": "The assessment result",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult"
-        }
-      }
-    },
-    "hardshipReview": {
-      "type": "object",
-      "description": "Hardship review details",
-      "properties": {
-        "status": {
-          "type": "object",
-          "description": "The assessment status",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus"
-        },
-        "result": {
-          "type": "object",
-          "description": "The assessment result",
-          "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult"
-        }
+    "assessments": {
+      "type": "array",
+      "description": "List of assessments performed",
+      "minItems": 1,
+      "items": {
+        "$ref": "common/Assessment.json"
       }
     }
   },
   "additionalProperties": false,
-  "required": []
+  "required": ["assessments"]
 }

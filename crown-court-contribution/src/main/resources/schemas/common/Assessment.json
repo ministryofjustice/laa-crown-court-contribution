@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "assessment.json",
+  "type": "object",
+  "description": "Assessment",
+  "properties": {
+    "assessmentType": {
+      "type": "object",
+      "description": "The type of assessment",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentType"
+    },
+    "status": {
+      "type": "object",
+      "description": "The assessment status",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus"
+    },
+    "result": {
+      "type": "object",
+      "description": "The assessment result",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["assessmentType", "status", "result"]
+}
