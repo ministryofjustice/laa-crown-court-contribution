@@ -25,7 +25,7 @@ public class ResourceServerConfiguration {
     @Bean
     protected BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint() {
         BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint = new BearerTokenAuthenticationEntryPoint();
-        bearerTokenAuthenticationEntryPoint.setRealmName("Crown Court Proceedings API");
+        bearerTokenAuthenticationEntryPoint.setRealmName("Crown Court Contribution API");
         return bearerTokenAuthenticationEntryPoint;
     }
 
