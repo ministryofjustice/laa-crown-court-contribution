@@ -53,5 +53,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["applId", "repId", "caseType", "appealType", "lastOutcome","assessments"]
+  "required": ["applId", "repId", "caseType", "appealType", "lastOutcome", "assessments"]
 }
