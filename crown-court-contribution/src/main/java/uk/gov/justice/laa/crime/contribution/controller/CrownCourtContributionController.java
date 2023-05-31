@@ -40,12 +40,6 @@ public class CrownCourtContributionController {
                     schema = @Schema(implementation = ErrorDTO.class)
             )
     )
-    @ApiResponse(responseCode = "404",
-            description = "Not found",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
     @ApiResponse(responseCode = "500",
             description = "Internal server error",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,

@@ -45,17 +45,11 @@ public class AppealContributionService {
 
     private AssessmentResult determineAssessmentResult(List<Assessment> assessments) {
         for (Assessment assessment : assessments) {
-            if (assessment.getStatus().value.equals("COMPLETE")) {
-                if (assessment.getResult().value.equals("PASS")) {
-                    return AssessmentResult.PASS;
-                } else if (assessment.getResult().value.equals("FAIL")) {
-                    return AssessmentResult.FAIL;
-                } else {
-                    // TODO: What to do in the case where result isnt PASS or FAIL???
-                }
+            if (assessment.getStatus().value.equals("COMPLETE") && (assessment.getResult().equals(AssessmentResult.PASS))) {
+                return AssessmentResult.PASS;
             }
         }
 
-        return null;
+        return AssessmentResult.FAIL;
     }
 }
