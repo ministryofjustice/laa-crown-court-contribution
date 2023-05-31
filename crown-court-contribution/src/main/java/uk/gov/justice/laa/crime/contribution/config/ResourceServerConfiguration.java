@@ -22,17 +22,17 @@ public class ResourceServerConfiguration {
     public static final String SCOPE_READ = "SCOPE_READ";
     public static final String SCOPE_READ_WRITE = "SCOPE_READ_WRITE";
 
-    @Bean
-    protected BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint() {
-        BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint = new BearerTokenAuthenticationEntryPoint();
-        bearerTokenAuthenticationEntryPoint.setRealmName("Crown Court Contribution API");
-        return bearerTokenAuthenticationEntryPoint;
-    }
+//    @Bean
+//    protected BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint() {
+//        BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint = new BearerTokenAuthenticationEntryPoint();
+//        bearerTokenAuthenticationEntryPoint.setRealmName("Crown Court Proceedings API");
+//        return bearerTokenAuthenticationEntryPoint;
+//    }
 
-    @Bean
-    public AccessDeniedHandler bearerTokenAccessDeniedHandler() {
-        return new BearerTokenAccessDeniedHandler();
-    }
+//    @Bean
+//    public AccessDeniedHandler bearerTokenAccessDeniedHandler() {
+//        return new BearerTokenAccessDeniedHandler();
+//    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
@@ -43,32 +43,32 @@ public class ResourceServerConfiguration {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/oauth2/**")
-                            .permitAll()
+                        .permitAll()
                         .requestMatchers("/open-api/**")
-                            .permitAll()
+                        .permitAll()
                         .requestMatchers("/actuator/**")
-                            .permitAll()
+                        .permitAll()
                         .requestMatchers("/error")
-                            .permitAll()
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, API_PATH)
-                            .hasAnyAuthority(SCOPE_READ, SCOPE_READ_WRITE)
+                        .permitAll()
                         .requestMatchers(HttpMethod.POST, API_PATH)
-                            .hasAuthority(SCOPE_READ_WRITE)
+                        .permitAll()
                         .requestMatchers(HttpMethod.PUT, API_PATH)
-                            .hasAuthority(SCOPE_READ_WRITE)
+                        .permitAll()
                         .requestMatchers(HttpMethod.DELETE, API_PATH)
-                            .hasAuthority(SCOPE_READ_WRITE)
+                        .permitAll()
                         .requestMatchers(HttpMethod.PATCH, API_PATH)
-                            .hasAuthority(SCOPE_READ_WRITE)
-                        .anyRequest().authenticated()
-                )
+                        .permitAll()
+                        .anyRequest().anonymous()
+                ).csrf().disable();
 
-                .oauth2ResourceServer(oauth2ResourceServer ->
-                        oauth2ResourceServer
-                                .accessDeniedHandler(bearerTokenAccessDeniedHandler())
-                                .authenticationEntryPoint(bearerTokenAuthenticationEntryPoint())
-                                .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder))
-                );
+//                .oauth2ResourceServer(oauth2ResourceServer ->
+//                        oauth2ResourceServer
+//                                .accessDeniedHandler(bearerTokenAccessDeniedHandler())
+//                                .authenticationEntryPoint(bearerTokenAuthenticationEntryPoint())
+//                                .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder))
+//                );
 
 
         return http.build();

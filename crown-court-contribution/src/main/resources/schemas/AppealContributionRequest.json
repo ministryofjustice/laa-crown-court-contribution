@@ -5,7 +5,7 @@
   "title": "Appeal Contribution Request",
   "description": "Request data for calculating contributions following an appeal",
   "properties": {
-    a: {
+    "applId": {
       "type": "integer",
       "description": "The associated application ID"
     },
@@ -22,10 +22,6 @@
       "type": "string",
       "description": "The appeal type",
       "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType"
-    },
-    "monthlyContributions": {
-      "type": "number",
-      "description": "The monthly contribution amount"
     },
     "userCreated": {
       "type": "string",
@@ -57,5 +53,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["assessments"]
+  "required": ["applId", "repId", "caseType", "appealType", "lastOutcome","assessments"]
 }

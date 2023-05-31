@@ -10,7 +10,6 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
 @AllArgsConstructor
 public class GetContributionAmountRequestBuilder {
 
-    // TODO: Can this just be mapped using mapstruct???
     public GetContributionAmountRequest build(AppealContributionRequest appealContributionRequest, AssessmentResult assessmentResult) {
         return new GetContributionAmountRequest()
                 .withCaseType(appealContributionRequest.getCaseType())

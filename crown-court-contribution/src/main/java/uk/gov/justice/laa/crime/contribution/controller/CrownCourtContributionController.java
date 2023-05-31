@@ -9,16 +9,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.AppealContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.AppealContributionValidator;
+
 
 @Slf4j
 @RestController
@@ -58,9 +56,9 @@ public class CrownCourtContributionController {
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = AppealContributionRequest.class)
             )
-    ) @Valid @RequestBody AppealContributionRequest appealContributionRequest) {
+    ) @Valid @RequestBody AppealContributionRequest appealContributionRequest, @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
         log.info("Received request to calculate appeal contributions for ID {}", appealContributionRequest.getApplId());
         appealContributionValidator.validate(appealContributionRequest);
-        return ResponseEntity.ok(appealContributionService.calculateContribution(appealContributionRequest));
+        return ResponseEntity.ok(appealContributionService.calculateContribution(appealContributionRequest, laaTransactionId));
     }
 }
