@@ -12,6 +12,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -60,7 +66,7 @@ public class TestModelDataBuilder {
         return new ApiCrownCourtSummary()
                 .withCrownCourtOutcome(apiCrownCourtOutcomeList);
     }
-
+    
     public static RepOrderDTO getRepOrderDTO() {
         return getRepOrderDTO(TestModelDataBuilder.REP_ID);
     }
@@ -138,4 +144,27 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static AppealContributionRequest buildAppealContributionRequest() {
+        return new AppealContributionRequest()
+                .withApplId(999)
+                .withRepId(999)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withAppealType(AppealType.ACS)
+                .withUserCreated("TEST")
+                .withLastOutcome(buildLastOutcome())
+                .withAssessments(List.of(buildAssessment()));
+    }
+
+    public static LastOutcome buildLastOutcome() {
+        return new LastOutcome()
+                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
+                .withDateSet(LocalDateTime.now().minusDays(1));
+    }
+
+    public static Assessment buildAssessment() {
+        return new Assessment()
+                .withAssessmentType(AssessmentType.INIT)
+                .withStatus(AssessmentStatus.COMPLETE)
+                .withResult(AssessmentResult.PASS);
+    }
 }
