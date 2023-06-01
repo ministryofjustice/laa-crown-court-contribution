@@ -15,9 +15,8 @@ import java.util.Arrays;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
+import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -153,6 +152,35 @@ public class TestModelDataBuilder {
                 .withUserCreated("TEST")
                 .withLastOutcome(buildLastOutcome())
                 .withAssessments(List.of(buildAssessment()));
+    }
+
+    public static AppealContributionResponse buildAppealContributionResponse() {
+        return new AppealContributionResponse()
+                .withId(9)
+                .withApplId(9)
+                .withRepId(9)
+                .withContributionFileId(9)
+                .withEffectiveDate(LocalDateTime.now())
+                .withCalcDate(LocalDateTime.now())
+                .withContributionCap(BigDecimal.valueOf(250))
+                .withMonthlyContributions(BigDecimal.valueOf(50))
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withUpliftApplied("N")
+                .withBasedOn("test")
+                .withTransferStatus(TransferStatus.SENT)
+                .withDateUpliftApplied(null)
+                .withDateUpliftRemoved(null)
+                .withDateCreated(LocalDateTime.now())
+                .withUserCreated("test")
+                .withDateModified(null)
+                .withUserModified(null)
+                .withCreateContributionOrder(null)
+                .withCorrespondenceId(9)
+                .withActive("Y")
+                .withReplacedDate(null)
+                .withLatest(true)
+                .withCcOutcomeCount(9)
+                .withSeHistoryId(9);
     }
 
     public static LastOutcome buildLastOutcome() {
