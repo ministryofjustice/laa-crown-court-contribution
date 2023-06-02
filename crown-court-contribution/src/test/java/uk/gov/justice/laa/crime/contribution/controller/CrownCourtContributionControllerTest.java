@@ -20,9 +20,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.service.AppealContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.AppealContributionValidator;
@@ -41,6 +43,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @DirtiesContext
 public class CrownCourtContributionControllerTest {
 
+    private static final String LAA_TRANSACTION_ID = "999";
     private static final String CLIENT_SECRET = "secret";
     private static final String CLIENT_CREDENTIALS = "client_credentials";
     private static final String CLIENT_ID = "test-client";
@@ -57,7 +60,7 @@ public class CrownCourtContributionControllerTest {
     private FilterChainProxy springSecurityFilterChain;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @MockBean
     private AppealContributionValidator appealContributionValidator;
@@ -93,10 +96,13 @@ public class CrownCourtContributionControllerTest {
                 MockMvcRequestBuilders.request(method, endpoint)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content);
+        requestBuilder.header("Laa-Transaction-Id", LAA_TRANSACTION_ID);
+
         if (withAuth) {
             final String accessToken = obtainAccessToken();
             requestBuilder.header("Authorization", "Bearer " + accessToken);
         }
+
         return requestBuilder;
     }
 
@@ -113,16 +119,33 @@ public class CrownCourtContributionControllerTest {
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL,false))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
     }
 
     @Test
     void givenInvalidRequest_whenCalculateAppealContributionIsInvoked_thenBadRequestResponse() throws Exception {
+        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
+        when(appealContributionValidator.validate(any(AppealContributionRequest.class)))
+                .thenThrow(new ValidationException("Test validation exception"));
+
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL,false))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenClientApiException_whenCalculateAppealContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
+        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
+        when(appealContributionValidator.validate(any(AppealContributionRequest.class)))
+                .thenReturn(Optional.empty());
+        when(appealContributionService.calculateContribution(any(AppealContributionRequest.class), anyString()))
+                .thenThrow(new APIClientException("Test api client exception"));
+
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL,false))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 }
