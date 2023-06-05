@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
+import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
@@ -23,6 +24,8 @@ class ContributionRulesServiceTest {
     private ContributionRulesService contributionRulesService;
     @Mock
     private ContributionRulesRepository contributionRulesRepository;
+    @Mock
+    private ApiCrownCourtSummary apiCrownCourtSummary;
 
     @Test
     void givenEitherWayCaseType_whenGetContributionVariationIsInvoked_thenReturnCorrectResponse() {
@@ -64,8 +67,19 @@ class ContributionRulesServiceTest {
                 .thenReturn(null);
 
         Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
-                CaseType.EITHER_WAY, null, CrownCourtOutcome.PART_CONVICTED);
+                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.AQUITTED);
         assertThat(response).isEmpty();
+    }
+
+    @Test
+    void givenCrownCourtSummaryWithValidOutcomes_whenGetActiveCCOutcomeIsInvoked_thenValidOutcomeIsReturned() {
+        assertThat(contributionRulesService.getActiveCCOutcome(TestModelDataBuilder.getApiCrownCourtSummary()))
+                .isEqualTo(CrownCourtOutcome.ABANDONED);
+    }
+
+    @Test
+    void givenCrownCourtSummaryWithEmptyOutcome_whenGetActiveCCOutcomeIsInvoked_thenNullIsReturned() {
+        assertThat(contributionRulesService.getActiveCCOutcome(apiCrownCourtSummary)).isNull();
     }
 
 }
