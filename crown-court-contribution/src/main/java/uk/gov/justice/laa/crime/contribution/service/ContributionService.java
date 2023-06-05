@@ -33,8 +33,8 @@ public class ContributionService {
                     Constants.PASS.equals(request.getHardshipResult())) {
                 response.setMeansResult(Constants.PASS);
             } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION).contains(request.getInitResult()) &&
-                            (Constants.FAIL.equals(request.getFullResult())) &&
-                            (Constants.FAIL.equals(Optional.ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
+                    (Constants.FAIL.equals(request.getFullResult())) &&
+                    (Constants.FAIL.equals(Optional.ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
                 response.setMeansResult(Constants.FAIL);
             }
         } else {
