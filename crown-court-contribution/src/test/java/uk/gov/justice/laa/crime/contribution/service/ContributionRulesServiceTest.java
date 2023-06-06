@@ -82,4 +82,19 @@ class ContributionRulesServiceTest {
         assertThat(contributionRulesService.getActiveCCOutcome(apiCrownCourtSummary)).isNull();
     }
 
+    @Test
+    void givenNoContributionRulesAvailable_whenIsContributionRuleApplicableIsInvoked_thenFalseIsReturned() {
+        assertThat(contributionRulesService
+                .isContributionRuleApplicable(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.CONVICTED)).isFalse();
+    }
+
+    @Test
+    void givenContributionRulesAvailable_whenIsContributionRuleApplicableIsInvoked_thenTrueIsReturned() {
+        when(contributionRulesRepository.findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
+                CaseType.EITHER_WAY.getCaseTypeString(), MagCourtOutcome.COMMITTED.getOutcome(), null))
+                .thenReturn(TestModelDataBuilder.getContributionRules());
+        assertThat(contributionRulesService
+                .isContributionRuleApplicable(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null)).isTrue();
+    }
+
 }

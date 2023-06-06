@@ -21,7 +21,9 @@ public class ContributionRulesService {
 
     private final ContributionRulesRepository contributionRulesRepository;
 
-    public Optional<ContributionVariationDTO> getContributionVariation(CaseType caseType, MagCourtOutcome magCourtOutcome, CrownCourtOutcome crownCourtOutcome) {
+    public Optional<ContributionVariationDTO> getContributionVariation(CaseType caseType,
+                                                                       MagCourtOutcome magCourtOutcome,
+                                                                       CrownCourtOutcome crownCourtOutcome) {
 
         String mcooOutcome = magCourtOutcome == null ? null : magCourtOutcome.getOutcome();
         String ccooOutcome = crownCourtOutcome == null ? null : crownCourtOutcome.getCode();
@@ -43,5 +45,11 @@ public class ContributionRulesService {
     public CrownCourtOutcome getActiveCCOutcome(ApiCrownCourtSummary crownCourtSummary) {
         return crownCourtSummary.getCrownCourtOutcome().stream().findFirst()
                 .map(ApiCrownCourtOutcome::getOutcome).orElse(null);
+    }
+
+    public boolean isContributionRuleApplicable(CaseType caseType,
+                                                MagCourtOutcome magCourtOutcome,
+                                                CrownCourtOutcome crownCourtOutcome) {
+        return getContributionVariation(caseType, magCourtOutcome, crownCourtOutcome).isPresent();
     }
 }
