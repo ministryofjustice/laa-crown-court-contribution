@@ -5,9 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.builder.AppealContributionResponseBuilder;
-import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestBuilder;
-import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestBuilder;
+import uk.gov.justice.laa.crime.contribution.builder.AppealContributionResponseMapper;
+import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
@@ -26,13 +26,13 @@ public class AppealContributionServiceTest {
     private MaatCourtDataService maatCourtDataService;
 
     @Mock
-    private GetContributionAmountRequestBuilder getContributionAmountRequestBuilder;
+    private GetContributionAmountRequestMapper getContributionAmountRequestMapper;
 
     @Mock
-    private CreateContributionRequestBuilder createContributionRequestBuilder;
+    private CreateContributionRequestMapper createContributionRequestMapper;
 
     @Mock
-    private AppealContributionResponseBuilder appealContributionResponseBuilder;
+    private AppealContributionResponseMapper appealContributionResponseMapper;
 
     @InjectMocks
     private AppealContributionService appealContributionService;
@@ -50,17 +50,17 @@ public class AppealContributionServiceTest {
         AppealContributionResponse appealContributionResponse = TestModelDataBuilder.buildAppealContributionResponse();
         appealContributionResponse.setUpfrontContributions(BigDecimal.valueOf(500));
 
-        when(getContributionAmountRequestBuilder.build(any(AppealContributionRequest.class), any(AssessmentResult.class)))
+        when(getContributionAmountRequestMapper.map(any(AppealContributionRequest.class), any(AssessmentResult.class)))
                 .thenReturn(new GetContributionAmountRequest());
         when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
                 .thenReturn(BigDecimal.valueOf(500));
         when(maatCourtDataService.findContribution(anyInt(), anyString()))
                 .thenReturn(currContribution);
-        when(createContributionRequestBuilder.build(any(AppealContributionRequest.class), any(BigDecimal.class)))
+        when(createContributionRequestMapper.map(any(AppealContributionRequest.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), anyString()))
                 .thenReturn(new Contribution());
-        when(appealContributionResponseBuilder.build(any(Contribution.class)))
+        when(appealContributionResponseMapper.map(any(Contribution.class)))
                 .thenReturn(appealContributionResponse);
 
         AppealContributionResponse response = appealContributionService.calculateContribution(appealContributionRequest, LAA_TRANSACTION_ID);
@@ -76,13 +76,13 @@ public class AppealContributionServiceTest {
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
 
-        when(getContributionAmountRequestBuilder.build(any(AppealContributionRequest.class), any(AssessmentResult.class)))
+        when(getContributionAmountRequestMapper.map(any(AppealContributionRequest.class), any(AssessmentResult.class)))
                 .thenReturn(new GetContributionAmountRequest());
         when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
                 .thenReturn(BigDecimal.valueOf(0));
         when(maatCourtDataService.findContribution(anyInt(), anyString()))
                 .thenReturn(currContribution);
-        when(appealContributionResponseBuilder.build(any(Contribution.class)))
+        when(appealContributionResponseMapper.map(any(Contribution.class)))
                 .thenReturn(TestModelDataBuilder.buildAppealContributionResponse());
 
         AppealContributionResponse response = appealContributionService.calculateContribution(appealContributionRequest, LAA_TRANSACTION_ID);

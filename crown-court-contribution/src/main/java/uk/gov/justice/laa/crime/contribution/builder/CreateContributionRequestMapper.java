@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 
 @Component
 @AllArgsConstructor
-public class CreateContributionRequestBuilder {
-    public CreateContributionRequest build(AppealContributionRequest appealContributionRequest, BigDecimal appealContributionAmount) {
+public class CreateContributionRequestMapper {
+    public CreateContributionRequest map(AppealContributionRequest appealContributionRequest, BigDecimal appealContributionAmount) {
         return new CreateContributionRequest()
                 .withRepId(appealContributionRequest.getRepId())
                 .withApplId(appealContributionRequest.getApplId())

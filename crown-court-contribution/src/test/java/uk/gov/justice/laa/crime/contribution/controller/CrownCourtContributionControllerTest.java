@@ -79,7 +79,7 @@ public class CrownCourtContributionControllerTest {
         params.add("grant_type", CLIENT_CREDENTIALS);
         params.add("scope", SCOPE_READ_WRITE);
 
-        ResultActions result = mvc.perform(post("/oauth2/token")
+        ResultActions result = mvc.perform(post(AUTH_URL)
                         .params(params)
                         .with(httpBasic(CLIENT_ID, CLIENT_SECRET)))
                 .andExpect(status().isOk());

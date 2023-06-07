@@ -18,13 +18,13 @@ public class CCCExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorDTO> handleValidationException(ValidationException exception) {
-        log.error("Validation exception: {}", exception);
+        log.error("Validation exception: {}", exception.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(APIClientException.class)
     public ResponseEntity<ErrorDTO> handleApiClientException(APIClientException exception) {
-        log.error("API client exception: {}", exception);
+        log.error("API client exception: {}", exception.getMessage());
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 }

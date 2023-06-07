@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRules
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ public class TestModelDataBuilder {
                 .hardshipResult(Constants.PASS)
                 .build();
     }
-
+    
     public static ContributionVariationDTO getContributionVariationDTO() {
         return ContributionVariationDTO.builder()
                 .variation("SQL COSTS")
@@ -140,6 +141,21 @@ public class TestModelDataBuilder {
                 .whoDWPChecked("ABC")
                 .rtCode("DEF")
                 .replaced("Y")
+                .build();
+    }
+
+    public static Contribution buildContribution() {
+        return Contribution.builder()
+                .id(9)
+                .applId(9)
+                .repId(9)
+                .effectiveDate(LocalDate.now())
+                .calcDate(LocalDate.now())
+                .contributionCap(BigDecimal.valueOf(250))
+                .monthlyContributions(BigDecimal.valueOf(250))
+                .upfrontContributions(BigDecimal.valueOf(250))
+                .dateCreated(LocalDateTime.now())
+                .userCreated("test")
                 .build();
     }
 

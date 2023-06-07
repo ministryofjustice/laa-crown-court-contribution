@@ -8,9 +8,9 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
 
 @Component
 @AllArgsConstructor
-public class GetContributionAmountRequestBuilder {
+public class GetContributionAmountRequestMapper {
 
-    public GetContributionAmountRequest build(AppealContributionRequest appealContributionRequest, AssessmentResult assessmentResult) {
+    public GetContributionAmountRequest map(AppealContributionRequest appealContributionRequest, AssessmentResult assessmentResult) {
         return new GetContributionAmountRequest()
                 .withCaseType(appealContributionRequest.getCaseType())
                 .withAppealType(appealContributionRequest.getAppealType())

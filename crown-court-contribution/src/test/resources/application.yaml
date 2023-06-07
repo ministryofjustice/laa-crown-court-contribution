@@ -38,8 +38,13 @@ services:
     assessments-domain: ${services.maat-api.base-url}/api/internal/v1/assessment
     contribution-endpoints:
       base-url: ${services.maat-api.assessments-domain}/contributions
-      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+      find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
       get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal
     correspondence-state-endpoints:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
-      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+      find-url: ${services.maat-api.correspondence-state-endpoints.base-url}/{repId}
+
+retry-config:
+  max-retries: 2
+  min-back-off-period: 3
+  jitter-value: 0.5

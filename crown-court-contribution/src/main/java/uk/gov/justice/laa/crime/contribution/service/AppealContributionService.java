@@ -3,11 +3,12 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.contribution.builder.AppealContributionResponseBuilder;
-import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestBuilder;
-import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestBuilder;
+import uk.gov.justice.laa.crime.contribution.builder.AppealContributionResponseMapper;
+import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,34 +19,34 @@ import java.util.List;
 public class AppealContributionService {
 
     private final MaatCourtDataService maatCourtDataService;
-    private final GetContributionAmountRequestBuilder getContributionAmountRequestBuilder;
-    private final CreateContributionRequestBuilder createContributionRequestBuilder;
-    private final AppealContributionResponseBuilder appealContributionResponseBuilder;
+    private final GetContributionAmountRequestMapper getContributionAmountRequestMapper;
+    private final CreateContributionRequestMapper createContributionRequestMapper;
+    private final AppealContributionResponseMapper appealContributionResponseMapper;
 
     public AppealContributionResponse calculateContribution(AppealContributionRequest appealContributionRequest, String laaTransactionId) {
         AssessmentResult assessmentResult = determineAssessmentResult(appealContributionRequest.getAssessments());
 
-        GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestBuilder.build(appealContributionRequest, assessmentResult);
+        GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(appealContributionRequest, assessmentResult);
         BigDecimal appealContributionAmount = maatCourtDataService.getContributionAppealAmount(getContributionAmountRequest, laaTransactionId);
 
         Integer repId = appealContributionRequest.getRepId();
         Contribution currContribution =  maatCourtDataService.findContribution(repId, laaTransactionId);
 
-        if (currContribution.getUpfrontContributions() != appealContributionAmount) {
-            CreateContributionRequest createContributionRequest = createContributionRequestBuilder.build(appealContributionRequest, appealContributionAmount);
+        if (!currContribution.getUpfrontContributions().equals(appealContributionAmount)) {
+            CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(appealContributionRequest, appealContributionAmount);
             Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);
 
             log.info("Contribution data has been updated");
-            return appealContributionResponseBuilder.build(newContribution);
+            return appealContributionResponseMapper.map(newContribution);
         }
 
         log.info("Contribution data is already up to date");
-        return appealContributionResponseBuilder.build(currContribution);
+        return appealContributionResponseMapper.map(currContribution);
     }
 
     private AssessmentResult determineAssessmentResult(List<Assessment> assessments) {
         for (Assessment assessment : assessments) {
-            if (assessment.getStatus().value.equals("COMPLETE") && (assessment.getResult().equals(AssessmentResult.PASS))) {
+            if (assessment.getStatus() == AssessmentStatus.COMPLETE && assessment.getResult() == AssessmentResult.PASS) {
                 return AssessmentResult.PASS;
             }
         }

@@ -12,7 +12,9 @@ public enum AssessmentStatus {
     COMPLETE("COMPLETE"),
     IN_PROGRESS("IN PROGRESS");
 
-    public final String value;
+    private static final String EXCEPTION_MESSAGE = "Assessment status with value: %s does not exist";
+
+    private final String value;
 
     public static AssessmentStatus getFrom(String value) {
         if (StringUtils.isBlank(value)) return null;
@@ -20,6 +22,6 @@ public enum AssessmentStatus {
         return Stream.of(AssessmentStatus.values())
                 .filter(assessmentStatus -> assessmentStatus.value.equals(value))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Assessment status with value: %s does not exist.", value)));
+                .orElseThrow(() -> new IllegalArgumentException(String.format(EXCEPTION_MESSAGE, value)));
     }
 }
