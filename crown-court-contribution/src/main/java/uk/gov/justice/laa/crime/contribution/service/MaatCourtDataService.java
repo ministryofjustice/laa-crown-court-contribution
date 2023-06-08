@@ -107,7 +107,10 @@ public class MaatCourtDataService {
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
         log.info(RESPONSE_STRING, response);
-        return response.getHeaders().getContentLength();
+        if(response != null) {
+            return response.getHeaders().getContentLength();
+        }
+        return 0L;
     }
 
     public RepOrderDTO getRepOrderByRepId(Integer repId, String laaTransactionId) {

@@ -5,9 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,8 +17,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ContributionService {
 
+    private final MaatCourtDataService maatCourtDataService;
 
-    public AssessmentResponseDTO getAssessmentResult(AssessmentRequestDTO request) {
+    public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
         AssessmentResponseDTO response = new AssessmentResponseDTO();
         response.setIojResult(Optional.ofNullable(request.getDecisionResult())
                 .orElse(request.getIojResult()));
@@ -47,4 +49,53 @@ public class ContributionService {
         }
         return response;
     }
+
+    public boolean checkReassessment(final int repId, final String laaTransactionId) {
+        log.info("Check if reassessment is required for REP_ID={}", repId);
+
+        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
+        long contributionCount = maatCourtDataService.getContributionCount(repId, laaTransactionId);
+        List<FinancialAssessmentDTO> financialAssessmentDTOS = repOrderDTO.getFinancialAssessments();
+        List<PassportAssessmentDTO> passportAssessmentDTOS = repOrderDTO.getPassportAssessments();
+
+        boolean finAssReassFlag = checkFinancialReassessment(contributionCount, financialAssessmentDTOS);
+        boolean passAssReassFlag = checkPassportReassessment(contributionCount, passportAssessmentDTOS);
+
+        LocalDateTime latestFinAssDate = financialAssessmentDTOS.stream()
+                .map(FinancialAssessmentDTO::getDateCreated)
+                .max(LocalDateTime::compareTo)
+                .get();
+
+        LocalDateTime latestPassportAssDate = passportAssessmentDTOS.stream()
+                .map(PassportAssessmentDTO::getDateCreated)
+                .max(LocalDateTime::compareTo)
+                .get();
+
+        if (latestFinAssDate.isAfter(latestPassportAssDate)) {
+            if (finAssReassFlag) {
+                return true;
+            } else return false;
+        } else return passAssReassFlag;
+    }
+
+    private boolean checkFinancialReassessment(final long contributionCount, final List<FinancialAssessmentDTO> financialAssessmentDTOS) {
+        Optional<FinancialAssessmentDTO> financialAssessmentDTO = financialAssessmentDTOS.stream()
+                .filter(fa -> fa.getReplaced().equals("Y"))
+                .findFirst();
+
+        if (financialAssessmentDTO.isPresent() && contributionCount > 0) {
+            return true;
+        } else return false;
+    }
+
+    private boolean checkPassportReassessment(final long contributionCount, final List<PassportAssessmentDTO> passportAssessmentDTOS) {
+        Optional<PassportAssessmentDTO> passportAssessmentDTO = passportAssessmentDTOS.stream()
+                .filter(pa -> pa.getReplaced().equals("Y"))
+                .findFirst();
+
+        if (passportAssessmentDTO.isPresent() && contributionCount > 0) {
+            return true;
+        } else return false;
+    }
+
 }
