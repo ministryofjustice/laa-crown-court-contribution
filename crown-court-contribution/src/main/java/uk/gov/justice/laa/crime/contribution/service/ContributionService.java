@@ -58,36 +58,24 @@ public class ContributionService {
         List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
         List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
 
-        boolean finAssReassFlag = checkFinancialReassessment(contributionCount, financialAssessments);
-        boolean passAssReassFlag = checkPassportReassessment(contributionCount, passportAssessments);
+        if (contributionCount > 0) {
+            LocalDateTime latestFinAssessmentDate = financialAssessments.stream()
+                    .map(FinancialAssessmentDTO::getDateCreated)
+                    .max(LocalDateTime::compareTo)
+                    .get();
 
-        LocalDateTime latestFinAssDate = financialAssessments.stream()
-                .map(FinancialAssessmentDTO::getDateCreated)
-                .max(LocalDateTime::compareTo)
-                .get();
+            LocalDateTime latestPassportAssessmentDate = passportAssessments.stream()
+                    .map(PassportAssessmentDTO::getDateCreated)
+                    .max(LocalDateTime::compareTo)
+                    .get();
 
-        LocalDateTime latestPassportAssDate = passportAssessments.stream()
-                .map(PassportAssessmentDTO::getDateCreated)
-                .max(LocalDateTime::compareTo)
-                .get();
-
-        if (latestFinAssDate.isAfter(latestPassportAssDate)) {
-            return finAssReassFlag;
-        } else return passAssReassFlag;
-    }
-
-    private boolean checkFinancialReassessment(final long contributionCount, final List<FinancialAssessmentDTO> financialAssessments) {
-        Optional<FinancialAssessmentDTO> financialAssessment = financialAssessments.stream()
-                .filter(fa -> fa.getReplaced().equals("Y"))
-                .findFirst();
-        return financialAssessment.isPresent() && (contributionCount > 0);
-    }
-
-    private boolean checkPassportReassessment(final long contributionCount, final List<PassportAssessmentDTO> passportAssessments) {
-        Optional<PassportAssessmentDTO> passportAssessment = passportAssessments.stream()
-                .filter(pa -> pa.getReplaced().equals("Y"))
-                .findFirst();
-        return passportAssessment.isPresent() && (contributionCount > 0);
+            if (latestFinAssessmentDate.isAfter(latestPassportAssessmentDate)) {
+                return financialAssessments.stream().anyMatch(fa -> fa.getReplaced().equals("Y"));
+            } else {
+                return passportAssessments.stream().anyMatch(pa -> pa.getReplaced().equals("Y"));
+            }
+        }
+        return false;
     }
 
 }
