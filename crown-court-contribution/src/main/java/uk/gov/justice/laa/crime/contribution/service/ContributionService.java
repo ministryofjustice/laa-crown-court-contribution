@@ -80,14 +80,14 @@ public class ContributionService {
         Optional<FinancialAssessmentDTO> financialAssessment = financialAssessments.stream()
                 .filter(fa -> fa.getReplaced().equals("Y"))
                 .findFirst();
-        return financialAssessment.isPresent() && contributionCount > 0;
+        return financialAssessment.isPresent() && (contributionCount > 0);
     }
 
     private boolean checkPassportReassessment(final long contributionCount, final List<PassportAssessmentDTO> passportAssessments) {
         Optional<PassportAssessmentDTO> passportAssessment = passportAssessments.stream()
                 .filter(pa -> pa.getReplaced().equals("Y"))
                 .findFirst();
-        return passportAssessment.isPresent() && contributionCount > 0;
+        return passportAssessment.isPresent() && (contributionCount > 0);
     }
 
 }
