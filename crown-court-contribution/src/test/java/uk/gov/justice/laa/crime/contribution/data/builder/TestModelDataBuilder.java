@@ -20,7 +20,6 @@ public class TestModelDataBuilder {
     public static final String PASSPORT_RESULT_FAIL_CONTINUE = "FAIL CONTINUE";
     public static final Integer REP_ID = 1234;
     public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
-    private final String LAA_TRANSACTION_ID = "b27b97e4-0514-42c4-8e09-fcc2c693e11f";
 
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
 

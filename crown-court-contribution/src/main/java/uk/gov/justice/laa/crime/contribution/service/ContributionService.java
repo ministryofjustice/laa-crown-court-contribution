@@ -55,47 +55,39 @@ public class ContributionService {
 
         RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
         long contributionCount = maatCourtDataService.getContributionCount(repId, laaTransactionId);
-        List<FinancialAssessmentDTO> financialAssessmentDTOS = repOrderDTO.getFinancialAssessments();
-        List<PassportAssessmentDTO> passportAssessmentDTOS = repOrderDTO.getPassportAssessments();
+        List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
+        List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
 
-        boolean finAssReassFlag = checkFinancialReassessment(contributionCount, financialAssessmentDTOS);
-        boolean passAssReassFlag = checkPassportReassessment(contributionCount, passportAssessmentDTOS);
+        boolean finAssReassFlag = checkFinancialReassessment(contributionCount, financialAssessments);
+        boolean passAssReassFlag = checkPassportReassessment(contributionCount, passportAssessments);
 
-        LocalDateTime latestFinAssDate = financialAssessmentDTOS.stream()
+        LocalDateTime latestFinAssDate = financialAssessments.stream()
                 .map(FinancialAssessmentDTO::getDateCreated)
                 .max(LocalDateTime::compareTo)
                 .get();
 
-        LocalDateTime latestPassportAssDate = passportAssessmentDTOS.stream()
+        LocalDateTime latestPassportAssDate = passportAssessments.stream()
                 .map(PassportAssessmentDTO::getDateCreated)
                 .max(LocalDateTime::compareTo)
                 .get();
 
         if (latestFinAssDate.isAfter(latestPassportAssDate)) {
-            if (finAssReassFlag) {
-                return true;
-            } else return false;
+            return finAssReassFlag;
         } else return passAssReassFlag;
     }
 
-    private boolean checkFinancialReassessment(final long contributionCount, final List<FinancialAssessmentDTO> financialAssessmentDTOS) {
-        Optional<FinancialAssessmentDTO> financialAssessmentDTO = financialAssessmentDTOS.stream()
+    private boolean checkFinancialReassessment(final long contributionCount, final List<FinancialAssessmentDTO> financialAssessments) {
+        Optional<FinancialAssessmentDTO> financialAssessment = financialAssessments.stream()
                 .filter(fa -> fa.getReplaced().equals("Y"))
                 .findFirst();
-
-        if (financialAssessmentDTO.isPresent() && contributionCount > 0) {
-            return true;
-        } else return false;
+        return financialAssessment.isPresent() && contributionCount > 0;
     }
 
-    private boolean checkPassportReassessment(final long contributionCount, final List<PassportAssessmentDTO> passportAssessmentDTOS) {
-        Optional<PassportAssessmentDTO> passportAssessmentDTO = passportAssessmentDTOS.stream()
+    private boolean checkPassportReassessment(final long contributionCount, final List<PassportAssessmentDTO> passportAssessments) {
+        Optional<PassportAssessmentDTO> passportAssessment = passportAssessments.stream()
                 .filter(pa -> pa.getReplaced().equals("Y"))
                 .findFirst();
-
-        if (passportAssessmentDTO.isPresent() && contributionCount > 0) {
-            return true;
-        } else return false;
+        return passportAssessment.isPresent() && contributionCount > 0;
     }
 
 }

@@ -11,7 +11,6 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -19,10 +18,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MaatCourtDataService {
 
+    private static final String RESPONSE_STRING = "Response from Court Data API: {}";
     @Qualifier("maatApiClient")
     private final RestAPIClient maatAPIClient;
     private final ServicesConfiguration configuration;
-    private static final String RESPONSE_STRING = "Response from Court Data API: {}";
 
     public Contribution findContribution(Integer repId, String laaTransactionId) {
         Contribution response = maatAPIClient.get(
@@ -104,10 +103,11 @@ public class MaatCourtDataService {
     public long getContributionCount(Integer repId, String laaTransactionId) {
         var response = maatAPIClient.head(
                 configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
-                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                repId
         );
         log.info(RESPONSE_STRING, response);
-        if(response != null) {
+        if (response != null) {
             return response.getHeaders().getContentLength();
         }
         return 0L;

@@ -101,7 +101,7 @@ class MaatCourtDataServiceTest {
     void givenValidRepId_whenContributionCountIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.getContributionCount(TEST_REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataClient).head(configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
-                Map.of(Constants.LAA_TRANSACTION_ID, LAA_TRANSACTION_ID));
+                Map.of(Constants.LAA_TRANSACTION_ID, LAA_TRANSACTION_ID), TEST_REP_ID);
     }
 
     @Test

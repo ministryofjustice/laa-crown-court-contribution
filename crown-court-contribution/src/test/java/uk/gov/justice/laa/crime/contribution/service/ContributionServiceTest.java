@@ -8,11 +8,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.*;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
@@ -22,14 +17,18 @@ import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.*;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
 
 @ExtendWith(MockitoExtension.class)
 class ContributionServiceTest {
+    private static final LocalDateTime dateCreated = LocalDateTime.parse("2023-07-10T15:01:25");
     @InjectMocks
     private ContributionService contributionService;
-
     @Mock
     private MaatCourtDataService maatCourtDataService;
 
@@ -77,15 +76,15 @@ class ContributionServiceTest {
 
     private static Stream<Arguments> getAssessmentRequestForNullMeansResult() {
         return Stream.of(
-                        Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                INIT, FAIL, FAIL)),
-                        Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                HARDSHIP_APPLICATION, FAIL, TEMP)),
-                        Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                INIT, INIT, INIT)),
-                        Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                INIT, INIT, null))
-                );
+                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                        INIT, FAIL, FAIL)),
+                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                        HARDSHIP_APPLICATION, FAIL, TEMP)),
+                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                        INIT, INIT, INIT)),
+                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
+                        INIT, INIT, null))
+        );
     }
 
     @ParameterizedTest()
@@ -117,7 +116,7 @@ class ContributionServiceTest {
         boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(isReassessment).isEqualTo(true);
+        assertThat(isReassessment).isTrue();
     }
 
     @Test
@@ -130,7 +129,7 @@ class ContributionServiceTest {
         boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(isReassessment).isEqualTo(false);
+        assertThat(isReassessment).isFalse();
     }
 
     @Test
@@ -143,33 +142,33 @@ class ContributionServiceTest {
         boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(isReassessment).isEqualTo(false);
+        assertThat(isReassessment).isFalse();
     }
 
     @Test
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentTrueAndContribCountAs1_thenReassessmentTrueIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getPassportAssessments().get(0).setDateCreated(LocalDateTime.parse("2023-07-10T15:01:25"));
+        repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
         when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
         boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(isReassessment).isEqualTo(true);
+        assertThat(isReassessment).isTrue();
     }
 
     @Test
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentTrueAndContribCountAs0_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getPassportAssessments().get(0).setDateCreated(LocalDateTime.parse("2023-07-10T15:01:25"));
+        repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(0L);
         when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
         boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(isReassessment).isEqualTo(false);
+        assertThat(isReassessment).isFalse();
     }
 
     @Test
@@ -182,7 +181,7 @@ class ContributionServiceTest {
         boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(isReassessment).isEqualTo(false);
+        assertThat(isReassessment).isFalse();
     }
 
 }
