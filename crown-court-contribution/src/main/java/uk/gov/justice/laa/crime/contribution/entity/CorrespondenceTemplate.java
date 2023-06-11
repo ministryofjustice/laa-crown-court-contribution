@@ -38,12 +38,15 @@ public class CorrespondenceTemplate {
     @Column(name = "effective_date")
     private LocalDate effectiveDate;
 
+    @Builder.Default
     @OneToMany(mappedBy = "cote")
     private Set<CorrespondenceRule> correspondenceRules = new LinkedHashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "upliftCote")
     private Set<CorrespondenceRule> correspondenceRulesUC = new LinkedHashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "reassessmentCote")
     private Set<CorrespondenceRule> correspondenceRulesRC = new LinkedHashSet<>();
 

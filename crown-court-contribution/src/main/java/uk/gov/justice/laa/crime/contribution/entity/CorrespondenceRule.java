@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -32,10 +33,10 @@ public class CorrespondenceRule {
 
     @NotNull
     @Column(name = "date_from", nullable = false)
-    private Instant dateFrom;
+    private LocalDateTime dateFrom;
 
     @Column(name = "date_to")
-    private Instant dateTo;
+    private LocalDateTime dateTo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cote_id")

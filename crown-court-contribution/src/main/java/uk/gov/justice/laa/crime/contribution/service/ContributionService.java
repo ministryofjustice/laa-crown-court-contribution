@@ -14,17 +14,21 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
 
 import java.util.Optional;
 import java.util.Set;
+
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ContributionService {
 
-    public static final String INEL = "INEL";
+    private static final String INEL = "INEL";
+    private static final String CONTRIBUTION_YES = "Y";
     private final CorrespondenceRuleRepository correspondenceRuleRepository;
 
     public AssessmentResponseDTO getAssessmentResult(AssessmentRequestDTO request) {
@@ -34,14 +38,14 @@ public class ContributionService {
 
         if (StringUtils.isNotBlank(request.getPassportResult())) {
 
-            if (Set.of(Constants.PASS, Constants.TEMP).contains(request.getPassportResult())) {
+            if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
                 response.setMeansResult(Constants.PASSPORT);
             } else if (Constants.FAIL.equals(request.getPassportResult())) {
                 response.setMeansResult(Constants.FAILPORT);
-            } else if (Constants.PASS.equals(request.getInitResult()) ||
-                    Constants.PASS.equals(request.getFullResult()) ||
-                    Constants.PASS.equals(request.getHardshipResult())) {
-                response.setMeansResult(Constants.PASS);
+            } else if (PASS.equals(request.getInitResult()) ||
+                    PASS.equals(request.getFullResult()) ||
+                    PASS.equals(request.getHardshipResult())) {
+                response.setMeansResult(PASS);
             } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION).contains(request.getInitResult()) &&
                     (Constants.FAIL.equals(request.getFullResult())) &&
                     (Constants.FAIL.equals(Optional.ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
@@ -71,34 +75,33 @@ public class ContributionService {
         request.setIojResult(assessmentResponseDTO.getIojResult());
         request.setMeansResult(assessmentResponseDTO.getMeansResult());
 
-        if (Set.of("INDICTABLE", "EITHER WAY", "CC ALREADY").contains(request.getCaseType())
+        if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY).contains(request.getCaseType())
                 || request.getEffectiveDate() != null
-                || ((request.getCaseType() != null && (request.getCaseType().getCaseTypeString() != null && request.getCaseType().getCaseTypeString().equals("APPEAL CC")))
-                && (request.getIojResult() != null && request.getIojResult().equals("PASS")))) {
+                || (CaseType.APPEAL_CC.equals(request.getCaseType()) && PASS.equals(request.getIojResult()))) {
             contributionResponse.setDoContribs('Y');
         }
 
         if (contributionResponse.getDoContribs() == 'Y') {
             CorrespondenceRuleAndTemplateInfo processedCases = getCoteInfo(request);
-            if (processedCases == null || processedCases.getId() == 0) {
+            if (processedCases == null) {
                 contributionResponse.setDoContribs('N');
                 contributionResponse.setCalcContribs('N');
-            }
-            contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
-            contributionResponseDTO.setDoContribs(contributionResponse.getDoContribs());
-            contributionResponseDTO.setCalcContribs(contributionResponse.getCalcContribs());
+            } else {
+                contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
+                contributionResponseDTO.setDoContribs(contributionResponse.getDoContribs());
+                contributionResponseDTO.setCalcContribs(contributionResponse.getCalcContribs());
 
-            if (processedCases != null && CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
+                if (processedCases != null && CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
                     contributionResponseDTO.setCorrespondenceTypeDesc(CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()).getDescription());
+                }
             }
-
         }
 
-        if(request.getMonthlyContribs() > 0 || (request.getFullResult() != null && request.getFullResult().equals(INEL))) {
+        if (request.getMonthlyContribs() > 0 || INEL.equals(request.getFullResult())) {
             contributionResponse.setDoContribs('Y');
         }
 
-        if(request.getRemoveContribs() != null && request.getRemoveContribs().equals("Y")) {
+        if (CONTRIBUTION_YES.equals(request.getRemoveContribs())) {
             contributionResponse.setCalcContribs('N');
         }
 
