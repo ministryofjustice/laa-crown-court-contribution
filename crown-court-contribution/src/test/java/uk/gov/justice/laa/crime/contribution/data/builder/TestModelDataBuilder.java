@@ -5,6 +5,14 @@ import static uk.gov.justice.laa.crime.contribution.common.Constants.*;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
+import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class TestModelDataBuilder {
@@ -66,5 +74,33 @@ public class TestModelDataBuilder {
                 return "No contributions required";
             }
         };
+    }
+
+    public static ContributionVariationDTO getContributionVariationDTO() {
+        return ContributionVariationDTO.builder()
+                .variation("SQL COSTS")
+                .variationRule("+")
+                .build();
+    }
+
+    public static ContributionRulesEntity getContributionRules() {
+        return ContributionRulesEntity.builder()
+                .variation("SQL COSTS")
+                .variationRule("+")
+                .build();
+    }
+
+    public static ApiCrownCourtOutcome getApiCrownCourtOutcome(CrownCourtOutcome crownCourtOutcome) {
+        return new ApiCrownCourtOutcome()
+                .withOutcome(crownCourtOutcome);
+    }
+
+    public static ApiCrownCourtSummary getApiCrownCourtSummary() {
+        List<ApiCrownCourtOutcome> apiCrownCourtOutcomeList = new ArrayList<>();
+        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED));
+        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED));
+        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));
+        return new ApiCrownCourtSummary()
+                .withCrownCourtOutcome(apiCrownCourtOutcomeList);
     }
 }

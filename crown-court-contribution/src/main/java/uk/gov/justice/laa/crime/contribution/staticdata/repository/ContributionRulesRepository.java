@@ -8,4 +8,7 @@ import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRules
 @Repository
 public interface ContributionRulesRepository extends JpaRepository<ContributionRulesEntity, Integer> {
 
+    ContributionRulesEntity findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
+            String caseType, String magsCourtOutcome, String crownCourtOutcome);
+
 }

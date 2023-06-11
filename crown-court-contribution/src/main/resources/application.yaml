@@ -30,6 +30,18 @@ spring:
     properties:
       hibernate.temp.use_jdbc_metadata_defaults: false
 
+  security:
+    oauth2:
+      client:
+        provider:
+          maat-api:
+            token-uri: ${MAAT_API_OAUTH_URL}
+        registration:
+          maat-api:
+            client-id: ${MAAT_API_OAUTH_CLIENT_ID}
+            client-secret: ${MAAT_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+
 services:
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
@@ -41,6 +53,15 @@ services:
     correspondence-state-endpoints:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
       find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+
+springdoc:
+  packagesToScan: uk.gov.justice.laa.crime.contribution
+  api-docs:
+    path: open-api/api-docs
+
+  swagger-ui:
+    path: open-api/swagger-ui.html
+    operationsSorter: method
 
 sentry:
   dsn: ${SENTRY_DSN}
