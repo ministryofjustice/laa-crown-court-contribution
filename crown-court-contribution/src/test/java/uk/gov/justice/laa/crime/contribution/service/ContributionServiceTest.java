@@ -12,8 +12,11 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.PassportAssessmentResult;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -235,4 +238,83 @@ class ContributionServiceTest {
         verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
+
+    @Test
+    void givenAValidRepId_whenCds15WorkAroundIsInvokedWithFailPassportAssessment_thenTrueIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getPassportAssessments().get(0).setReplaced("Y");
+        repOrderDTO.getPassportAssessments().get(0).setResult(PassportAssessmentResult.FAIL.getResult());
+        repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
+        repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.PASS.getResult());
+
+        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isTrue();
+    }
+
+    @Test
+    void givenAValidRepId_whenCds15WorkAroundIsInvokedWithPassPassportAssessment_thenFalseIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getPassportAssessments().get(0).setReplaced("Y");
+        repOrderDTO.getPassportAssessments().get(0).setResult(PassportAssessmentResult.PASS.getResult());
+        repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
+        repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.PASS.getResult());
+
+        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isFalse();
+    }
+
+    @Test
+    void givenAValidRepId_whenCds15WorkAroundIsInvokedWithFailedInitialAssessment_thenFalseIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getPassportAssessments().get(0).setReplaced("Y");
+        repOrderDTO.getPassportAssessments().get(0).setResult(PassportAssessmentResult.PASS.getResult());
+        repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
+        repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.FAIL.getResult());
+
+        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isFalse();
+    }
+
+    @Test
+    void givenAValidRepId_whenCds15WorkAroundIsInvokedWithFailedAssessments_thenFalseIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getPassportAssessments().get(0).setReplaced("Y");
+        repOrderDTO.getPassportAssessments().get(0).setResult(PassportAssessmentResult.FAIL.getResult());
+        repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
+        repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.FAIL.getResult());
+
+        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isFalse();
+    }
+
+    @Test
+    void givenRepOrderWithNoPassportAssessments_whenGetPassportAssessmentResultIsInvoked_thenNullIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.setPassportAssessments(new ArrayList<>());
+
+        assertThat(ContributionService.getPassportAssessmentResult(repOrderDTO)).isNull();
+    }
+
+    @Test
+    void givenRepOrderWithReplacedPassportAssessment_whenGetPassportAssessmentResultIsInvoked_thenValidResultIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getPassportAssessments().get(0).setReplaced("Y");
+        repOrderDTO.getPassportAssessments().get(0).setResult(PassportAssessmentResult.PASS.getResult());
+
+        assertThat(ContributionService.getPassportAssessmentResult(repOrderDTO)).isEqualTo(PassportAssessmentResult.PASS.getResult());
+    }
+
+    @Test
+    void givenRepOrderWithNoFinancialAssessments_whenGetInitialAssessmentResultIsInvoked_thenNullIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.setFinancialAssessments(new ArrayList<>());
+
+        assertThat(ContributionService.getInitialAssessmentResult(repOrderDTO)).isNull();
+    }
+
+    @Test
+    void givenRepOrderWithFinancialAssessments_whenGetInitialAssessmentResultIsInvoked_thenValidResultIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
+        repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.PASS.getResult());
+
+        assertThat(ContributionService.getInitialAssessmentResult(repOrderDTO)).isEqualTo(InitAssessmentResult.PASS.getResult());
+    }
+
 }
