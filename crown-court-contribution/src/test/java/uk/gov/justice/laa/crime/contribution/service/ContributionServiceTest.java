@@ -184,4 +184,55 @@ class ContributionServiceTest {
         assertThat(isReassessment).isFalse();
     }
 
+    @Test
+    void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportAssessmentAsNull_thenReassessmentFalseIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.setPassportAssessments(null);
+        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
+        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
+
+        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(isReassessment).isFalse();
+    }
+
+    @Test
+    void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinancialAssessmentAsNull_thenReassessmentFalseIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.setFinancialAssessments(null);
+        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
+        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
+
+        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(isReassessment).isFalse();
+    }
+
+    @Test
+    void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinancialAssessmentDateCreatedAsNull_thenReassessmentFalseIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getFinancialAssessments().get(0).setDateCreated(null);
+        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
+        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
+
+        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(isReassessment).isFalse();
+    }
+
+    @Test
+    void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportAssessmentDateCreatedAsNull_thenReassessmentFalseIsReturned() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.getPassportAssessments().get(0).setDateCreated(null);
+        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
+        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
+
+        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(isReassessment).isFalse();
+    }
 }

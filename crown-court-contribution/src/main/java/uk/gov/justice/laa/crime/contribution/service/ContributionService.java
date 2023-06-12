@@ -8,9 +8,9 @@ import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
+import static java.util.Optional.ofNullable;
 
 @Slf4j
 @Service
@@ -21,7 +21,7 @@ public class ContributionService {
 
     public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
         AssessmentResponseDTO response = new AssessmentResponseDTO();
-        response.setIojResult(Optional.ofNullable(request.getDecisionResult())
+        response.setIojResult(ofNullable(request.getDecisionResult())
                 .orElse(request.getIojResult()));
 
         if (StringUtils.isNotBlank(request.getPassportResult())) {
@@ -36,7 +36,7 @@ public class ContributionService {
                 response.setMeansResult(Constants.PASS);
             } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION).contains(request.getInitResult()) &&
                     (Constants.FAIL.equals(request.getFullResult())) &&
-                    (Constants.FAIL.equals(Optional.ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
+                    (Constants.FAIL.equals(ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
                 response.setMeansResult(Constants.FAIL);
             }
         } else {
@@ -59,20 +59,24 @@ public class ContributionService {
         List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
 
         if (contributionCount > 0) {
-            LocalDateTime latestFinAssessmentDate = financialAssessments.stream()
+            Optional<LocalDateTime> latestFinAssessmentDate = ofNullable(financialAssessments)
+                    .orElseGet(Collections::emptyList).stream()
                     .map(FinancialAssessmentDTO::getDateCreated)
-                    .max(LocalDateTime::compareTo)
-                    .get();
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo);
 
-            LocalDateTime latestPassportAssessmentDate = passportAssessments.stream()
+            Optional<LocalDateTime> latestPassportAssessmentDate = ofNullable(passportAssessments)
+                    .orElseGet(Collections::emptyList).stream()
                     .map(PassportAssessmentDTO::getDateCreated)
-                    .max(LocalDateTime::compareTo)
-                    .get();
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo);
 
-            if (latestFinAssessmentDate.isAfter(latestPassportAssessmentDate)) {
-                return financialAssessments.stream().anyMatch(fa -> fa.getReplaced().equals("Y"));
-            } else {
-                return passportAssessments.stream().anyMatch(pa -> pa.getReplaced().equals("Y"));
+            if (latestFinAssessmentDate.isPresent() && latestPassportAssessmentDate.isPresent()) {
+                if (latestFinAssessmentDate.get().isAfter(latestPassportAssessmentDate.get())) {
+                    return financialAssessments.stream().anyMatch(fa -> fa.getReplaced().equals("Y"));
+                } else {
+                    return passportAssessments.stream().anyMatch(pa -> pa.getReplaced().equals("Y"));
+                }
             }
         }
         return false;
