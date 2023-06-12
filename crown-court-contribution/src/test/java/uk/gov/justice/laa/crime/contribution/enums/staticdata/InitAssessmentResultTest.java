@@ -8,10 +8,10 @@ import java.util.Objects;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class InitAssessmentResultTest {
+class InitAssessmentResultTest {
 
     @Test
-    public void givenValidResultString_whenGetFromIsInvoked_thenCorrectEnumIsReturned() {
+    void givenValidResultString_whenGetFromIsInvoked_thenCorrectEnumIsReturned() {
         InitAssessmentResult result = InitAssessmentResult.getFrom("PASS");
         assertThat(InitAssessmentResult.getFrom("PASS")).isEqualTo(InitAssessmentResult.PASS);
         assertThat(Objects.requireNonNull(result).getReason())
@@ -19,12 +19,12 @@ public class InitAssessmentResultTest {
     }
 
     @Test
-    public void givenBlankString_whenGetFromIsInvoked_thenNullIsReturned() {
+    void givenBlankString_whenGetFromIsInvoked_thenNullIsReturned() {
         assertThat(InitAssessmentResult.getFrom(null)).isNull();
     }
 
     @Test
-    public void givenInvalidResultString_whenGetFromIsInvoked_thenExceptionIsThrown() {
+    void givenInvalidResultString_whenGetFromIsInvoked_thenExceptionIsThrown() {
         assertThatThrownBy(
                 () -> InitAssessmentResult.getFrom("MOCK_RESULT_STRING")
         ).isInstanceOf(IllegalArgumentException.class);
