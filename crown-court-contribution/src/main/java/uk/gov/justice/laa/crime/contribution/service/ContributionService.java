@@ -8,18 +8,16 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
 
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
 @Slf4j
@@ -30,10 +28,11 @@ public class ContributionService {
     private static final String INEL = "INEL";
     private static final String CONTRIBUTION_YES = "Y";
     private final CorrespondenceRuleRepository correspondenceRuleRepository;
+    private final MaatCourtDataService maatCourtDataService;
 
-    public AssessmentResponseDTO getAssessmentResult(AssessmentRequestDTO request) {
+    public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
         AssessmentResponseDTO response = new AssessmentResponseDTO();
-        response.setIojResult(Optional.ofNullable(request.getDecisionResult())
+        response.setIojResult(ofNullable(request.getDecisionResult())
                 .orElse(request.getIojResult()));
 
         if (StringUtils.isNotBlank(request.getPassportResult())) {
@@ -48,7 +47,7 @@ public class ContributionService {
                 response.setMeansResult(PASS);
             } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION).contains(request.getInitResult()) &&
                     (Constants.FAIL.equals(request.getFullResult())) &&
-                    (Constants.FAIL.equals(Optional.ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
+                    (Constants.FAIL.equals(ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
                 response.setMeansResult(Constants.FAIL);
             }
         } else {
@@ -120,5 +119,35 @@ public class ContributionService {
 
     }
 
+    public boolean checkReassessment(final int repId, final String laaTransactionId) {
+        log.info("Check if reassessment is required for REP_ID={}", repId);
 
+        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
+        long contributionCount = maatCourtDataService.getContributionCount(repId, laaTransactionId);
+        List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
+        List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
+
+        if (contributionCount > 0) {
+            Optional<LocalDateTime> latestFinAssessmentDate = ofNullable(financialAssessments)
+                    .orElseGet(Collections::emptyList).stream()
+                    .map(FinancialAssessmentDTO::getDateCreated)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo);
+
+            Optional<LocalDateTime> latestPassportAssessmentDate = ofNullable(passportAssessments)
+                    .orElseGet(Collections::emptyList).stream()
+                    .map(PassportAssessmentDTO::getDateCreated)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo);
+
+            if (latestFinAssessmentDate.isPresent() && latestPassportAssessmentDate.isPresent()) {
+                if (latestFinAssessmentDate.get().isAfter(latestPassportAssessmentDate.get())) {
+                    return financialAssessments.stream().anyMatch(fa -> fa.getReplaced().equals("Y"));
+                } else {
+                    return passportAssessments.stream().anyMatch(pa -> pa.getReplaced().equals("Y"));
+                }
+            }
+        }
+        return false;
+    }
 }
