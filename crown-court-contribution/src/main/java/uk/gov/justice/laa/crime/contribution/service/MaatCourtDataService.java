@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
 
 import java.math.BigDecimal;
@@ -17,10 +18,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MaatCourtDataService {
 
+    private static final String RESPONSE_STRING = "Response from Court Data API: {}";
     @Qualifier("maatApiClient")
     private final RestAPIClient maatAPIClient;
     private final ServicesConfiguration configuration;
-    private static final String RESPONSE_STRING = "Response from Court Data API: {}";
 
     public Contribution findContribution(Integer repId, String laaTransactionId) {
         Contribution response = maatAPIClient.get(
@@ -98,4 +99,30 @@ public class MaatCourtDataService {
         log.info(RESPONSE_STRING, response);
         return response;
     }
+
+    public long getContributionCount(Integer repId, String laaTransactionId) {
+        var response = maatAPIClient.head(
+                configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        if (response != null) {
+            return response.getHeaders().getContentLength();
+        }
+        return 0L;
+    }
+
+    public RepOrderDTO getRepOrderByRepId(Integer repId, String laaTransactionId) {
+        var response = maatAPIClient.get(
+                RepOrderDTO.class,
+                configuration.getMaatApi().getContributionEndpoints().getGetRepOrderUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
+
 }

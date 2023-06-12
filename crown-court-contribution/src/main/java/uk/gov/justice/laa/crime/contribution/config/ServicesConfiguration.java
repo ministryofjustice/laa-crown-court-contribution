@@ -42,6 +42,13 @@ public class ServicesConfiguration {
 
             @NotNull
             private String getAppealAmountUrl;
+
+            @NotNull
+            private String getContributionCountUrl;
+
+            @NotNull
+            private String getRepOrderUrl;
+
         }
 
         @Data
