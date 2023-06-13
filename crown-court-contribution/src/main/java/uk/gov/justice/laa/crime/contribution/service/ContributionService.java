@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.PassportAssessmentResult;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -82,4 +84,27 @@ public class ContributionService {
         return false;
     }
 
+    public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {
+
+        String passportAssessmentResult = getPassportAssessmentResult(repOrderDTO);
+
+        String initialAssessmentResult = getInitialAssessmentResult(repOrderDTO);
+
+        return PassportAssessmentResult.FAIL.getResult().equals(passportAssessmentResult)
+                && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
+    }
+
+    protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
+                .stream().filter(passportAssessmentDTO -> "Y".equals(passportAssessmentDTO.getReplaced())).toList());
+        passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
+        return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
+    }
+
+    protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(repOrderDTO.getFinancialAssessments()
+                .stream().filter(financialAssessmentDTO -> "N".equals(financialAssessmentDTO.getReplaced())).toList());
+        financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
+        return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
+    }
 }
