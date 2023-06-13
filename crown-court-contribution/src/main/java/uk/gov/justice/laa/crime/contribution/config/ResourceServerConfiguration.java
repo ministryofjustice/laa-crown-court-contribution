@@ -18,21 +18,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @EnableWebSecurity
 public class ResourceServerConfiguration {
 
-    public static final String API_PATH = "/api/**";
-    public static final String SCOPE_READ = "SCOPE_READ";
-    public static final String SCOPE_READ_WRITE = "SCOPE_READ_WRITE";
-
-//    @Bean
-//    protected BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint() {
-//        BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint = new BearerTokenAuthenticationEntryPoint();
-//        bearerTokenAuthenticationEntryPoint.setRealmName("Crown Court Proceedings API");
-//        return bearerTokenAuthenticationEntryPoint;
-//    }
-
-//    @Bean
-//    public AccessDeniedHandler bearerTokenAccessDeniedHandler() {
-//        return new BearerTokenAccessDeniedHandler();
-//    }
+    private static final String API_PATH = "/api/**";
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
@@ -62,14 +48,6 @@ public class ResourceServerConfiguration {
                         .permitAll()
                         .anyRequest().anonymous()
                 ).csrf().disable();
-
-//                .oauth2ResourceServer(oauth2ResourceServer ->
-//                        oauth2ResourceServer
-//                                .accessDeniedHandler(bearerTokenAccessDeniedHandler())
-//                                .authenticationEntryPoint(bearerTokenAuthenticationEntryPoint())
-//                                .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder))
-//                );
-
 
         return http.build();
     }
