@@ -13,6 +13,8 @@ import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTem
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.PassportAssessmentResult;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,6 +31,20 @@ public class ContributionService {
     private static final String CONTRIBUTION_YES = "Y";
     private final CorrespondenceRuleRepository correspondenceRuleRepository;
     private final MaatCourtDataService maatCourtDataService;
+
+    protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
+                .stream().filter(passportAssessmentDTO -> "Y".equals(passportAssessmentDTO.getReplaced())).toList());
+        passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
+        return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
+    }
+
+    protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(repOrderDTO.getFinancialAssessments()
+                .stream().filter(financialAssessmentDTO -> "N".equals(financialAssessmentDTO.getReplaced())).toList());
+        financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
+        return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
+    }
 
     public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
         AssessmentResponseDTO response = new AssessmentResponseDTO();
@@ -149,5 +165,15 @@ public class ContributionService {
             }
         }
         return false;
+    }
+
+    public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {
+
+        String passportAssessmentResult = getPassportAssessmentResult(repOrderDTO);
+
+        String initialAssessmentResult = getInitialAssessmentResult(repOrderDTO);
+
+        return PassportAssessmentResult.FAIL.getResult().equals(passportAssessmentResult)
+                && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
     }
 }

@@ -12,7 +12,7 @@ import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealAssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
@@ -68,7 +68,7 @@ class MaatCourtDataServiceTest {
                 .withCaseType(CaseType.APPEAL_CC)
                 .withAppealType(AppealType.ACN)
                 .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withAssessmentResult(AppealAssessmentResult.PASS);
+                .withAssessmentResult(AssessmentResult.PASS);
 
         maatCourtDataService.getContributionAppealAmount(expected, LAA_TRANSACTION_ID);
 
@@ -79,7 +79,7 @@ class MaatCourtDataServiceTest {
                 any(CaseType.class),
                 any(AppealType.class),
                 any(CrownCourtAppealOutcome.class),
-                any(AppealAssessmentResult.class)
+                any(AssessmentResult.class)
         );
     }
 

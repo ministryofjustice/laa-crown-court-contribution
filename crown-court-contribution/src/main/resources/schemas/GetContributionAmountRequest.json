@@ -23,7 +23,7 @@
     "assessmentResult": {
       "type": "object",
       "description": "The associated assessment result",
-      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealAssessmentResult"
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult"
     }
   },
   "additionalProperties": false,

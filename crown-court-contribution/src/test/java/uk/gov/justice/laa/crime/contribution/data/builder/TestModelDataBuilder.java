@@ -2,16 +2,15 @@ package uk.gov.justice.laa.crime.contribution.data.builder;
 
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -185,5 +184,73 @@ public class TestModelDataBuilder {
                 .rtCode("DEF")
                 .replaced("Y")
                 .build();
+    }
+
+    public static Contribution buildContribution() {
+        return Contribution.builder()
+                .id(9)
+                .applId(9)
+                .repId(9)
+                .effectiveDate(LocalDate.now())
+                .calcDate(LocalDate.now())
+                .contributionCap(BigDecimal.valueOf(250))
+                .monthlyContributions(BigDecimal.valueOf(250))
+                .upfrontContributions(BigDecimal.valueOf(250))
+                .dateCreated(LocalDateTime.now())
+                .userCreated("test")
+                .build();
+    }
+
+    public static AppealContributionRequest buildAppealContributionRequest() {
+        return new AppealContributionRequest()
+                .withApplId(999)
+                .withRepId(999)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withAppealType(AppealType.ACS)
+                .withUserCreated("TEST")
+                .withLastOutcome(buildLastOutcome())
+                .withAssessments(List.of(buildAssessment()));
+    }
+
+    public static AppealContributionResponse buildAppealContributionResponse() {
+        return new AppealContributionResponse()
+                .withId(9)
+                .withApplId(9)
+                .withRepId(9)
+                .withContributionFileId(9)
+                .withEffectiveDate(LocalDateTime.now())
+                .withCalcDate(LocalDateTime.now())
+                .withContributionCap(BigDecimal.valueOf(250))
+                .withMonthlyContributions(BigDecimal.valueOf(50))
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withUpliftApplied("N")
+                .withBasedOn("test")
+                .withTransferStatus(TransferStatus.SENT)
+                .withDateUpliftApplied(null)
+                .withDateUpliftRemoved(null)
+                .withDateCreated(LocalDateTime.now())
+                .withUserCreated("test")
+                .withDateModified(null)
+                .withUserModified(null)
+                .withCreateContributionOrder(null)
+                .withCorrespondenceId(9)
+                .withActive("Y")
+                .withReplacedDate(null)
+                .withLatest(true)
+                .withCcOutcomeCount(9)
+                .withSeHistoryId(9);
+    }
+
+    public static LastOutcome buildLastOutcome() {
+        return new LastOutcome()
+                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
+                .withDateSet(LocalDateTime.now().minusDays(1));
+    }
+
+    public static Assessment buildAssessment() {
+        return new Assessment()
+                .withAssessmentType(AssessmentType.INIT)
+                .withStatus(AssessmentStatus.COMPLETE)
+                .withResult(AssessmentResult.PASS);
     }
 }
