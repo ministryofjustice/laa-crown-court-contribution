@@ -106,7 +106,7 @@ public class ContributionService {
                 contributionResponseDTO.setDoContribs(contributionResponse.getDoContribs());
                 contributionResponseDTO.setCalcContribs(contributionResponse.getCalcContribs());
 
-                if (processedCases != null && CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
+                if (CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
                     contributionResponseDTO.setCorrespondenceTypeDesc(CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()).getDescription());
                 }
             }
