@@ -247,7 +247,7 @@ class ContributionServiceTest {
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
         repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.PASS.getResult());
 
-        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isTrue();
+        assertThat(contributionService.isCds15WorkAround(repOrderDTO)).isTrue();
     }
 
     @Test
@@ -258,7 +258,7 @@ class ContributionServiceTest {
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
         repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.PASS.getResult());
 
-        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isFalse();
+        assertThat(contributionService.isCds15WorkAround(repOrderDTO)).isFalse();
     }
 
     @Test
@@ -269,7 +269,7 @@ class ContributionServiceTest {
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
         repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.FAIL.getResult());
 
-        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isFalse();
+        assertThat(contributionService.isCds15WorkAround(repOrderDTO)).isFalse();
     }
 
     @Test
@@ -280,7 +280,7 @@ class ContributionServiceTest {
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
         repOrderDTO.getFinancialAssessments().get(0).setInitResult(InitAssessmentResult.FAIL.getResult());
 
-        assertThat(contributionService.cds15WorkAround(repOrderDTO)).isFalse();
+        assertThat(contributionService.isCds15WorkAround(repOrderDTO)).isFalse();
     }
 
     @Test

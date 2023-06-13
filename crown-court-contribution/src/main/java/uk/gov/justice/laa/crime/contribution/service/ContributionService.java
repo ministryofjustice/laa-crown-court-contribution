@@ -84,7 +84,7 @@ public class ContributionService {
         return false;
     }
 
-    public boolean cds15WorkAround(RepOrderDTO repOrderDTO) {
+    public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {
 
         String passportAssessmentResult = getPassportAssessmentResult(repOrderDTO);
 
@@ -94,15 +94,15 @@ public class ContributionService {
                 && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
     }
 
-    protected static String getPassportAssessmentResult(RepOrderDTO repOrderDTO) {
-        List<PassportAssessmentDTO> passportAssessments = new java.util.ArrayList<>(repOrderDTO.getPassportAssessments()
+    protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
                 .stream().filter(passportAssessmentDTO -> "Y".equals(passportAssessmentDTO.getReplaced())).toList());
         passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
         return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
     }
 
-    protected static String getInitialAssessmentResult(RepOrderDTO repOrderDTO) {
-        List<FinancialAssessmentDTO> financialAssessments = new java.util.ArrayList<>(repOrderDTO.getFinancialAssessments()
+    protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(repOrderDTO.getFinancialAssessments()
                 .stream().filter(financialAssessmentDTO -> "N".equals(financialAssessmentDTO.getReplaced())).toList());
         financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
         return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
