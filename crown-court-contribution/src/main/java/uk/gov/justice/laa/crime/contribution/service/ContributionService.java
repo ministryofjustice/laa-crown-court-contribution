@@ -114,7 +114,7 @@ public class ContributionService {
         if (null != repOrderDTO) {
 
             String messageOutcome = Optional.ofNullable(repOrderDTO.getMagsOutcome()).orElse("na");
-            if (messageOutcome.equals(msgOutcome)) {
+            if (!messageOutcome.equals(msgOutcome)) {
                 return true;
             }
         }

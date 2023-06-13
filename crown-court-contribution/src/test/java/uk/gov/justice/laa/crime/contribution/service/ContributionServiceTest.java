@@ -328,25 +328,25 @@ class ContributionServiceTest {
     @Test
     void givenValidRepIdAndOutcomeIsNotMatch_whenHasMessageOutcomeChangedIsInvoked_thenFalseIsReturn() {
         when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(getRepOrderDTO(REP_ID));
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcomeMessage");
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcome");
         assertThat(hasMsgOutcomeChanged).isFalse();
 
     }
 
     @Test
-    void givenValidRepIdAndOutcomeIsNull_whenHasMessageOutcomeChangedIsInvoked_thenFalseIsReturn() {
+    void givenValidRepIdAndOutcomeIsNull_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setMagsOutcome(null);
         when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcomeMessage");
-        assertThat(hasMsgOutcomeChanged).isFalse();
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcome");
+        assertThat(hasMsgOutcomeChanged).isTrue();
 
     }
 
     @Test
     void givenValidRepId_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
         when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(getRepOrderDTO(REP_ID));
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcome");
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcomeMessage");
         assertThat(hasMsgOutcomeChanged).isTrue();
 
     }
