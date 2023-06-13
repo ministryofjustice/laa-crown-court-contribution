@@ -7,7 +7,6 @@ import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static java.util.Optional.ofNullable;
 

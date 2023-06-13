@@ -41,7 +41,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = {CrownCourtContributionApplication.class}, webEnvironment = DEFINED_PORT)
 @DirtiesContext
-public class CrownCourtContributionControllerTest {
+class CrownCourtContributionControllerTest {
 
     private static final String LAA_TRANSACTION_ID = "999";
     private static final String CLIENT_SECRET = "secret";

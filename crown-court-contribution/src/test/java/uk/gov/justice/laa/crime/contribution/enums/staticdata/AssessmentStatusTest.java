@@ -6,7 +6,7 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class AssessmentStatusTest {
+class AssessmentStatusTest {
 
     @Test
     void givenValidValue_whenGetFromIsInvoked_thenValidAssessmentStatusIsReturned() {

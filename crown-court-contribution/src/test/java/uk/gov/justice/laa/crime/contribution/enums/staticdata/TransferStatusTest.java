@@ -6,7 +6,7 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class TransferStatusTest {
+class TransferStatusTest {
     @Test
     void givenValidValue_whenGetFromIsInvoked_thenValidAssessmentStatusIsReturned() {
         assertThat(TransferStatus.getFrom("SENT")).isEqualTo(TransferStatus.SENT);

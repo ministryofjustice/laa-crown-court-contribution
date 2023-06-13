@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class AppealContributionServiceTest {
+class AppealContributionServiceTest {
 
     private static final String LAA_TRANSACTION_ID = "99999";
 

@@ -14,7 +14,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class AppealContributionValidatorTest {
+class AppealContributionValidatorTest {
 
     private static AppealContributionValidator appealContributionValidator = new AppealContributionValidator();
 

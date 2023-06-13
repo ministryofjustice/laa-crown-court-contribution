@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
 @DirtiesContext
-public class CrownCourtContributionIntegrationTest {
+class CrownCourtContributionIntegrationTest {
 
     private static final String CLIENT_CREDENTIALS = "client_credentials";
     private static final String SCOPE_READ_WRITE = "READ_WRITE";
