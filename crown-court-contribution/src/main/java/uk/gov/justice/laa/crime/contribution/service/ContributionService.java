@@ -107,4 +107,17 @@ public class ContributionService {
         financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
         return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
     }
+
+    public boolean hasMessageOutcomeChanged(int repId, String laaTransactionId, String msgOutcome) {
+
+        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
+        if (null != repOrderDTO) {
+
+            String messageOutcome = Optional.ofNullable(repOrderDTO.getMagsOutcome()).orElse("na");
+            if (messageOutcome.equals(msgOutcome)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
