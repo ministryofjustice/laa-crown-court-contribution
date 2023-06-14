@@ -81,6 +81,40 @@ public class TestModelDataBuilder {
         };
     }
 
+    public static CorrespondenceRuleAndTemplateInfo getEmptyCorrespondenceRuleAndTemplateInfo() {
+        return new CorrespondenceRuleAndTemplateInfo() {
+            @Override
+            public String getCalcContribs() {
+                return "N";
+            }
+
+            @Override
+            public Integer getUpliftCoteId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public Integer getReassessmentCoteId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public Integer getId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public String getCotyCorrespondenceType() {
+                return "";
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+        };
+    }
+
     public static ContributionVariationDTO getContributionVariationDTO() {
         return ContributionVariationDTO.builder()
                 .variation("SQL COSTS")

@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
@@ -122,16 +123,18 @@ class ContributionServiceTest {
                 Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS,
                         PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS,
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, PASS,
                         PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS))
 
         );
     }
 
-    private static Stream<Arguments> YesContributionRequest() {
+    private static Stream<Arguments> contributionRequest() {
         return Stream.of(
                 Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS,
-                        PASS, FAIL, "INEL", PASS, 1, CONTRIBUTION_YES, PASS))
+                        PASS, FAIL, "INEL", PASS, 1, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS,
+                        PASS, FAIL, FULL, PASS, 1, CONTRIBUTION_YES, PASS))
 
         );
     }
@@ -179,7 +182,7 @@ class ContributionServiceTest {
     }
 
     @ParameterizedTest()
-    @MethodSource("YesContributionRequest")
+    @MethodSource("contributionRequest")
     void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnYesContribution(ContributionRequestDTO request) {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo());
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
@@ -190,6 +193,16 @@ class ContributionServiceTest {
         assertThat(response.getUpliftCote()).isEqualTo(1);
         assertThat(response.getReassessmentCoteId()).isEqualTo(1);
         assertThat(response.getTemplateDesc()).isEqualTo("No contributions required");
+    }
+
+    @ParameterizedTest()
+    @MethodSource("contributionRequest")
+    void givenAValidContributeRequestAndEmptyCorrespondence_whenCheckContribConditionIsInvoked_thenReturnYesContribution(ContributionRequestDTO request) {
+        when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo());
+        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
+        assertThat(response.getDoContribs()).isEqualTo('Y');
+        assertThat(response.getId()).isEqualTo(1);
+        assertThat(response.getCorrespondenceType()).isEmpty();
     }
 
     @Test
