@@ -4,8 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
+import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.PassportAssessmentResult;
 
@@ -13,13 +20,31 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ContributionService {
 
+    private static final String INEL = "INEL";
+    private static final String CONTRIBUTION_YES = "Y";
+    private final CorrespondenceRuleRepository correspondenceRuleRepository;
     private final MaatCourtDataService maatCourtDataService;
+
+    protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
+                .stream().filter(passportAssessmentDTO -> "Y".equals(passportAssessmentDTO.getReplaced())).toList());
+        passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
+        return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
+    }
+
+    protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
+        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(repOrderDTO.getFinancialAssessments()
+                .stream().filter(financialAssessmentDTO -> "N".equals(financialAssessmentDTO.getReplaced())).toList());
+        financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
+        return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
+    }
 
     public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
         AssessmentResponseDTO response = new AssessmentResponseDTO();
@@ -28,14 +53,14 @@ public class ContributionService {
 
         if (StringUtils.isNotBlank(request.getPassportResult())) {
 
-            if (Set.of(Constants.PASS, Constants.TEMP).contains(request.getPassportResult())) {
+            if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
                 response.setMeansResult(Constants.PASSPORT);
             } else if (Constants.FAIL.equals(request.getPassportResult())) {
                 response.setMeansResult(Constants.FAILPORT);
-            } else if (Constants.PASS.equals(request.getInitResult()) ||
-                    Constants.PASS.equals(request.getFullResult()) ||
-                    Constants.PASS.equals(request.getHardshipResult())) {
-                response.setMeansResult(Constants.PASS);
+            } else if (PASS.equals(request.getInitResult()) ||
+                    PASS.equals(request.getFullResult()) ||
+                    PASS.equals(request.getHardshipResult())) {
+                response.setMeansResult(PASS);
             } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION).contains(request.getInitResult()) &&
                     (Constants.FAIL.equals(request.getFullResult())) &&
                     (Constants.FAIL.equals(ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
@@ -50,6 +75,64 @@ public class ContributionService {
             }
         }
         return response;
+    }
+
+    @Transactional
+    public ContributionResponseDTO checkContribsCondition(ContributionRequestDTO request) {
+        ContributionResponseDTO contributionResponseDTO = null;
+        AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
+
+        ContributionResponseDTO contributionResponse = new ContributionResponseDTO();
+        contributionResponse.setDoContribs('N');
+        contributionResponse.setCalcContribs('N');
+
+        AssessmentResponseDTO assessmentResponseDTO = getAssessmentResult(assessmentRequestDTO);
+        request.setIojResult(assessmentResponseDTO.getIojResult());
+        request.setMeansResult(assessmentResponseDTO.getMeansResult());
+
+        if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY).contains(request.getCaseType())
+                || request.getEffectiveDate() != null
+                || (CaseType.APPEAL_CC.equals(request.getCaseType()) && PASS.equals(request.getIojResult()))) {
+            contributionResponse.setDoContribs('Y');
+        }
+
+        if (contributionResponse.getDoContribs() == 'Y') {
+            CorrespondenceRuleAndTemplateInfo processedCases = getCoteInfo(request);
+            if (processedCases == null) {
+                contributionResponse.setDoContribs('N');
+                contributionResponse.setCalcContribs('N');
+            } else {
+                contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
+                contributionResponseDTO.setDoContribs(contributionResponse.getDoContribs());
+                contributionResponseDTO.setCalcContribs(contributionResponse.getCalcContribs());
+
+                if (CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
+                    contributionResponseDTO.setCorrespondenceTypeDesc(CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()).getDescription());
+                }
+            }
+        }
+
+        if (request.getMonthlyContribs() > 0 || INEL.equals(request.getFullResult())) {
+            contributionResponse.setDoContribs('Y');
+        }
+
+        if (CONTRIBUTION_YES.equals(request.getRemoveContribs())) {
+            contributionResponse.setCalcContribs('N');
+        }
+
+        return contributionResponseDTO;
+    }
+
+    @Transactional
+    public CorrespondenceRuleAndTemplateInfo getCoteInfo(ContributionRequestDTO contributionRequestDTO) {
+        return correspondenceRuleRepository.getCoteInfo(
+                contributionRequestDTO.getMeansResult(),
+                contributionRequestDTO.getIojResult(),
+                contributionRequestDTO.getMagCourtOutcome(),
+                contributionRequestDTO.getCrownCourtOutcome(),
+                contributionRequestDTO.getInitResult());
+
+
     }
 
     public boolean checkReassessment(final int repId, final String laaTransactionId) {
@@ -92,20 +175,6 @@ public class ContributionService {
 
         return PassportAssessmentResult.FAIL.getResult().equals(passportAssessmentResult)
                 && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
-    }
-
-    protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
-        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
-                .stream().filter(passportAssessmentDTO -> "Y".equals(passportAssessmentDTO.getReplaced())).toList());
-        passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
-        return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
-    }
-
-    protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
-        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(repOrderDTO.getFinancialAssessments()
-                .stream().filter(financialAssessmentDTO -> "N".equals(financialAssessmentDTO.getReplaced())).toList());
-        financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
-        return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
     }
 
     public boolean hasMessageOutcomeChanged(int repId, String laaTransactionId, String msgOutcome) {
