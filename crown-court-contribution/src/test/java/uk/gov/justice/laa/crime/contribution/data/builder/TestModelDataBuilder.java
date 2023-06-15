@@ -1,44 +1,120 @@
 package uk.gov.justice.laa.crime.contribution.data.builder;
 
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.Assessment;
-import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
-import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+import java.util.Collections;
 import java.util.List;
+
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
 @Component
 public class TestModelDataBuilder {
 
     public static final String PASSPORT_RESULT_FAIL_CONTINUE = "FAIL CONTINUE";
     public static final Integer REP_ID = 1234;
+    public static final Integer CORRESPONDENCE_ID = 1;
     public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
 
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
 
         return AssessmentRequestDTO.builder()
-                .iojResult(Constants.PASS)
-                .decisionResult(Constants.PASS)
-                .passportResult(Constants.PASS)
-                .initResult(Constants.PASS)
-                .fullResult(Constants.FULL)
-                .hardshipResult(Constants.PASS)
+                .iojResult(PASS)
+                .decisionResult(PASS)
+                .passportResult(PASS)
+                .initResult(PASS)
+                .fullResult(FULL)
+                .hardshipResult(PASS)
                 .build();
     }
-    
+
+    public static ContributionRequestDTO getContributionRequestDTO() {
+        return ContributionRequestDTO.builder()
+                .iojResult(PASS)
+                .decisionResult(PASS)
+                .initResult(PASS)
+                .fullResult(FULL)
+                .hardshipResult(PASS)
+                .passportResult(PASS).build();
+    }
+
+    public static CorrespondenceRuleAndTemplateInfo getCorrespondenceRuleAndTemplateInfo() {
+        return new CorrespondenceRuleAndTemplateInfo() {
+            @Override
+            public String getCalcContribs() {
+                return "N";
+            }
+
+            @Override
+            public Integer getUpliftCoteId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public Integer getReassessmentCoteId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public Integer getId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public String getCotyCorrespondenceType() {
+                return "CONTRIBUTION_NOTICE";
+            }
+
+            @Override
+            public String getDescription() {
+                return "No contributions required";
+            }
+        };
+    }
+
+    public static CorrespondenceRuleAndTemplateInfo getEmptyCorrespondenceRuleAndTemplateInfo() {
+        return new CorrespondenceRuleAndTemplateInfo() {
+            @Override
+            public String getCalcContribs() {
+                return "N";
+            }
+
+            @Override
+            public Integer getUpliftCoteId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public Integer getReassessmentCoteId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public Integer getId() {
+                return CORRESPONDENCE_ID;
+            }
+
+            @Override
+            public String getCotyCorrespondenceType() {
+                return "";
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+        };
+    }
+
     public static ContributionVariationDTO getContributionVariationDTO() {
         return ContributionVariationDTO.builder()
                 .variation("SQL COSTS")
@@ -66,7 +142,7 @@ public class TestModelDataBuilder {
         return new ApiCrownCourtSummary()
                 .withCrownCourtOutcome(apiCrownCourtOutcomeList);
     }
-    
+
     public static RepOrderDTO getRepOrderDTO() {
         return getRepOrderDTO(TestModelDataBuilder.REP_ID);
     }
@@ -82,8 +158,8 @@ public class TestModelDataBuilder {
                 .decisionReasonCode("rder-code")
                 .crownRepOrderDecision("cc-rep-doc")
                 .crownRepOrderType("cc-rep-type")
-                .financialAssessments(Arrays.asList(getFinancialAssessmentDTO()))
-                .passportAssessments(Arrays.asList(getPassportAssessmentDTO()))
+                .financialAssessments(Collections.singletonList(getFinancialAssessmentDTO()))
+                .passportAssessments(Collections.singletonList(getPassportAssessmentDTO()))
                 .build();
     }
 
