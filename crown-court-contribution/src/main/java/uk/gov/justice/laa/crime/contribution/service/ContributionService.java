@@ -181,11 +181,8 @@ public class ContributionService {
 
         RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
         if (null != repOrderDTO) {
-
             String messageOutcome = Optional.ofNullable(repOrderDTO.getMagsOutcome()).orElse("na");
-            if (!messageOutcome.equals(msgOutcome)) {
-                return true;
-            }
+            return !messageOutcome.equals(msgOutcome);
         }
         return false;
     }
