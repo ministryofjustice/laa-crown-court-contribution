@@ -176,4 +176,12 @@ public class ContributionService {
         return PassportAssessmentResult.FAIL.getResult().equals(passportAssessmentResult)
                 && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
     }
+
+    public boolean hasMessageOutcomeChanged(String msgOutcome, RepOrderDTO repOrderDTO) {
+        if (null != repOrderDTO) {
+            String messageOutcome = Optional.ofNullable(repOrderDTO.getMagsOutcome()).orElse("na");
+            return !messageOutcome.equals(msgOutcome);
+        }
+        return false;
+    }
 }
