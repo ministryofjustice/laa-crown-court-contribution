@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
@@ -25,7 +26,7 @@ public class MaatCourtDataService {
 
     public Contribution findContribution(Integer repId, String laaTransactionId) {
         Contribution response = maatAPIClient.get(
-                Contribution.class,
+                new ParameterizedTypeReference<Contribution>() {},
                 configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 repId
@@ -37,7 +38,7 @@ public class MaatCourtDataService {
     public Contribution createContribution(CreateContributionRequest request, String laaTransactionId) {
         Contribution response = maatAPIClient.post(
                 request,
-                Contribution.class,
+                new ParameterizedTypeReference<Contribution>() {},
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
@@ -48,7 +49,7 @@ public class MaatCourtDataService {
     public Contribution updateContribution(UpdateContributionRequest request, String laaTransactionId) {
         Contribution response = maatAPIClient.put(
                 request,
-                Contribution.class,
+                new ParameterizedTypeReference<Contribution>() {},
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
@@ -58,7 +59,7 @@ public class MaatCourtDataService {
 
     public BigDecimal getContributionAppealAmount(GetContributionAmountRequest request, String laaTransactionId) {
         BigDecimal response = maatAPIClient.get(
-                BigDecimal.class,
+                new ParameterizedTypeReference<BigDecimal>() {},
                 configuration.getMaatApi().getContributionEndpoints().getGetAppealAmountUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 request.getCaseType(), request.getAppealType(), request.getOutcome(), request.getAssessmentResult()
@@ -69,7 +70,7 @@ public class MaatCourtDataService {
 
     public CorrespondenceState findCorrespondenceState(Integer repId, String laaTransactionId) {
         CorrespondenceState response = maatAPIClient.get(
-                CorrespondenceState.class,
+                new ParameterizedTypeReference<CorrespondenceState>() {},
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getFindUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 repId
@@ -81,7 +82,7 @@ public class MaatCourtDataService {
     public CorrespondenceState createCorrespondenceState(CorrespondenceState state, String laaTransactionId) {
         CorrespondenceState response = maatAPIClient.post(
                 state,
-                CorrespondenceState.class,
+                new ParameterizedTypeReference<CorrespondenceState>() {},
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
@@ -92,7 +93,7 @@ public class MaatCourtDataService {
     public CorrespondenceState updateCorrespondenceState(CorrespondenceState state, String laaTransactionId) {
         CorrespondenceState response = maatAPIClient.put(
                 state,
-                CorrespondenceState.class,
+                new ParameterizedTypeReference<CorrespondenceState>() {},
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
         );
@@ -115,7 +116,7 @@ public class MaatCourtDataService {
 
     public RepOrderDTO getRepOrderByRepId(Integer repId, String laaTransactionId) {
         var response = maatAPIClient.get(
-                RepOrderDTO.class,
+                new ParameterizedTypeReference<RepOrderDTO>() {},
                 configuration.getMaatApi().getContributionEndpoints().getGetRepOrderUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 repId

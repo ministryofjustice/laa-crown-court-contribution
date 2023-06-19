@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,6 +9,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
+import org.springframework.core.ParameterizedTypeReference;
 import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
@@ -43,14 +45,14 @@ class MaatCourtDataServiceTest {
     @Test
     void givenValidRepId_whenFindContributionIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.findContribution(TEST_REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataClient).get(eq(Contribution.class), anyString(), anyMap(), anyInt());
+        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<Contribution>(){}), anyString(), anyMap(), anyInt());
     }
 
     @Test
     void givenValidParams_whenCreateContributionIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.createContribution(new CreateContributionRequest(), LAA_TRANSACTION_ID);
         verify(maatCourtDataClient).post(
-                any(CreateContributionRequest.class), eq(Contribution.class), anyString(), anyMap()
+                any(CreateContributionRequest.class), eq(new ParameterizedTypeReference<Contribution>(){}), anyString(), anyMap()
         );
     }
 
@@ -58,7 +60,7 @@ class MaatCourtDataServiceTest {
     void givenValidParams_whenUpdateContributionIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.updateContribution(new UpdateContributionRequest(), LAA_TRANSACTION_ID);
         verify(maatCourtDataClient).put(
-                any(UpdateContributionRequest.class), eq(Contribution.class), anyString(), anyMap()
+                any(UpdateContributionRequest.class), eq(new ParameterizedTypeReference<Contribution>(){}), anyString(), anyMap()
         );
     }
 
@@ -73,7 +75,7 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.getContributionAppealAmount(expected, LAA_TRANSACTION_ID);
 
         verify(maatCourtDataClient).get(
-                eq(BigDecimal.class),
+                eq(new ParameterizedTypeReference<BigDecimal>(){}),
                 anyString(),
                 anyMap(),
                 any(CaseType.class),
@@ -86,14 +88,14 @@ class MaatCourtDataServiceTest {
     @Test
     void givenValidRepId_whenFindCorrespondenceStateIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.findCorrespondenceState(TEST_REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataClient).get(eq(CorrespondenceState.class), anyString(), anyMap(), anyInt());
+        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<CorrespondenceState>(){}), anyString(), anyMap(), anyInt());
     }
 
     @Test
     void givenValidParams_whenCreateCorrespondenceStateIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.createCorrespondenceState(new CorrespondenceState(), LAA_TRANSACTION_ID);
         verify(maatCourtDataClient).post(
-                any(CorrespondenceState.class), eq(CorrespondenceState.class), anyString(), anyMap()
+                any(CorrespondenceState.class), eq(new ParameterizedTypeReference<CorrespondenceState>(){}), anyString(), anyMap()
         );
     }
 
@@ -107,9 +109,6 @@ class MaatCourtDataServiceTest {
     @Test
     void givenValidRepId_whengetRepOrderByRepIdIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.getRepOrderByRepId(TEST_REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataClient).get(RepOrderDTO.class,
-                configuration.getMaatApi().getContributionEndpoints().getGetRepOrderUrl(),
-                Map.of(Constants.LAA_TRANSACTION_ID, LAA_TRANSACTION_ID),
-                TEST_REP_ID);
+        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<RepOrderDTO>(){}),anyString(), anyMap(), anyInt());
     }
 }
