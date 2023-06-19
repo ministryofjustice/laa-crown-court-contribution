@@ -51,7 +51,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation "org.springframework.security:spring-security-oauth2-authorization-server:$versions.springauthserverVersion"
 
-    implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:1.0.0"
+    implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:2.0.0"
 
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
