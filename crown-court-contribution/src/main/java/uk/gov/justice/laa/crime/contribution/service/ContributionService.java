@@ -177,9 +177,7 @@ public class ContributionService {
                 && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
     }
 
-    public boolean hasMessageOutcomeChanged(int repId, String laaTransactionId, String msgOutcome) {
-
-        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
+    public boolean hasMessageOutcomeChanged(String msgOutcome, RepOrderDTO repOrderDTO) {
         if (null != repOrderDTO) {
             String messageOutcome = Optional.ofNullable(repOrderDTO.getMagsOutcome()).orElse("na");
             return !messageOutcome.equals(msgOutcome);

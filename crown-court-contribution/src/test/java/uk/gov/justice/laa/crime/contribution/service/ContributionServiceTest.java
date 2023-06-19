@@ -413,16 +413,14 @@ class ContributionServiceTest {
 
     @Test
     void givenInvalidRepId_whenHasMessageOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(null);
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcome");
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged("outcome", null);
         assertThat(hasMsgOutcomeChanged).isFalse();
 
     }
 
     @Test
     void givenValidRepIdAndOutcomeIsNotMatch_whenHasMessageOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(getRepOrderDTO(REP_ID));
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcome");
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged( "outcome", getRepOrderDTO(REP_ID));
         assertThat(hasMsgOutcomeChanged).isFalse();
 
     }
@@ -431,16 +429,13 @@ class ContributionServiceTest {
     void givenValidRepIdAndOutcomeIsNull_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setMagsOutcome(null);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcome");
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged( "outcome", repOrderDTO);
         assertThat(hasMsgOutcomeChanged).isTrue();
 
     }
-
     @Test
     void givenValidRepId_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(getRepOrderDTO(REP_ID));
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged(REP_ID, LAA_TRANSACTION_ID, "outcomeMessage");
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged("outcomeMessage", getRepOrderDTO(REP_ID));
         assertThat(hasMsgOutcomeChanged).isTrue();
 
     }
