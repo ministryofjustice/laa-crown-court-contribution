@@ -444,17 +444,17 @@ class ContributionServiceTest {
 
     }
     @Test
-    void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+    void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(null);
         boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(hasCCOutcomeChanged).isFalse();
+        assertThat(hasCCOutcomeChanged).isTrue();
 
     }
     @Test
-    void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+    void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(Collections.emptyList());
         boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(hasCCOutcomeChanged).isFalse();
+        assertThat(hasCCOutcomeChanged).isTrue();
 
     }
     @Test
