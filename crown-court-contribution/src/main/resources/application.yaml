@@ -55,6 +55,8 @@ services:
     correspondence-state-endpoints:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
       find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+    rep-order-endpoints:
+      find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
 
 springdoc:
   packagesToScan: uk.gov.justice.laa.crime.contribution

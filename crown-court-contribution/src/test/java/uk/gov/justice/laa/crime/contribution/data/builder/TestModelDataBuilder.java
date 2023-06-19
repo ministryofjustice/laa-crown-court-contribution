@@ -287,4 +287,12 @@ public class TestModelDataBuilder {
                 .withStatus(AssessmentStatus.COMPLETE)
                 .withResult(AssessmentResult.PASS);
     }
+
+    public static RepOrderCCOutcomeDTO getRepOrderCCOutcomeDTO(Integer outcomeId, String outcome) {
+        return RepOrderCCOutcomeDTO.builder()
+                .id(outcomeId)
+                .outcome(outcome)
+                .outcomeDate(LocalDateTime.now())
+                .build();
+    }
 }

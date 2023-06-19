@@ -11,10 +11,7 @@ import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.PassportAssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -177,10 +174,26 @@ public class ContributionService {
                 && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
     }
 
+
     public boolean hasMessageOutcomeChanged(String msgOutcome, RepOrderDTO repOrderDTO) {
         if (null != repOrderDTO) {
             String messageOutcome = Optional.ofNullable(repOrderDTO.getMagsOutcome()).orElse("na");
             return !messageOutcome.equals(msgOutcome);
+        }
+        return false;
+    }
+
+    public boolean hasCCOutcomeChanged(final int repId, final String laaTransactionId) {
+
+        List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId, laaTransactionId);
+        if (null != repOrderCCOutcomeList && !repOrderCCOutcomeList.isEmpty()) {
+            RepOrderCCOutcomeDTO outcomeDTO = repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId)).get();
+            RepOrderCCOutcomeDTO repOrderCCOutcomeDTO =  repOrderCCOutcomeList.stream()
+                    .filter(outcome -> outcome.getId() == outcomeDTO.getId()).findFirst().get();
+                if (null == repOrderCCOutcomeDTO.getOutcome()
+                        || CrownCourtOutcome.AQUITTED.getCode().equals(repOrderCCOutcomeDTO.getOutcome())) {
+                    return true;
+                }
         }
         return false;
     }

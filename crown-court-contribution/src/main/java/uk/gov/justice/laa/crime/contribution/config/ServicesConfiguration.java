@@ -29,6 +29,9 @@ public class ServicesConfiguration {
         @NotNull
         private CorrespondenceStateEndpoints correspondenceStateEndpoints;
 
+        @NotNull
+        private RepOrderEndpoints repOrderEndpoints;
+
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
@@ -62,6 +65,14 @@ public class ServicesConfiguration {
             @NotNull
             private String findUrl;
 
+        }
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class RepOrderEndpoints {
+            @NotNull
+            private String findOutcomeUrl;
         }
     }
 }
