@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -118,6 +120,17 @@ public class MaatCourtDataService {
         var response = maatAPIClient.get(
                 new ParameterizedTypeReference<RepOrderDTO>() {},
                 configuration.getMaatApi().getContributionEndpoints().getGetRepOrderUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
+    public List<RepOrderCCOutcomeDTO> getRepOrderCCOutcomeByRepId(Integer repId, String laaTransactionId) {
+        List<RepOrderCCOutcomeDTO> response = maatAPIClient.get(
+                new ParameterizedTypeReference<List<RepOrderCCOutcomeDTO>>() {},
+                configuration.getMaatApi().getRepOrderEndpoints().getFindOutcomeUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 repId
         );
