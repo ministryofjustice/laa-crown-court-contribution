@@ -13,15 +13,19 @@ import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.PassportAssessmentResult;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -410,6 +414,80 @@ class ContributionServiceTest {
 
         assertThat(ContributionService.getInitialAssessmentResult(repOrderDTO)).isEqualTo(InitAssessmentResult.PASS.getResult());
     }
+
+    @Test
+    void givenInvalidRepId_whenHasMessageOutcomeChangedIsInvoked_thenFalseIsReturn() {
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged("outcome", null);
+        assertThat(hasMsgOutcomeChanged).isFalse();
+
+    }
+
+    @Test
+    void givenValidRepIdAndOutcomeIsNotMatch_whenHasMessageOutcomeChangedIsInvoked_thenFalseIsReturn() {
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged( "outcome", getRepOrderDTO(REP_ID));
+        assertThat(hasMsgOutcomeChanged).isFalse();
+
+    }
+
+    @Test
+    void givenValidRepIdAndOutcomeIsNull_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.setMagsOutcome(null);
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged( "outcome", repOrderDTO);
+        assertThat(hasMsgOutcomeChanged).isTrue();
+
+    }
+    @Test
+    void givenValidRepId_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged("outcomeMessage", getRepOrderDTO(REP_ID));
+        assertThat(hasMsgOutcomeChanged).isTrue();
+
+    }
+    @Test
+    void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(null);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(hasCCOutcomeChanged).isFalse();
+
+    }
+    @Test
+    void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(Collections.emptyList());
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(hasCCOutcomeChanged).isFalse();
+
+    }
+    @Test
+    void givenValidRepId_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
+        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.ABANDONED.getCode()));
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any())).thenReturn(outcomeList);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(hasCCOutcomeChanged).isTrue();
+
+    }
+    @Test
+    void givenValidRepIdAndEmptyOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null));
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any())).thenReturn(outcomeList);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(hasCCOutcomeChanged).isFalse();
+
+    }
+    @Test
+    void givenValidRepIdAndOutcomeIsAquitted_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.AQUITTED.getCode()));
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any())).thenReturn(outcomeList);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(hasCCOutcomeChanged).isFalse();
+
+    }
+
 
 }
 

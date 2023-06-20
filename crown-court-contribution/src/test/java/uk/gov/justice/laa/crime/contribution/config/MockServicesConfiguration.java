@@ -23,10 +23,14 @@ public class MockServicesConfiguration {
                         "/correspondence-state", "/correspondence-state/{repId}"
                 );
 
+        ServicesConfiguration.MaatApi.RepOrderEndpoints repOrderEndpoints =
+                new ServicesConfiguration.MaatApi.RepOrderEndpoints("/rep-orders/cc-outcome/reporder/{repId}");
+
         maatApiConfiguration.setBaseUrl(host);
         servicesConfiguration.setMaatApi(maatApiConfiguration);
         maatApiConfiguration.setContributionEndpoints(contributionEndpoints);
         maatApiConfiguration.setCorrespondenceStateEndpoints(correspondenceStateEndpoints);
+        maatApiConfiguration.setRepOrderEndpoints(repOrderEndpoints);
 
         return servicesConfiguration;
     }
