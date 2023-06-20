@@ -444,47 +444,47 @@ class ContributionServiceTest {
 
     }
     @Test
-    void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
+    void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(null);
         boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(hasCCOutcomeChanged).isTrue();
+        assertThat(hasCCOutcomeChanged).isFalse();
 
     }
     @Test
-    void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
+    void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(Collections.emptyList());
         boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(hasCCOutcomeChanged).isTrue();
+        assertThat(hasCCOutcomeChanged).isFalse();
 
     }
     @Test
-    void givenValidRepId_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+    void givenValidRepId_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.ABANDONED.getCode()));
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any())).thenReturn(outcomeList);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(hasCCOutcomeChanged).isTrue();
+
+    }
+    @Test
+    void givenValidRepIdAndEmptyOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
+        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
+        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null));
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any())).thenReturn(outcomeList);
         boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
         assertThat(hasCCOutcomeChanged).isFalse();
 
     }
     @Test
-    void givenValidRepIdAndEmptyOutcome_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
-        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any())).thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(hasCCOutcomeChanged).isTrue();
-
-    }
-    @Test
-    void givenValidRepIdAndOutcomeIsAquitted_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
+    void givenValidRepIdAndOutcomeIsAquitted_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.AQUITTED.getCode()));
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any())).thenReturn(outcomeList);
         boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
-        assertThat(hasCCOutcomeChanged).isTrue();
+        assertThat(hasCCOutcomeChanged).isFalse();
 
     }
 
