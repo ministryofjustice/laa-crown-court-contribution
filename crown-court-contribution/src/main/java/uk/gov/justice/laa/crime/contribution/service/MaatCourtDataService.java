@@ -145,5 +145,16 @@ public class MaatCourtDataService {
         return response;
     }
 
-
+    public List<???> getContributionsSummary(Integer repId, String laaTransactionId) {
+        // TODO: Need to refactor once determined url and response type from MAAT API endpoint
+        List<???> response = maatAPIClient.get(
+                new ParameterizedTypeReference<???>() {},
+                configuration.getMaatApi().???,
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        // TODO: Might need to map to another model if response type is not suitable
+        return response;
+    }
 }
