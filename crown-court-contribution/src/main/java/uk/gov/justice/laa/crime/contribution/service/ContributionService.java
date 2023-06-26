@@ -195,4 +195,12 @@ public class ContributionService {
         }
         return isOutcomeChanged;
     }
+
+
+    public boolean hasApplicationStatusChanged(RepOrderDTO repOrderDTO, CaseType caseType, String status) {
+        log.info("Get applicant details from Crime Apply datastore");
+        return CaseType.INDICTABLE.equals(caseType) && repOrderDTO != null
+                && repOrderDTO.getRorsStatus() != null
+                && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
+    }
 }

@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
@@ -39,6 +38,12 @@ class ContributionServiceTest {
     private static final LocalDateTime dateCreated = LocalDateTime.parse("2023-07-10T15:01:25");
     private static final String CONTRIBUTION_NO = "N";
     private static final String CONTRIBUTION_YES = "Y";
+
+    private static final String RORS_STATUS = "rors-status";
+
+    private static final String RORS_STATUS_CURR = "CURR";
+
+
     @InjectMocks
     private ContributionService contributionService;
     @Mock
@@ -424,7 +429,7 @@ class ContributionServiceTest {
 
     @Test
     void givenValidRepIdAndOutcomeIsNotMatch_whenHasMessageOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged( "outcome", getRepOrderDTO(REP_ID));
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged("outcome", getRepOrderDTO(REP_ID));
         assertThat(hasMsgOutcomeChanged).isFalse();
 
     }
@@ -433,16 +438,18 @@ class ContributionServiceTest {
     void givenValidRepIdAndOutcomeIsNull_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setMagsOutcome(null);
-        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged( "outcome", repOrderDTO);
+        boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged("outcome", repOrderDTO);
         assertThat(hasMsgOutcomeChanged).isTrue();
 
     }
+
     @Test
     void givenValidRepId_whenHasMessageOutcomeChangedIsInvoked_thenTrueIsReturn() {
         boolean hasMsgOutcomeChanged = contributionService.hasMessageOutcomeChanged("outcomeMessage", getRepOrderDTO(REP_ID));
         assertThat(hasMsgOutcomeChanged).isTrue();
 
     }
+
     @Test
     void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(null);
@@ -450,6 +457,7 @@ class ContributionServiceTest {
         assertThat(hasCCOutcomeChanged).isFalse();
 
     }
+
     @Test
     void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(Collections.emptyList());
@@ -457,6 +465,7 @@ class ContributionServiceTest {
         assertThat(hasCCOutcomeChanged).isFalse();
 
     }
+
     @Test
     void givenValidRepId_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
@@ -467,6 +476,7 @@ class ContributionServiceTest {
         assertThat(hasCCOutcomeChanged).isTrue();
 
     }
+
     @Test
     void givenValidRepIdAndEmptyOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
@@ -477,6 +487,7 @@ class ContributionServiceTest {
         assertThat(hasCCOutcomeChanged).isFalse();
 
     }
+
     @Test
     void givenValidRepIdAndOutcomeIsAquitted_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
@@ -488,6 +499,48 @@ class ContributionServiceTest {
 
     }
 
+
+    @Test
+    void givenValidRepIdAndCaseTypeDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
+                CaseType.APPEAL_CC, RORS_STATUS);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
+
+    @Test
+    void givenValidRepIdAndRorsStatusMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
+                CaseType.INDICTABLE, RORS_STATUS);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
+
+    @Test
+    void givenValidRepIdAndRorsStatusDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenTrueIsReturn() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.setRorsStatus(RORS_STATUS_CURR);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
+                CaseType.INDICTABLE, RORS_STATUS);
+        assertThat(hasApplicationStatusChanged).isTrue();
+    }
+
+    @Test
+    void givenInvalidRepId_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
+                CaseType.INDICTABLE, RORS_STATUS);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
+
+    @Test
+    void givenValidRepIdAndRorsStatusIsNull_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
+        repOrderDTO.setRorsStatus(null);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
+                CaseType.INDICTABLE, RORS_STATUS);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
 
 }
 
