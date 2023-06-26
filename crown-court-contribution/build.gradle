@@ -16,7 +16,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 def versions = [
-        pitest                  : "1.4.10",
+        pitest                  : "1.14.2",
         sentryVersion           : "6.15.0",
         springdocVersion        : "2.1.0",
         springauthserverVersion : "1.0.1",
