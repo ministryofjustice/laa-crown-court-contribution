@@ -39,6 +39,12 @@ class ContributionServiceTest {
     private static final LocalDateTime dateCreated = LocalDateTime.parse("2023-07-10T15:01:25");
     private static final String CONTRIBUTION_NO = "N";
     private static final String CONTRIBUTION_YES = "Y";
+
+    private static final String RORS_STATUS = "rors-status";
+
+    private static final String RORS_STATUS_CURR = "CURR";
+
+
     @InjectMocks
     private ContributionService contributionService;
     @Mock
@@ -488,6 +494,50 @@ class ContributionServiceTest {
 
     }
 
+
+    @Test
+    void givenValidRepIdAndCaseTypeDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged( 1234,
+                CaseType.APPEAL_CC, RORS_STATUS, LAA_TRANSACTION_ID);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
+
+    @Test
+    void givenValidRepIdAndRorsStatusMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO(1234);
+        when(maatCourtDataService.getRepOrderByRepId(any(), any())).thenReturn(repOrderDTO);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged( 1234,
+                CaseType.INDICTABLE, RORS_STATUS, LAA_TRANSACTION_ID);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
+
+    @Test
+    void givenValidRepIdAndRorsStatusDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenTrueIsReturn() {
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO(1234);
+        repOrderDTO.setRorsStatus(RORS_STATUS_CURR);
+        when(maatCourtDataService.getRepOrderByRepId(any(), any())).thenReturn(repOrderDTO);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged( 1234,
+                CaseType.INDICTABLE, RORS_STATUS, LAA_TRANSACTION_ID);
+        assertThat(hasApplicationStatusChanged).isTrue();
+    }
+
+    @Test
+    void givenInvalidRepId_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        when(maatCourtDataService.getRepOrderByRepId(any(), any())).thenReturn(null);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged( 1234,
+                CaseType.INDICTABLE, RORS_STATUS, LAA_TRANSACTION_ID);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
+
+    @Test
+    void givenValidRepIdAndRorsStatusIsNull_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO(1234);
+        repOrderDTO.setRorsStatus(null);
+        when(maatCourtDataService.getRepOrderByRepId(any(), any())).thenReturn(repOrderDTO);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged( 1234,
+                CaseType.INDICTABLE, RORS_STATUS, LAA_TRANSACTION_ID);
+        assertThat(hasApplicationStatusChanged).isFalse();
+    }
 
 }
 
