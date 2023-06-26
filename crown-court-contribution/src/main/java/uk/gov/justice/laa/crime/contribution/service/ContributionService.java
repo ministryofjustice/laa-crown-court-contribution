@@ -197,18 +197,10 @@ public class ContributionService {
     }
 
 
-    public boolean hasApplicationStatusChanged(final int repId, final CaseType caseType, final String status, final String laaTransactionId) {
+    public boolean hasApplicationStatusChanged(RepOrderDTO repOrderDTO, CaseType caseType, String status) {
         log.info("Get applicant details from Crime Apply datastore");
-        boolean hasStatusChanged = false;
-        RepOrderDTO repOrderDTO;
-        if (CaseType.INDICTABLE.equals(caseType)) {
-            repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
-            if (repOrderDTO != null
-                    && repOrderDTO.getRorsStatus() != null
-                    && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status)) {
-                hasStatusChanged = true;
-            }
-        }
-        return hasStatusChanged;
+        return CaseType.INDICTABLE.equals(caseType) && repOrderDTO != null
+                && repOrderDTO.getRorsStatus() != null
+                && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
     }
 }
