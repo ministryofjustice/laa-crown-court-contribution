@@ -158,6 +158,7 @@ public class TestModelDataBuilder {
                 .decisionReasonCode("rder-code")
                 .crownRepOrderDecision("cc-rep-doc")
                 .crownRepOrderType("cc-rep-type")
+                .rorsStatus("rors-status")
                 .financialAssessments(Collections.singletonList(getFinancialAssessmentDTO()))
                 .passportAssessments(Collections.singletonList(getPassportAssessmentDTO()))
                 .build();
