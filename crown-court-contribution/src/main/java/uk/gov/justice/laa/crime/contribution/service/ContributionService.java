@@ -9,10 +9,12 @@ import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -202,5 +204,15 @@ public class ContributionService {
         return CaseType.INDICTABLE.equals(caseType) && repOrderDTO != null
                 && repOrderDTO.getRorsStatus() != null
                 && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
+    }
+
+    public boolean hasContributionBeenSent(final int repId, final String laaTransactionId) {
+        List<Contribution> contribList = maatCourtDataService.findContribution(repId, laaTransactionId, Boolean.FALSE);
+        List<Contribution> contributionList = Optional.ofNullable(contribList).orElse(Collections.emptyList()).stream().filter(
+                contribution ->   ("SENT".equals(contribution.getTransferStatus()) &&
+                                            contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0)
+        ).toList();
+
+        return !contributionList.isEmpty() ? true : false;
     }
 }
