@@ -45,10 +45,10 @@ spring:
 services:
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
-    assessments-domain: /api/internal/v1/assessment
+    assessments-domain: ${services.maat-api.base-url}/api/internal/v1/assessment
     contribution-endpoints:
       base-url: ${services.maat-api.assessments-domain}/contributions
-      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+      find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
       get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal
       get-contribution-count-url: ${services.maat-api.assessments-domain}/{repId}/contribution
       get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
@@ -75,3 +75,8 @@ sentry:
   send-default-pii: true
   attach-stacktrace: true
   sample-rate: 0.05
+
+retry-config:
+  max-retries: 3
+  min-back-off-period: 5
+  jitter-value: 0.75

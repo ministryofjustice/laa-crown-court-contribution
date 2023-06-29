@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.MultiValueMap;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import org.springframework.core.ParameterizedTypeReference;
@@ -29,6 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class MaatCourtDataServiceTest {
@@ -48,8 +50,8 @@ class MaatCourtDataServiceTest {
 
     @Test
     void givenValidRepId_whenFindContributionIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.findContribution(TEST_REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<Contribution>(){}), anyString(), anyMap(), anyInt());
+        maatCourtDataService.findContribution(TEST_REP_ID, LAA_TRANSACTION_ID, true);
+        verify(maatCourtDataClient).get(any(), anyString(), anyMap(), any(), anyInt());
     }
 
     @Test

@@ -54,8 +54,8 @@ class AppealContributionServiceTest {
                 .thenReturn(new GetContributionAmountRequest());
         when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
                 .thenReturn(BigDecimal.valueOf(500));
-        when(maatCourtDataService.findContribution(anyInt(), anyString()))
-                .thenReturn(currContribution);
+        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+                .thenReturn(List.of(currContribution));
         when(createContributionRequestMapper.map(any(AppealContributionRequest.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), anyString()))
@@ -80,8 +80,8 @@ class AppealContributionServiceTest {
                 .thenReturn(new GetContributionAmountRequest());
         when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
                 .thenReturn(BigDecimal.valueOf(0));
-        when(maatCourtDataService.findContribution(anyInt(), anyString()))
-                .thenReturn(currContribution);
+        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+                .thenReturn(List.of(currContribution));
         when(appealContributionResponseMapper.map(any(Contribution.class)))
                 .thenReturn(TestModelDataBuilder.buildAppealContributionResponse());
 

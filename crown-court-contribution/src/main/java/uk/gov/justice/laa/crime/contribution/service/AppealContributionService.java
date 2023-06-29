@@ -30,8 +30,8 @@ public class AppealContributionService {
         BigDecimal appealContributionAmount = maatCourtDataService.getContributionAppealAmount(getContributionAmountRequest, laaTransactionId);
 
         Integer repId = appealContributionRequest.getRepId();
-        Contribution currContribution =  maatCourtDataService.findContribution(repId, laaTransactionId);
-
+        List<Contribution> currContributionList =  maatCourtDataService.findContribution(repId, laaTransactionId, true);
+        Contribution currContribution = currContributionList.get(0);
         if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
             CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(appealContributionRequest, appealContributionAmount);
             Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);

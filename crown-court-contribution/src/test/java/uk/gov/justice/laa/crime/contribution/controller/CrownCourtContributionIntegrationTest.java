@@ -167,7 +167,7 @@ class CrownCourtContributionIntegrationTest {
         mockMaatApi.enqueue(new MockResponse()
                 .setHeader("Content-Type", MediaType.APPLICATION_JSON)
                 .setResponseCode(OK.code())
-                .setBody(objectMapper.writeValueAsString(TestModelDataBuilder.buildContribution())));
+                .setBody(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.buildContribution()))));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isOk())
@@ -189,7 +189,7 @@ class CrownCourtContributionIntegrationTest {
         mockMaatApi.enqueue(new MockResponse()
                 .setHeader("Content-Type", MediaType.APPLICATION_JSON)
                 .setResponseCode(OK.code())
-                .setBody(objectMapper.writeValueAsString(TestModelDataBuilder.buildContribution())));
+                .setBody(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.buildContribution()))));
         mockMaatApi.enqueue(new MockResponse()
                 .setHeader("Content-Type", MediaType.APPLICATION_JSON)
                 .setResponseCode(OK.code())
