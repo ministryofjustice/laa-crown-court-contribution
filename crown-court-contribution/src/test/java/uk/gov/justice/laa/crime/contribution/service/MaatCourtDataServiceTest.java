@@ -29,6 +29,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class MaatCourtDataServiceTest {
@@ -48,8 +49,8 @@ class MaatCourtDataServiceTest {
 
     @Test
     void givenValidRepId_whenFindContributionIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.findContribution(TEST_REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<Contribution>(){}), anyString(), anyMap(), anyInt());
+        maatCourtDataService.findContribution(TEST_REP_ID, LAA_TRANSACTION_ID, true);
+        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<List<Contribution>>(){}), anyString(), anyMap(), anyMap(), anyInt());
     }
 
     @Test

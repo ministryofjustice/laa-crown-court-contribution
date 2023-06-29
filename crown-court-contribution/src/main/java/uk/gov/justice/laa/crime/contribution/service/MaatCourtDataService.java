@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
@@ -26,11 +28,16 @@ public class MaatCourtDataService {
     private final RestAPIClient maatAPIClient;
     private final ServicesConfiguration configuration;
 
-    public Contribution findContribution(Integer repId, String laaTransactionId) {
-        Contribution response = maatAPIClient.get(
-                new ParameterizedTypeReference<Contribution>() {},
+    public List<Contribution> findContribution(Integer repId, String laaTransactionId, boolean findLatestContribution) {
+
+        final MultiValueMap<String, Boolean> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("findLatestContribution", findLatestContribution);
+
+        List<Contribution> response = maatAPIClient.get(
+                new ParameterizedTypeReference<List<Contribution>>() {},
                 configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                queryParams,
                 repId
         );
         log.info(RESPONSE_STRING, response);
