@@ -8,7 +8,9 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -24,9 +26,8 @@ public class CompareContributionService {
         RepOrderDTO repOrderDTO = compareContributionDTO.getRepOrderDTO();
         String laaTransactionId = compareContributionDTO.getLaaTransactionId();
         Integer repId = repOrderDTO.getId();
-        Integer result = null;
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, laaTransactionId, false);
-        contributions = contributions.stream()
+        contributions = Optional.ofNullable(contributions).orElse(Collections.emptyList()).stream()
                 .filter(getActiveContribution(repId)).toList();
         if(contributions.isEmpty()) {
             return getResutlOnNoPreviousContribution(repOrderDTO, laaTransactionId, repId);
@@ -34,23 +35,36 @@ public class CompareContributionService {
             return getResultOnActiveContribution(compareContributionDTO, repOrderDTO, laaTransactionId, repId, contributions);
         }
     }
+
+    private Integer getResutlOnNoPreviousContribution(RepOrderDTO repOrderDTO, String laaTransactionId, Integer repId) {
+        Integer result = 0;
+        if(repOrderDTO.getCatyCaseType().equals("APPEAL CC")) {
+            CorrespondenceState correspondenceState = CorrespondenceState.builder().status("appealCC").repId(repId).build();
+            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+        }
+        if(contributionService.isCds15WorkAround(repOrderDTO)){
+            CorrespondenceState correspondenceState = CorrespondenceState.builder().status("cds15").repId(repId).build();
+            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+        }
+
+        if(contributionService.checkReassessment(repId, laaTransactionId)){
+            CorrespondenceState correspondenceState = CorrespondenceState.builder().status("re-ass").repId(repId).build();
+            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+        }
+        return result;
+    }
+
     private Integer getResultOnActiveContribution(ContributionDTO compareContributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, Integer repId, List<Contribution> contributions) {
         Integer result;
         Contribution contribution = contributions.get(0);
-        if (contribution.getContributionCap().compareTo(compareContributionDTO.getContributionCap()) == 0 &&
-                contribution.getUpfrontContributions().compareTo(compareContributionDTO.getUpfrontContributions()) == 0 &&
-                contribution.getMonthlyContributions().compareTo(compareContributionDTO.getMonthlyContributions()) == 0 &&
-                contribution.getEffectiveDate().isEqual(compareContributionDTO.getEffectiveDate())) {
+        if (contributionRecordsAreIdentical(compareContributionDTO, contribution)) {
             CorrespondenceState status = maatCourtDataService.findCorrespondenceState(repId, laaTransactionId);
             result = 2;
-
             if (contributionService.hasMessageOutcomeChanged(compareContributionDTO.getMagCourtOutcome().getOutcome(), repOrderDTO) ||
                     (repOrderDTO.getCatyCaseType().equals("APPEAL CC") && status.getStatus().equals("appealCC"))) {
-
                 result = 1;
                 CorrespondenceState correspondenceState = CorrespondenceState.builder().status("appealCC").repId(repId).build();
                 maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
-
             } else if (status.getStatus().equals("APPEAL CC")) {
                 CorrespondenceState correspondenceState = CorrespondenceState.builder().status("none").repId(repId).build();
                 maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
@@ -89,24 +103,13 @@ public class CompareContributionService {
         return result;
     }
 
-    private Integer getResutlOnNoPreviousContribution(RepOrderDTO repOrderDTO, String laaTransactionId, Integer repId) {
-        Integer result;
-        result = 0;
-        if(repOrderDTO.getCatyCaseType().equals("APPEAL CC")) {
-            CorrespondenceState correspondenceState = CorrespondenceState.builder().status("appealCC").repId(repId).build();
-            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
-        }
-        if(contributionService.isCds15WorkAround(repOrderDTO)){
-            CorrespondenceState correspondenceState = CorrespondenceState.builder().status("cds15").repId(repId).build();
-            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
-        }
-
-        if(contributionService.checkReassessment(repId, laaTransactionId)){
-            CorrespondenceState correspondenceState = CorrespondenceState.builder().status("re-ass").repId(repId).build();
-            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
-        }
-        return result;
+    private static boolean contributionRecordsAreIdentical(ContributionDTO compareContributionDTO, Contribution contribution) {
+        return contribution.getContributionCap().compareTo(compareContributionDTO.getContributionCap()) == 0 &&
+                contribution.getUpfrontContributions().compareTo(compareContributionDTO.getUpfrontContributions()) == 0 &&
+                contribution.getMonthlyContributions().compareTo(compareContributionDTO.getMonthlyContributions()) == 0 &&
+                contribution.getEffectiveDate().isEqual(compareContributionDTO.getEffectiveDate());
     }
+
 
     private static Predicate<Contribution> getActiveContribution(Integer repId) {
         return contribution ->
