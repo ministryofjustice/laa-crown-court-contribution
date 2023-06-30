@@ -43,7 +43,6 @@ public class ContributionDTO {
     private Boolean latest;
     private Integer ccOutcomeCount;
     private Integer seHistoryId;
-    private RepOrderDTO repOrderDTO;
     private MagCourtOutcome magCourtOutcome;
 
 }

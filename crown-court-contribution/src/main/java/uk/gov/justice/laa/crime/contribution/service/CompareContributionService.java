@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
@@ -29,17 +30,18 @@ public class CompareContributionService {
 
     private final ContributionService contributionService;
 
-    public Integer compareContribution(ContributionDTO compareContributionDTO){
-        RepOrderDTO repOrderDTO = compareContributionDTO.getRepOrderDTO();
-        String laaTransactionId = compareContributionDTO.getLaaTransactionId();
-        Integer repId = repOrderDTO.getId();
+    @Transactional
+    public Integer compareContribution(ContributionDTO contributionDTO){
+        String laaTransactionId = contributionDTO.getLaaTransactionId();
+        Integer repId = contributionDTO.getRepId();
+        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, laaTransactionId, false);
         contributions = Optional.ofNullable(contributions).orElse(Collections.emptyList()).stream()
-                .filter(getActiveContribution(repId)).toList();
+                .filter(isActiveContribution(repId)).toList();
         if(contributions.isEmpty()) {
             return getResutlOnNoPreviousContribution(repOrderDTO, laaTransactionId, repId);
         } else {
-            return getResultOnActiveContribution(compareContributionDTO, repOrderDTO, laaTransactionId, repId, contributions);
+            return getResultOnActiveContribution(contributionDTO, repOrderDTO, laaTransactionId, repId, contributions);
         }
     }
 
@@ -61,13 +63,13 @@ public class CompareContributionService {
         return result;
     }
 
-    private Integer getResultOnActiveContribution(ContributionDTO compareContributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, Integer repId, List<Contribution> contributions) {
+    private Integer getResultOnActiveContribution(ContributionDTO contributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, Integer repId, List<Contribution> contributions) {
         Integer result;
         Contribution contribution = contributions.get(0);
-        if (contributionRecordsAreIdentical(compareContributionDTO, contribution)) {
+        if (contributionRecordsAreIdentical(contributionDTO, contribution)) {
             CorrespondenceState status = maatCourtDataService.findCorrespondenceState(repId, laaTransactionId);
             result = 2;
-            MagCourtOutcome MagCourtOutcome = compareContributionDTO.getMagCourtOutcome();
+            MagCourtOutcome MagCourtOutcome = contributionDTO.getMagCourtOutcome();
             String mcooOutcome = MagCourtOutcome == null ? null : MagCourtOutcome.getOutcome();
             if (contributionService.hasMessageOutcomeChanged(mcooOutcome, repOrderDTO) ||
                     (repOrderDTO.getCatyCaseType().equals(CaseType.APPEAL_CC.getCaseTypeString()) && status.getStatus().equals(STATUS_APPEAL_CC))) {
@@ -120,7 +122,7 @@ public class CompareContributionService {
     }
 
 
-    private static Predicate<Contribution> getActiveContribution(Integer repId) {
+    private static Predicate<Contribution> isActiveContribution(Integer repId) {
         return contribution ->
                 contribution.getRepId().equals(repId)
                         && contribution.getReplacedDate() == null
