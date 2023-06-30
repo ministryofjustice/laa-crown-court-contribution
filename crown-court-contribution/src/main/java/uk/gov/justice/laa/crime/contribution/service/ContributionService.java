@@ -207,12 +207,11 @@ public class ContributionService {
     }
 
     public boolean hasContributionBeenSent(final int repId, final String laaTransactionId) {
-        List<Contribution> contribList = maatCourtDataService.findContribution(repId, laaTransactionId, Boolean.FALSE);
-        List<Contribution> contributionList = Optional.ofNullable(contribList).orElse(Collections.emptyList()).stream().filter(
-                contribution ->   ("SENT".equals(contribution.getTransferStatus()) &&
-                                            contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0)
-        ).toList();
+        List<Contribution> allContributions = maatCourtDataService.findContribution(repId, laaTransactionId, Boolean.FALSE);
+        List<Contribution> sentMonthlyContributions = Optional.ofNullable(allContributions).orElse(Collections.emptyList()).stream()
+                .filter( contribution ->   "SENT".equals(contribution.getTransferStatus()))
+                .filter( contribution -> contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0).toList();
 
-        return !contributionList.isEmpty() ? true : false;
+        return !sentMonthlyContributions.isEmpty();
     }
 }
