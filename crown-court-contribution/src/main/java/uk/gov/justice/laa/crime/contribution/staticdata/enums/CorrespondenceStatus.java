@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public enum CorrespondenceStatus {
-    APPEAL_CC("INDICTABLE"),
+    APPEAL_CC("appealCC"),
     CDS15("cds15"),
     REASS("re-ass"),
     NONE("none");
