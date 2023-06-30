@@ -313,7 +313,7 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static ContributionDTO getContributionDTOForCaseStatus(String status,
+    public static ContributionDTO getContributionDTOForCaseStatus(String caseType,
                                                                   BigDecimal contributionCap,
                                                                   BigDecimal upfrontContributions,
                                                                   BigDecimal monthlyContributions,
@@ -329,7 +329,7 @@ public class TestModelDataBuilder {
                 .replacedDate(null)
                 .effectiveDate(effectiveDate)
                 .active(isActive).magCourtOutcome(magCourtOutcome).
-                repOrderDTO(getRepOrderDTOForCaseType(status)).build();
+                repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
     }
 
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
