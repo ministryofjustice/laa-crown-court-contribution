@@ -44,5 +44,6 @@ public class ContributionDTO {
     private Integer ccOutcomeCount;
     private Integer seHistoryId;
     private MagCourtOutcome magCourtOutcome;
+    private RepOrderDTO repOrderDTO;
 
 }

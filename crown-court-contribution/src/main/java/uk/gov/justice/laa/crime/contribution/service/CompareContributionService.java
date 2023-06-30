@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceStatus;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
 
 import java.util.Collections;
@@ -21,50 +22,42 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class CompareContributionService {
 
-    public static final String STATUS_APPEAL_CC = "appealCC";
-    public static final String STATUS_NONE = "none";
-    public static final String STATUS_CDS_15 = "cds15";
-    public static final String STATUS_RE_ASS = "re-ass";
-
     private final MaatCourtDataService maatCourtDataService;
 
     private final ContributionService contributionService;
 
     @Transactional
-    public Integer compareContribution(ContributionDTO contributionDTO){
+    public int compareContribution(ContributionDTO contributionDTO) {
         String laaTransactionId = contributionDTO.getLaaTransactionId();
-        Integer repId = contributionDTO.getRepId();
-        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
+        int repId = contributionDTO.getRepId();
+        RepOrderDTO repOrderDTO = contributionDTO.getRepOrderDTO();
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, laaTransactionId, false);
-        contributions = Optional.ofNullable(contributions).orElse(Collections.emptyList()).stream()
+        List<Contribution> activeContribution = Optional.ofNullable(contributions).orElse(Collections.emptyList()).stream()
                 .filter(isActiveContribution(repId)).toList();
-        if(contributions.isEmpty()) {
+        if (activeContribution.isEmpty()) {
             return getResutlOnNoPreviousContribution(repOrderDTO, laaTransactionId, repId);
         } else {
-            return getResultOnActiveContribution(contributionDTO, repOrderDTO, laaTransactionId, repId, contributions);
+            return getResultOnActiveContribution(contributionDTO, repOrderDTO, laaTransactionId, repId, activeContribution);
         }
     }
 
-    private Integer getResutlOnNoPreviousContribution(RepOrderDTO repOrderDTO, String laaTransactionId, Integer repId) {
-        Integer result = 0;
-        if(repOrderDTO.getCatyCaseType().equals(CaseType.APPEAL_CC.getCaseTypeString())) {
-            CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_APPEAL_CC).repId(repId).build();
-            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+    private int getResutlOnNoPreviousContribution(RepOrderDTO repOrderDTO, String laaTransactionId, int repId) {
+        int result = 0;
+        if (CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType())) {
+            createCorrespondenceStatus(CorrespondenceStatus.APPEAL_CC.getStatus(), repId, laaTransactionId);
         }
-        if(contributionService.isCds15WorkAround(repOrderDTO)){
-            CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_CDS_15).repId(repId).build();
-            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+        if (contributionService.isCds15WorkAround(repOrderDTO)) {
+            createCorrespondenceStatus(CorrespondenceStatus.CDS15.getStatus(), repId, laaTransactionId);
         }
 
-        if(contributionService.checkReassessment(repId, laaTransactionId)){
-            CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_RE_ASS).repId(repId).build();
-            maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+        if (contributionService.checkReassessment(repId, laaTransactionId)) {
+            createCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId, laaTransactionId);
         }
         return result;
     }
 
-    private Integer getResultOnActiveContribution(ContributionDTO contributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, Integer repId, List<Contribution> contributions) {
-        Integer result;
+    private int getResultOnActiveContribution(ContributionDTO contributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, int repId, List<Contribution> contributions) {
+        int result;
         Contribution contribution = contributions.get(0);
         if (contributionRecordsAreIdentical(contributionDTO, contribution)) {
             CorrespondenceState status = maatCourtDataService.findCorrespondenceState(repId, laaTransactionId);
@@ -72,46 +65,70 @@ public class CompareContributionService {
             MagCourtOutcome MagCourtOutcome = contributionDTO.getMagCourtOutcome();
             String mcooOutcome = MagCourtOutcome == null ? null : MagCourtOutcome.getOutcome();
             if (contributionService.hasMessageOutcomeChanged(mcooOutcome, repOrderDTO) ||
-                    (repOrderDTO.getCatyCaseType().equals(CaseType.APPEAL_CC.getCaseTypeString()) && status.getStatus().equals(STATUS_APPEAL_CC))) {
+                    (CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType())
+                            && checkStatusForAppealCC(status))) {
                 result = 1;
-                CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_APPEAL_CC).repId(repId).build();
-                maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
-            } else if (status.getStatus().equals(CaseType.APPEAL_CC.getCaseTypeString())) {
-                CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_NONE).repId(repId).build();
-                maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+                createCorrespondenceStatus(CorrespondenceStatus.APPEAL_CC.getStatus(), repId, laaTransactionId);
             } else {
-                if(contributionService.isCds15WorkAround(repOrderDTO)) {
-                    if(status.getStatus().equals(STATUS_CDS_15)) {
-                        result = 2;
-                        CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_NONE).repId(repId).build();
-                        maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
-                    } else if(status.getStatus().equals(STATUS_RE_ASS)) {
-                        result = 1;
-                        CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_CDS_15).repId(repId).build();
-                        maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+                if (checkStatusForAppealCC(status)) {
+                    createCorrespondenceStatus(CorrespondenceStatus.NONE.getStatus(), repId, laaTransactionId);
+                } else {
+                    if (contributionService.isCds15WorkAround(repOrderDTO)) {
+                        result = getResultOnCds15WorkAround(laaTransactionId, repId, status);
                     }
-                }
-                if(contributionService.checkReassessment(repId, laaTransactionId)){
-                    status = maatCourtDataService.findCorrespondenceState(repId, laaTransactionId);
-                    if(status.getStatus().equals(STATUS_RE_ASS)) {
-                        result = 2;
-                        CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_NONE).repId(repId).build();
-                        maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
-                    } else {
-                        result = 1;
-                        CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_RE_ASS).repId(repId).build();
-                        maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+                    if (contributionService.checkReassessment(repId, laaTransactionId)) {
+                        result = getResultOnReass(laaTransactionId, repId);
                     }
                 }
             }
         } else {
             result = 1;
-            if(contributionService.checkReassessment(repId, laaTransactionId)) {
-                CorrespondenceState correspondenceState = CorrespondenceState.builder().status(STATUS_RE_ASS).repId(repId).build();
-                maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+            if (contributionService.checkReassessment(repId, laaTransactionId)) {
+                createCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId, laaTransactionId);
             }
         }
         return result;
+    }
+
+    private int getResultOnReass(String laaTransactionId, int repId) {
+        int result = 2;
+        CorrespondenceState status = maatCourtDataService.findCorrespondenceState(repId, laaTransactionId);
+        if (checkStatusForReass(status)) {
+            createCorrespondenceStatus(CorrespondenceStatus.NONE.getStatus(), repId, laaTransactionId);
+        } else {
+            result = 1;
+            createCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId, laaTransactionId);
+        }
+        return result;
+    }
+
+    private int getResultOnCds15WorkAround(String laaTransactionId, int repId, CorrespondenceState status) {
+        int result = 2;
+        if (checkStatusForCds15(status)) {
+            createCorrespondenceStatus(CorrespondenceStatus.NONE.getStatus(), repId, laaTransactionId);
+        } else if (checkStatusForReass(status)) {
+            result = 1;
+            createCorrespondenceStatus(CorrespondenceStatus.CDS15.getStatus(), repId, laaTransactionId);
+        }
+        return result;
+    }
+
+    private static boolean checkStatusForCds15(CorrespondenceState status) {
+        return CorrespondenceStatus.CDS15.getStatus().equals(status.getStatus());
+    }
+
+    private static boolean checkStatusForAppealCC(CorrespondenceState status) {
+        return CorrespondenceStatus.APPEAL_CC.getStatus().equals(status.getStatus());
+    }
+
+    private static boolean checkStatusForReass(CorrespondenceState status) {
+        return CorrespondenceStatus.REASS.getStatus().equals(status.getStatus());
+    }
+
+
+    private void createCorrespondenceStatus(String statusAppealCc, int repId, String laaTransactionId) {
+        CorrespondenceState correspondenceState = CorrespondenceState.builder().status(statusAppealCc).repId(repId).build();
+        maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
     }
 
     private static boolean contributionRecordsAreIdentical(ContributionDTO compareContributionDTO, Contribution contribution) {
@@ -122,7 +139,7 @@ public class CompareContributionService {
     }
 
 
-    private static Predicate<Contribution> isActiveContribution(Integer repId) {
+    private static Predicate<Contribution> isActiveContribution(int repId) {
         return contribution ->
                 contribution.getRepId().equals(repId)
                         && contribution.getReplacedDate() == null
