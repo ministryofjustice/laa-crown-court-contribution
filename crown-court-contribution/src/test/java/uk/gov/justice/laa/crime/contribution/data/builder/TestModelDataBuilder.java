@@ -313,13 +313,13 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static ContributionDTO getContributionDTOForCaseStatus(String caseType,
-                                                                  BigDecimal contributionCap,
-                                                                  BigDecimal upfrontContributions,
-                                                                  BigDecimal monthlyContributions,
-                                                                  LocalDate effectiveDate,
-                                                                  String isActive,
-                                                                  MagCourtOutcome magCourtOutcome) {
+    public static ContributionDTO getContributionDTOForCompareContributionService(String caseType,
+                                                                                  BigDecimal contributionCap,
+                                                                                  BigDecimal upfrontContributions,
+                                                                                  BigDecimal monthlyContributions,
+                                                                                  LocalDate effectiveDate,
+                                                                                  String isActive,
+                                                                                  MagCourtOutcome magCourtOutcome) {
         return ContributionDTO.builder()
                 .repId(123)
                 .laaTransactionId("123456")
