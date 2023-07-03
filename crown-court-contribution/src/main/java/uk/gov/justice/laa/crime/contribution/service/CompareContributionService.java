@@ -144,7 +144,7 @@ public class CompareContributionService {
 
     private void setCorrespondenceStatus(String statusAppealCc, int repId, String laaTransactionId) {
         CorrespondenceState correspondenceState = CorrespondenceState.builder().status(statusAppealCc).repId(repId).build();
-        maatCourtDataService.createCorrespondenceState(correspondenceState, laaTransactionId);
+        maatCourtDataService.updateCorrespondenceState(correspondenceState, laaTransactionId);
     }
 
     private boolean magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(RepOrderDTO repOrderDTO, CorrespondenceState status, String mcooOutcome) {

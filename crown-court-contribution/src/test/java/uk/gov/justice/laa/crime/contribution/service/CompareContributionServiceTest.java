@@ -39,7 +39,7 @@ class CompareContributionServiceTest {
 
         int result = compareContributionService.compareContribution(contributionDTO);
         assertThat(result).isZero();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -52,7 +52,7 @@ class CompareContributionServiceTest {
 
         int result = compareContributionService.compareContribution(contributionDTO);
         assertThat(result).isZero();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -65,7 +65,7 @@ class CompareContributionServiceTest {
 
         int result = compareContributionService.compareContribution(contributionDTO);
         assertThat(result).isZero();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -79,7 +79,7 @@ class CompareContributionServiceTest {
         int result = compareContributionService.compareContribution(contributionDTO);
 
         assertThat(result).isOne();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -93,7 +93,7 @@ class CompareContributionServiceTest {
         int result = compareContributionService.compareContribution(contributionDTO);
 
         assertThat(result).isOne();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -108,7 +108,7 @@ class CompareContributionServiceTest {
         int result = compareContributionService.compareContribution(contributionDTO);
 
         assertThat(result).isOne();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -123,7 +123,7 @@ class CompareContributionServiceTest {
         int result = compareContributionService.compareContribution(contributionDTO);
 
         assertThat(result).isEqualTo(2);
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -139,7 +139,7 @@ class CompareContributionServiceTest {
         int result = compareContributionService.compareContribution(contributionDTO);
 
         assertThat(result).isEqualTo(2);
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -155,7 +155,7 @@ class CompareContributionServiceTest {
 
         int result = compareContributionService.compareContribution(contributionDTO);
         assertThat(result).isOne();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -171,7 +171,7 @@ class CompareContributionServiceTest {
         int result = compareContributionService.compareContribution(contributionDTO);
 
         assertThat(result).isEqualTo(2);
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
     @Test
@@ -187,7 +187,7 @@ class CompareContributionServiceTest {
         int result = compareContributionService.compareContribution(contributionDTO);
 
         assertThat(result).isOne();
-        verify(maatCourtDataService, times(1)).createCorrespondenceState(any(CorrespondenceState.class), anyString());
+        verify(maatCourtDataService, times(1)).updateCorrespondenceState(any(CorrespondenceState.class), anyString());
     }
 
 }
