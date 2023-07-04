@@ -236,6 +236,22 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static Contribution buildContributionForCompareContributionService() {
+        return Contribution.builder()
+                .id(123)
+                .applId(123)
+                .repId(123)
+                .replacedDate(null)
+                .calcDate(LocalDate.now())
+                .contributionCap(BigDecimal.valueOf(250))
+                .monthlyContributions(BigDecimal.valueOf(250))
+                .upfrontContributions(BigDecimal.valueOf(250))
+                .effectiveDate(LocalDate.now())
+                .userCreated("test")
+                .active("Y")
+                .build();
+    }
+
     public static AppealContributionRequest buildAppealContributionRequest() {
         return new AppealContributionRequest()
                 .withApplId(999)
@@ -295,5 +311,30 @@ public class TestModelDataBuilder {
                 .outcome(outcome)
                 .outcomeDate(LocalDateTime.now())
                 .build();
+    }
+
+    public static ContributionDTO getContributionDTOForCompareContributionService(String caseType,
+                                                                                  BigDecimal contributionCap,
+                                                                                  BigDecimal upfrontContributions,
+                                                                                  BigDecimal monthlyContributions,
+                                                                                  LocalDate effectiveDate,
+                                                                                  String isActive,
+                                                                                  MagCourtOutcome magCourtOutcome) {
+        return ContributionDTO.builder()
+                .repId(123)
+                .laaTransactionId("123456")
+                .contributionCap(contributionCap)
+                .upfrontContributions(upfrontContributions)
+                .monthlyContributions(monthlyContributions)
+                .replacedDate(null)
+                .effectiveDate(effectiveDate)
+                .active(isActive).magCourtOutcome(magCourtOutcome).
+                repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
+    }
+
+    public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
+        return RepOrderDTO.builder()
+                .id(123)
+                .catyCaseType(caseType).build();
     }
 }
