@@ -3,14 +3,8 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,16 +15,16 @@ public class ContributionDTOBuilder {
                 .applId(request.getApplId())
                 .repId(request.getRepId())
                 .contributionFileId(request.getContributionFileId())
-                .effectiveDate(request.getEffectiveDate() != null ? request.getEffectiveDate().toLocalDate():null)
-                .calcDate(request.getCalcDate() != null ? request.getCalcDate().toLocalDate():null)
+                .effectiveDate(request.getEffectiveDate() != null ? request.getEffectiveDate().toLocalDate() : null)
+                .calcDate(request.getCalcDate() != null ? request.getCalcDate().toLocalDate() : null)
                 .contributionCap(request.getContributionCap())
                 .monthlyContributions(request.getMonthlyContributions())
                 .upfrontContributions(request.getUpfrontContributions())
                 .upliftApplied(request.getUpliftApplied())
                 .basedOn(request.getBasedOn())
                 .transferStatus(request.getTransferStatus() != null ? request.getTransferStatus().getValue() : null)
-                .dateUpliftApplied(request.getDateUpliftApplied() != null ? request.getDateUpliftApplied().toLocalDate():null)
-                .dateUpliftRemoved(request.getDateUpliftRemoved() != null ? request.getDateUpliftRemoved().toLocalDate():null)
+                .dateUpliftApplied(request.getDateUpliftApplied() != null ? request.getDateUpliftApplied().toLocalDate() : null)
+                .dateUpliftRemoved(request.getDateUpliftRemoved() != null ? request.getDateUpliftRemoved().toLocalDate() : null)
                 .createContributionOrder(request.getCreateContributionOrder())
                 .correspondenceId(request.getCorrespondenceId());
 
