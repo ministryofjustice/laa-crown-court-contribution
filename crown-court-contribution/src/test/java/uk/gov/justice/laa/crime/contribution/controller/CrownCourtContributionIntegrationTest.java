@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
@@ -27,6 +28,7 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
 import java.io.IOException;
@@ -68,6 +70,9 @@ class CrownCourtContributionIntegrationTest {
 
     @Autowired
     private FilterChainProxy springSecurityFilterChain;
+
+    @MockBean
+    private CompareContributionService compareContributionService;
 
     @BeforeAll
     public void setUp() {

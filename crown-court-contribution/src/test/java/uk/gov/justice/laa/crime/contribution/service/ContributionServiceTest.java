@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
@@ -30,7 +31,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.*;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
@@ -45,6 +45,7 @@ class ContributionServiceTest {
 
     private static final String RORS_STATUS_CURR = "CURR";
 
+    private static final String LAA_TRANSACTION_ID = "laaTransactionId";
 
     @InjectMocks
     private ContributionService contributionService;
@@ -52,6 +53,9 @@ class ContributionServiceTest {
     private MaatCourtDataService maatCourtDataService;
     @Mock
     private CorrespondenceRuleRepository repository;
+
+    @Mock
+    private CompareContributionService compareContributionService;
 
     private static Stream<Arguments> getAssessmentRequestForIojResult() {
         return Stream.of(
@@ -578,5 +582,19 @@ class ContributionServiceTest {
         assertThat(hasContributionBeenSent).isTrue();
     }
 
+    @Test
+    void givenValidContributionAndCompareResultIsLessThanTwo_whenCreateContribsIsInvoked_thenContributionIsReturn() {
+        when(compareContributionService.compareContribution(any())).thenReturn(1);
+        when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), any())).thenReturn(TestModelDataBuilder.getContribution());
+        Contribution result = contributionService.createContribs(new CreateContributionRequest(), LAA_TRANSACTION_ID);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void givenValidContributionAndCompareResultIsGreaterThanTwo_whenCreateContribsIsInvoked_thenNullIsReturn() {
+        when(compareContributionService.compareContribution(any())).thenReturn(3);
+        Contribution result = contributionService.createContribs(new CreateContributionRequest(), LAA_TRANSACTION_ID);
+        assertThat(result).isNull();
+    }
 }
 
