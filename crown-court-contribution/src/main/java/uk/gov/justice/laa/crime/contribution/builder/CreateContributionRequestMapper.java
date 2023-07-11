@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 
@@ -25,4 +26,21 @@ public class CreateContributionRequestMapper {
                 .withCreateContributionOrder("N");
 
     }
+
+    public CreateContributionRequest map(ContributionDTO contributionDTO, BigDecimal appealContributionAmount) {
+        return new CreateContributionRequest()
+                .withRepId(contributionDTO.getRepId())
+                .withApplId(contributionDTO.getApplId())
+                .withContributionCap(BigDecimal.ZERO)
+                .withEffectiveDate(contributionDTO.getLastOutcome().getDateSet())
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpliftApplied("N")
+                .withBasedOn(null)
+                .withUpfrontContributions(appealContributionAmount)
+                .withUserCreated(contributionDTO.getUserCreated())
+                .withCorrespondenceId(null)
+                .withCreateContributionOrder("N");
+
+    }
+
 }
