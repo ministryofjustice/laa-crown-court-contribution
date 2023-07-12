@@ -16,23 +16,21 @@ public class CalculateContributionValidator {
     public Optional<Void> validate(CalculateContributionRequest calculateContributionRequest) {
         log.debug("Performing validation against calculate contributions request");
         if (calculateContributionRequest != null) {
-            if (calculateContributionRequest.getLastOutcome() != null && calculateContributionRequest.getLastOutcome().getDateSet() != null) {
-                if (calculateContributionRequest.getLastOutcome().getDateSet().isAfter(LocalDateTime.now())) {
-                    throw new ValidationException("The dateSet for lastOutcome is invalid");
-                }
-            }
-
-            boolean isNoCompletedAssessment = calculateContributionRequest.getAssessments()
-                    .stream()
-                    .filter(assessment -> assessment.getStatus() == AssessmentStatus.COMPLETE)
-                    .toList()
-                    .isEmpty();
-            if (isNoCompletedAssessment) {
-                throw new ValidationException("There must be at least one COMPLETE assessment");
+            if (calculateContributionRequest.getLastOutcome() != null
+                    && calculateContributionRequest.getLastOutcome().getDateSet() != null
+                    && calculateContributionRequest.getLastOutcome().getDateSet().isAfter(LocalDateTime.now())) {
+                throw new ValidationException("The dateSet for lastOutcome is invalid");
             }
         }
 
-
+        boolean isNoCompletedAssessment = calculateContributionRequest.getAssessments()
+                .stream()
+                .filter(assessment -> assessment.getStatus() == AssessmentStatus.COMPLETE)
+                .toList()
+                .isEmpty();
+        if (isNoCompletedAssessment) {
+            throw new ValidationException("There must be at least one COMPLETE assessment");
+        }
         return Optional.empty();
     }
 }

@@ -22,7 +22,7 @@ public class CalculateContributionService {
         contributionDTO.setRepOrderDTO(repOrderDTO);
 
         if (CaseType.APPEAL_CC.equals(contributionDTO.getCaseType())) {
-            contributionDTO = appealContributionService.calculateContribution(contributionDTO, laaTransactionId);
+            appealContributionService.calculateContribution(contributionDTO, laaTransactionId);
         }
         return new CalculateContributionResponse();
     }

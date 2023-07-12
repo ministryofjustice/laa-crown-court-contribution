@@ -226,13 +226,28 @@ public class TestModelDataBuilder {
                 .id(9)
                 .applId(9)
                 .repId(9)
+                .contributionFileId(1)
                 .effectiveDate(LocalDate.now())
                 .calcDate(LocalDate.now())
                 .contributionCap(BigDecimal.valueOf(250))
                 .monthlyContributions(BigDecimal.valueOf(250))
                 .upfrontContributions(BigDecimal.valueOf(250))
+                .upliftApplied("NS")
+                .basedOn("Means")
+                .transferStatus("NOT SENT")
+                .dateUpliftApplied(LocalDate.now())
+                .dateUpliftRemoved(LocalDate.now())
                 .dateCreated(LocalDateTime.now())
                 .userCreated("test")
+                .dateModified(LocalDateTime.now())
+                .userModified("test")
+                .createContributionOrder("N")
+                .correspondenceId(1)
+                .active("Y")
+                .replacedDate(LocalDate.now())
+                .latest(true)
+                .ccOutcomeCount(1)
+                .seHistoryId(1)
                 .build();
     }
 
@@ -306,13 +321,13 @@ public class TestModelDataBuilder {
     public static LastOutcome buildLastOutcome() {
         return new LastOutcome()
                 .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withDateSet(LocalDateTime.now().minusDays(1));
+                .withDateSet(TEST_DATE);
     }
 
     public static LastOutcome__1 buildLastOutcome_1() {
         return new LastOutcome__1()
                 .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withDateSet(LocalDateTime.now().minusDays(1));
+                .withDateSet(TEST_DATE);
     }
 
     public static Assessment buildAssessment() {
@@ -339,6 +354,7 @@ public class TestModelDataBuilder {
                                                                                   MagCourtOutcome magCourtOutcome) {
         return ContributionDTO.builder()
                 .repId(123)
+                .applId(123)
                 .laaTransactionId("123456")
                 .contributionCap(contributionCap)
                 .upfrontContributions(upfrontContributions)
@@ -347,9 +363,12 @@ public class TestModelDataBuilder {
                 .effectiveDate(effectiveDate)
                 .active(isActive).magCourtOutcome(magCourtOutcome)
                 .assessments(List.of(buildAssessment()))
+                .lastOutcome(buildLastOutcome_1())
+                .userCreated("TEST")
                 .repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
 
     }
+
 
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
         return RepOrderDTO.builder()
