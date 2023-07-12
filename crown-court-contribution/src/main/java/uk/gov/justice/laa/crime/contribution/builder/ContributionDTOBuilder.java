@@ -8,6 +8,8 @@ import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
+import static java.util.Optional.ofNullable;
+
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContributionDTOBuilder {
@@ -55,8 +57,8 @@ public class ContributionDTOBuilder {
                 .applId(contribution.getApplId())
                 .repId(contribution.getRepId())
                 .contributionFileId(contribution.getContributionFileId())
-                .effectiveDate(contribution.getEffectiveDate().atStartOfDay().toLocalDate())
-                .calcDate(contribution.getCalcDate().atStartOfDay().toLocalDate())
+                .effectiveDate(ofNullable(contribution.getEffectiveDate()).orElse(null))
+                .calcDate(ofNullable(contribution.getCalcDate()).orElse(null))
                 .contributionCap(contribution.getContributionCap())
                 .monthlyContributions(contribution.getMonthlyContributions())
                 .upfrontContributions(contribution.getUpfrontContributions())

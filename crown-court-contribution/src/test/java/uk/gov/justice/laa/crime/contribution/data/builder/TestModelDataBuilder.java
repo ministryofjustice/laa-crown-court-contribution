@@ -263,6 +263,17 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
+    public static CalculateContributionRequest buildCalculateContributionRequest() {
+        return new CalculateContributionRequest()
+                .withApplId(999)
+                .withRepId(999)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withAppealType(AppealType.ACS)
+                .withUserCreated("TEST")
+                .withLastOutcome(buildLastOutcome_1())
+                .withAssessments(List.of(buildAssessment()));
+    }
+
     public static AppealContributionResponse buildAppealContributionResponse() {
         return new AppealContributionResponse()
                 .withId(9)
@@ -298,6 +309,12 @@ public class TestModelDataBuilder {
                 .withDateSet(LocalDateTime.now().minusDays(1));
     }
 
+    public static LastOutcome__1 buildLastOutcome_1() {
+        return new LastOutcome__1()
+                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
+                .withDateSet(LocalDateTime.now().minusDays(1));
+    }
+
     public static Assessment buildAssessment() {
         return new Assessment()
                 .withAssessmentType(AssessmentType.INIT)
@@ -328,8 +345,10 @@ public class TestModelDataBuilder {
                 .monthlyContributions(monthlyContributions)
                 .replacedDate(null)
                 .effectiveDate(effectiveDate)
-                .active(isActive).magCourtOutcome(magCourtOutcome).
-                repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
+                .active(isActive).magCourtOutcome(magCourtOutcome)
+                .assessments(List.of(buildAssessment()))
+                .repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
+
     }
 
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {

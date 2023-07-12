@@ -40,6 +40,8 @@ services:
       base-url: ${services.maat-api.assessments-domain}/contributions
       find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
       get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal
+      get-contribution-count-url: ${services.maat-api.assessments-domain}/{repId}/contribution
+      get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
     correspondence-state-endpoints:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
       find-url: ${services.maat-api.correspondence-state-endpoints.base-url}/{repId}
