@@ -3,6 +3,8 @@ package uk.gov.justice.laa.crime.contribution.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -15,6 +17,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -47,7 +51,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 
-@WebMvcTest(CrownCourtContributionController.class)
+@Import(CrownCourtContributionTestConfiguration.class)
+@SpringBootTest(classes = {CrownCourtContributionApplication.class}, webEnvironment = DEFINED_PORT)
+@DirtiesContext
 class CrownCourtContributionControllerTest {
 
     private static final String LAA_TRANSACTION_ID = "999";
@@ -69,10 +75,10 @@ class CrownCourtContributionControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Mock
-    private CalculateContributionValidator appealContributionValidator;
+    @MockBean
+    private CalculateContributionValidator calculateContributionValidator;
 
-    @Mock
+    @MockBean
     private CalculateContributionService calculateContributionService;
 
     @BeforeEach
@@ -113,12 +119,12 @@ class CrownCourtContributionControllerTest {
         return requestBuilder;
     }
 
-    //@Test
+    @Test
     void givenValidRequest_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
          String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(appealContributionValidator.validate(any(CalculateContributionRequest.class))).thenReturn(Optional.empty());
+        when(calculateContributionValidator.validate(any(CalculateContributionRequest.class))).thenReturn(Optional.empty());
 
         when(calculateContributionService.calculateContribution(any(ContributionDTO.class), anyString()))
                 .thenReturn(new CalculateContributionResponse());
@@ -128,12 +134,12 @@ class CrownCourtContributionControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
-    //@Test
+    @Test
     void givenInvalidRequest_whenCalculateAppealContributionIsInvoked_thenBadRequestResponse() throws Exception {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(appealContributionValidator.validate(any(CalculateContributionRequest.class)))
+        when(calculateContributionValidator.validate(any(CalculateContributionRequest.class)))
                 .thenThrow(new ValidationException("Test validation exception"));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
@@ -141,12 +147,12 @@ class CrownCourtContributionControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
-    //@Test
+    @Test
     void givenClientApiException_whenCalculateAppealContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(appealContributionValidator.validate(any(CalculateContributionRequest.class)))
+        when(calculateContributionValidator.validate(any(CalculateContributionRequest.class)))
                 .thenReturn(Optional.empty());
         when(calculateContributionService.calculateContribution(any(ContributionDTO.class), anyString()))
                 .thenThrow(new APIClientException("Test api client exception"));
