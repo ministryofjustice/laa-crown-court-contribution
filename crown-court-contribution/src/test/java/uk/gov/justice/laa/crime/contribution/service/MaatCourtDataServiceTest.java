@@ -14,6 +14,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
@@ -129,6 +130,23 @@ class MaatCourtDataServiceTest {
     void givenAInvalidParameter_whenGetRepOrderCCOutcomeByRepIdIsInvoked_thenReturnError() {
         when(maatCourtDataClient.get(any(), anyString(), anyMap(), any())).thenThrow(new APIClientException());
         assertThatThrownBy(() -> maatCourtDataService.getRepOrderCCOutcomeByRepId(
+                TEST_REP_ID, LAA_TRANSACTION_ID)
+        ).isInstanceOf(APIClientException.class);
+    }
+
+    @Test
+    void givenAValidRepId_whenGetContributionsSummaryIsInvoked_thenContributionsSummariesAreReturned() {
+        maatCourtDataService.getContributionsSummary(TEST_REP_ID, LAA_TRANSACTION_ID);
+
+        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<List<ContributionsSummaryDTO>>() {}),
+                anyString(), anyMap(), anyInt());
+    }
+
+    @Test
+    void givenInvalidResponseFromMaatApi_whenGetContributionsSummaryIsInvoked_thenExceptionIsRaised() {
+        when(maatCourtDataClient.get(any(), anyString(), anyMap(), anyInt())).thenThrow(new APIClientException());
+
+        assertThatThrownBy(() -> maatCourtDataService.getContributionsSummary(
                 TEST_REP_ID, LAA_TRANSACTION_ID)
         ).isInstanceOf(APIClientException.class);
     }

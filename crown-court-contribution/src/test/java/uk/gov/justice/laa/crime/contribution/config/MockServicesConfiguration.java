@@ -13,6 +13,7 @@ public class MockServicesConfiguration {
                 new ServicesConfiguration.MaatApi.ContributionEndpoints(
                         "/contributions",
                         "/contributions/{repId}",
+                        "/contributions/{repId}/summary",
                         "/contribution-appeal",
                         "/{repId}/contribution",
                         "/rep-orders/{repId}"
