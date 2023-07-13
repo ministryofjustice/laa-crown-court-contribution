@@ -15,13 +15,12 @@ public class CalculateContributionValidator {
 
     public Optional<Void> validate(CalculateContributionRequest calculateContributionRequest) {
         log.debug("Performing validation against calculate contributions request");
-        if (calculateContributionRequest != null) {
-            if (calculateContributionRequest.getLastOutcome() != null
+        if (calculateContributionRequest != null
+                    && calculateContributionRequest.getLastOutcome() != null
                     && calculateContributionRequest.getLastOutcome().getDateSet() != null
                     && calculateContributionRequest.getLastOutcome().getDateSet().isAfter(LocalDateTime.now())) {
                 throw new ValidationException("The dateSet for lastOutcome is invalid");
             }
-        }
 
         boolean isNoCompletedAssessment = calculateContributionRequest.getAssessments()
                 .stream()

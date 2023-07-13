@@ -23,11 +23,13 @@
     },
     "effectiveDate": {
       "type": "string",
-      "description": "Effective Date"
+      "description": "Effective Date",
+      "format": "date-time"
     },
     "calcDate": {
       "type": "string",
-      "description": "Calculate Contribution Date"
+      "description": "Calculate Contribution Date",
+      "format": "date-time"
     },
     "contributionCap": {
       "type": "number",
@@ -55,15 +57,18 @@
     },
     "dateUpliftApplied": {
       "type": "string",
-      "description": "Date Uplift Applied"
+      "description": "Date Uplift Applied",
+      "format": "date-time"
     },
     "dateUpliftRemoved": {
       "type": "string",
-      "description": "Date Uplift Removed"
+      "description": "Date Uplift Removed",
+      "format": "date-time"
     },
     "dateCreated": {
       "type": "string",
-      "description": "Date Contribution Created"
+      "description": "Date Contribution Created",
+      "format": "date-time"
     },
     "userCreated": {
       "type": "string",
@@ -71,7 +76,8 @@
     },
     "dateModified": {
       "type": "string",
-      "description": "Date Modified"
+      "description": "Date Modified",
+      "format": "date-time"
     },
     "userModified": {
       "type": "string",

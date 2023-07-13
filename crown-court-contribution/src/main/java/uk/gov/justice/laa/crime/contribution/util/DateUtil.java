@@ -9,6 +9,10 @@ public final class DateUtil {
         return date != null ? LocalDate.parse(date) : null;
     }
 
+    public static LocalDate parse(final LocalDateTime date) {
+        return date != null ? date.toLocalDate() : null;
+    }
+
     public static LocalDateTime parseDateTime(final String dateTime) {
         return dateTime != null ? LocalDateTime.parse(dateTime) : null;
     }
