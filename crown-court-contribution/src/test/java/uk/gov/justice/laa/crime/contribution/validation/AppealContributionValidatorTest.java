@@ -24,6 +24,22 @@ class AppealContributionValidatorTest {
     }
 
     @Test
+    void givenEmptyOutcome_whenValidateIsInvoked_thenNoExceptionIsRaised() {
+        CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        calculateContributionRequest.setLastOutcome(null);
+
+        assertThat(calculateContributionValidator.validate(calculateContributionRequest)).isEmpty();
+    }
+
+    @Test
+    void givenEmptyOutDateSet_whenValidateIsInvoked_thenNoExceptionIsRaised() {
+        CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        calculateContributionRequest.getLastOutcome().setDateSet(null);
+
+        assertThat(calculateContributionValidator.validate(calculateContributionRequest)).isEmpty();
+    }
+
+    @Test
     void givenIncorrectOutcomeDateSet_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
         CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         LastOutcome__1 lastOutcome = TestModelDataBuilder.buildLastOutcome_1();

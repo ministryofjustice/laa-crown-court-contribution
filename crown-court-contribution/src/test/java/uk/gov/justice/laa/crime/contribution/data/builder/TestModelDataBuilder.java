@@ -25,6 +25,8 @@ public class TestModelDataBuilder {
     public static final Integer CORRESPONDENCE_ID = 1;
     public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
 
+    public static final String LAA_TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
+
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
 
         return AssessmentRequestDTO.builder()
