@@ -6,10 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
@@ -30,6 +32,8 @@ public class ContributionService {
     private static final String CONTRIBUTION_YES = "Y";
     private final CorrespondenceRuleRepository correspondenceRuleRepository;
     private final MaatCourtDataService maatCourtDataService;
+
+    private final CompareContributionService compareContributionService;
 
     protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
         List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
@@ -209,10 +213,16 @@ public class ContributionService {
     public boolean hasContributionBeenSent(final int repId, final String laaTransactionId) {
         List<Contribution> contribList = maatCourtDataService.findContribution(repId, laaTransactionId, Boolean.FALSE);
         List<Contribution> contributionList = Optional.ofNullable(contribList).orElse(Collections.emptyList()).stream().filter(
-                contribution ->   ("SENT".equals(contribution.getTransferStatus()) &&
-                                            contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0)
+                contribution -> ("SENT".equals(contribution.getTransferStatus()) &&
+                        contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0)
         ).toList();
 
-        return !contributionList.isEmpty() ? true : false;
+        return !contributionList.isEmpty();
+    }
+
+    public Contribution createContribs(CreateContributionRequest request, String laaTransactionId) {
+        log.info("Inactivate existing Contribution and create a new Contribution");
+        return compareContributionService.compareContribution(ContributionDTOBuilder.build(request)) < 2 ?
+                maatCourtDataService.createContribution(request, laaTransactionId) : null;
     }
 }
