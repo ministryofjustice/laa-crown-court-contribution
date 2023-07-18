@@ -154,7 +154,6 @@ public class MaatCourtDataService {
                 repId
         );
         log.info(RESPONSE_STRING, response);
-        // TODO: Might need to map to another model if response type is not suitable
         return response;
     }
 }
