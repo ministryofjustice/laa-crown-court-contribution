@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
@@ -30,7 +31,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.*;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
@@ -45,6 +45,7 @@ class ContributionServiceTest {
 
     private static final String RORS_STATUS_CURR = "CURR";
 
+    private static final String LAA_TRANSACTION_ID = "laaTransactionId";
 
     @InjectMocks
     private ContributionService contributionService;
@@ -53,99 +54,45 @@ class ContributionServiceTest {
     @Mock
     private CorrespondenceRuleRepository repository;
 
+    @Mock
+    private CompareContributionService compareContributionService;
+
     private static Stream<Arguments> getAssessmentRequestForIojResult() {
-        return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null,
-                        PASS, FULL, PASS), PASS),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), PASS)
-        );
+        return Stream.of(Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, PASS, FULL, PASS), PASS), Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), PASS));
     }
 
     private static Stream<Arguments> getAssessmentRequestForMeansResult() {
-        return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null,
-                        PASS, FULL, PASS), FULL),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null,
-                        PASS, null, PASS), INIT.concat(PASS)),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null,
-                        null, null, PASS), NONE),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, PASS,
-                        PASS, FULL, PASS), PASSPORT),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, FAIL,
-                        PASS, FULL, PASS), FAILPORT),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        PASS, PASS, PASS), PASS),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        FAIL, PASS, PASS), PASS),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        FAIL, FAIL, PASS), PASS),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        FAIL, FAIL, FAIL), FAIL),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        FAIL, FAIL, null), FAIL),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        FULL, FAIL, FAIL), FAIL),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        FULL, FAIL, null), FAIL),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        HARDSHIP_APPLICATION, FAIL, FAIL), FAIL),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        HARDSHIP_APPLICATION, FAIL, null), FAIL)
+        return Stream.of(Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, PASS, FULL, PASS), FULL), Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), INIT.concat(PASS)), Arguments.of(new AssessmentRequestDTO(PASS, null, null, null, null, PASS), NONE), Arguments.of(new AssessmentRequestDTO(PASS, PASS, PASS, PASS, FULL, PASS), PASSPORT), Arguments.of(new AssessmentRequestDTO(PASS, PASS, FAIL, PASS, FULL, PASS), FAILPORT), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, PASS, PASS, PASS), PASS), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, PASS, PASS), PASS), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, PASS), PASS), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, FAIL), FAIL), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, null), FAIL), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FULL, FAIL, FAIL), FAIL), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FULL, FAIL, null), FAIL), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, HARDSHIP_APPLICATION, FAIL, FAIL), FAIL), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, HARDSHIP_APPLICATION, FAIL, null), FAIL)
 
         );
     }
 
     private static Stream<Arguments> getAssessmentRequestForNullMeansResult() {
-        return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        INIT, FAIL, FAIL)),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        HARDSHIP_APPLICATION, FAIL, TEMP)),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        INIT, INIT, INIT)),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        INIT, INIT, null))
-        );
+        return Stream.of(Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, FAIL, FAIL)), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, HARDSHIP_APPLICATION, FAIL, TEMP)), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, INIT, INIT)), Arguments.of(new AssessmentRequestDTO(PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, INIT, null)));
     }
 
     private static Stream<Arguments> inValidContributionRequest() {
-        return Stream.of(
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, FAIL,
-                        PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS,
-                        PASS, FAIL, FULL, PASS, 0, CONTRIBUTION_NO, PASS))
-        );
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, FAIL, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, 0, CONTRIBUTION_NO, PASS)));
     }
 
     private static Stream<Arguments> NoContributionRequest() {
-        return Stream.of(
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS,
-                        PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.EITHER_WAY, null, PASS, PASS,
-                        PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.EITHER_WAY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.CC_ALREADY, null, PASS, PASS,
-                        PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.CC_ALREADY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.COMMITAL, LocalDate.now(), PASS, PASS,
-                        PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.COMMITAL, LocalDate.now(), PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS,
-                        PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, PASS,
-                        PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS))
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS))
 
         );
     }
 
     private static Stream<Arguments> contributionRequest() {
-        return Stream.of(
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS,
-                        PASS, FAIL, "INEL", PASS, 1, CONTRIBUTION_YES, PASS)),
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS,
-                        PASS, FAIL, FULL, PASS, 1, CONTRIBUTION_YES, PASS))
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, "INEL", PASS, 1, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, 1, CONTRIBUTION_YES, PASS))
 
         );
     }
@@ -505,16 +452,14 @@ class ContributionServiceTest {
     @Test
     void givenValidRepIdAndCaseTypeDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
-                CaseType.APPEAL_CC, RORS_STATUS);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.APPEAL_CC, RORS_STATUS);
         assertThat(hasApplicationStatusChanged).isFalse();
     }
 
     @Test
     void givenValidRepIdAndRorsStatusMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
-                CaseType.INDICTABLE, RORS_STATUS);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
         assertThat(hasApplicationStatusChanged).isFalse();
     }
 
@@ -522,16 +467,14 @@ class ContributionServiceTest {
     void givenValidRepIdAndRorsStatusDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenTrueIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setRorsStatus(RORS_STATUS_CURR);
-        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
-                CaseType.INDICTABLE, RORS_STATUS);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
         assertThat(hasApplicationStatusChanged).isTrue();
     }
 
     @Test
     void givenInvalidRepId_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
-                CaseType.INDICTABLE, RORS_STATUS);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
         assertThat(hasApplicationStatusChanged).isFalse();
     }
 
@@ -539,8 +482,7 @@ class ContributionServiceTest {
     void givenValidRepIdAndRorsStatusIsNull_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setRorsStatus(null);
-        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO,
-                CaseType.INDICTABLE, RORS_STATUS);
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
         assertThat(hasApplicationStatusChanged).isFalse();
     }
 
@@ -578,5 +520,19 @@ class ContributionServiceTest {
         assertThat(hasContributionBeenSent).isTrue();
     }
 
+    @Test
+    void givenValidContributionAndCompareResultIsLessThanTwo_whenCreateContribsIsInvoked_thenContributionIsReturn() {
+        when(compareContributionService.compareContribution(any())).thenReturn(1);
+        when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), any())).thenReturn(TestModelDataBuilder.getContribution());
+        Contribution result = contributionService.createContribs(new CreateContributionRequest(), LAA_TRANSACTION_ID);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void givenValidContributionAndCompareResultIsGreaterThanTwo_whenCreateContribsIsInvoked_thenNullIsReturn() {
+        when(compareContributionService.compareContribution(any())).thenReturn(3);
+        Contribution result = contributionService.createContribs(new CreateContributionRequest(), LAA_TRANSACTION_ID);
+        assertThat(result).isNull();
+    }
 }
 

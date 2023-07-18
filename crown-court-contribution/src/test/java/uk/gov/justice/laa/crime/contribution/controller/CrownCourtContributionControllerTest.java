@@ -27,6 +27,7 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.service.AppealContributionService;
+import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.AppealContributionValidator;
 
 import java.util.Optional;
@@ -67,6 +68,9 @@ class CrownCourtContributionControllerTest {
 
     @MockBean
     private AppealContributionService appealContributionService;
+
+    @MockBean
+    private CompareContributionService compareContributionService;
 
     @BeforeEach
     public void setUp() {
