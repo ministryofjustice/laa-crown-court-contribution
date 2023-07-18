@@ -377,4 +377,21 @@ public class TestModelDataBuilder {
                 .id(123)
                 .catyCaseType(caseType).build();
     }
+
+    public static Contribution getContribution() {
+        return Contribution.builder()
+                .id(123)
+                .applId(123)
+                .repId(123)
+                .replacedDate(null)
+                .calcDate(LocalDate.now())
+                .contributionCap(BigDecimal.valueOf(250))
+                .monthlyContributions(BigDecimal.valueOf(250))
+                .upfrontContributions(BigDecimal.valueOf(250))
+                .effectiveDate(LocalDate.now())
+                .userCreated("test")
+                .active("Y")
+                .build();
+    }
+
 }

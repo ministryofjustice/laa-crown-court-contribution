@@ -3,13 +3,8 @@ package uk.gov.justice.laa.crime.contribution.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -17,8 +12,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -36,20 +29,18 @@ import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.CalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.service.AppealContributionService;
 import uk.gov.justice.laa.crime.contribution.service.CalculateContributionService;
-import uk.gov.justice.laa.crime.contribution.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 
 @Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = {CrownCourtContributionApplication.class}, webEnvironment = DEFINED_PORT)
@@ -80,6 +71,9 @@ class CrownCourtContributionControllerTest {
 
     @MockBean
     private CalculateContributionService calculateContributionService;
+
+    @MockBean
+    private CompareContributionService compareContributionService;
 
     @BeforeEach
     public void setUp() {
@@ -122,7 +116,7 @@ class CrownCourtContributionControllerTest {
     @Test
     void givenValidRequest_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
-         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
+        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         when(calculateContributionValidator.validate(any(CalculateContributionRequest.class))).thenReturn(Optional.empty());
 
