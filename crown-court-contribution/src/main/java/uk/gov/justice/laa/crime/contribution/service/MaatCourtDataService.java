@@ -10,6 +10,7 @@ import org.springframework.util.MultiValueMap;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
@@ -145,5 +146,14 @@ public class MaatCourtDataService {
         return response;
     }
 
-
+    public List<ContributionsSummaryDTO> getContributionsSummary(Integer repId, String laaTransactionId) {
+        List<ContributionsSummaryDTO> response = maatAPIClient.get(
+                new ParameterizedTypeReference<List<ContributionsSummaryDTO>>() {},
+                configuration.getMaatApi().getContributionEndpoints().getSummaryUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
 }

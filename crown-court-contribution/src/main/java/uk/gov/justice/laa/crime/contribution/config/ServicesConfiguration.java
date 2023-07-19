@@ -44,6 +44,9 @@ public class ServicesConfiguration {
             private String findUrl;
 
             @NotNull
+            private String summaryUrl;
+
+            @NotNull
             private String getAppealAmountUrl;
 
             @NotNull
