@@ -25,6 +25,8 @@ public class TestModelDataBuilder {
     public static final Integer CORRESPONDENCE_ID = 1;
     public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
 
+    public static final String LAA_TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
+
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
 
         return AssessmentRequestDTO.builder()
@@ -226,13 +228,28 @@ public class TestModelDataBuilder {
                 .id(9)
                 .applId(9)
                 .repId(9)
+                .contributionFileId(1)
                 .effectiveDate(LocalDate.now())
                 .calcDate(LocalDate.now())
                 .contributionCap(BigDecimal.valueOf(250))
                 .monthlyContributions(BigDecimal.valueOf(250))
                 .upfrontContributions(BigDecimal.valueOf(250))
+                .upliftApplied("NS")
+                .basedOn("Means")
+                .transferStatus("NOT SENT")
+                .dateUpliftApplied(LocalDate.now())
+                .dateUpliftRemoved(LocalDate.now())
                 .dateCreated(LocalDateTime.now())
                 .userCreated("test")
+                .dateModified(LocalDateTime.now())
+                .userModified("test")
+                .createContributionOrder("N")
+                .correspondenceId(1)
+                .active("Y")
+                .replacedDate(LocalDate.now())
+                .latest(true)
+                .ccOutcomeCount(1)
+                .seHistoryId(1)
                 .build();
     }
 
@@ -260,6 +277,17 @@ public class TestModelDataBuilder {
                 .withAppealType(AppealType.ACS)
                 .withUserCreated("TEST")
                 .withLastOutcome(buildLastOutcome())
+                .withAssessments(List.of(buildAssessment()));
+    }
+
+    public static CalculateContributionRequest buildCalculateContributionRequest() {
+        return new CalculateContributionRequest()
+                .withApplId(999)
+                .withRepId(999)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withAppealType(AppealType.ACS)
+                .withUserCreated("TEST")
+                .withLastOutcome(buildLastOutcome_1())
                 .withAssessments(List.of(buildAssessment()));
     }
 
@@ -295,7 +323,13 @@ public class TestModelDataBuilder {
     public static LastOutcome buildLastOutcome() {
         return new LastOutcome()
                 .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withDateSet(LocalDateTime.now().minusDays(1));
+                .withDateSet(TEST_DATE);
+    }
+
+    public static LastOutcome__1 buildLastOutcome_1() {
+        return new LastOutcome__1()
+                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
+                .withDateSet(TEST_DATE);
     }
 
     public static Assessment buildAssessment() {
@@ -322,15 +356,21 @@ public class TestModelDataBuilder {
                                                                                   MagCourtOutcome magCourtOutcome) {
         return ContributionDTO.builder()
                 .repId(123)
+                .applId(123)
                 .laaTransactionId("123456")
                 .contributionCap(contributionCap)
                 .upfrontContributions(upfrontContributions)
                 .monthlyContributions(monthlyContributions)
                 .replacedDate(null)
                 .effectiveDate(effectiveDate)
-                .active(isActive).magCourtOutcome(magCourtOutcome).
-                repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
+                .active(isActive).magCourtOutcome(magCourtOutcome)
+                .assessments(List.of(buildAssessment()))
+                .lastOutcome(buildLastOutcome_1())
+                .userCreated("TEST")
+                .repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
+
     }
+
 
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
         return RepOrderDTO.builder()

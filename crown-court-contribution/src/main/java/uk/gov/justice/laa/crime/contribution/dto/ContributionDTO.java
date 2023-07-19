@@ -4,11 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.justice.laa.crime.contribution.model.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.LastOutcome__1;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -42,6 +47,10 @@ public class ContributionDTO {
     private Boolean latest;
     private Integer ccOutcomeCount;
     private Integer seHistoryId;
+    private CaseType caseType;
+    private List<Assessment> assessments;
+    private AppealType appealType;
+    private LastOutcome__1 lastOutcome;
     private MagCourtOutcome magCourtOutcome;
     private RepOrderDTO repOrderDTO;
 
