@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
@@ -518,21 +517,6 @@ class ContributionServiceTest {
         when(maatCourtDataService.findContribution(any(), any(), any())).thenReturn(List.of(contribution));
         boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID, LAA_TRANSACTION_ID);
         assertThat(hasContributionBeenSent).isTrue();
-    }
-
-    @Test
-    void givenValidContributionAndCompareResultIsLessThanTwo_whenCreateContribsIsInvoked_thenContributionIsReturn() {
-        when(compareContributionService.compareContribution(any())).thenReturn(1);
-        when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), any())).thenReturn(TestModelDataBuilder.getContribution());
-        Contribution result = contributionService.createContribs(new CreateContributionRequest(), LAA_TRANSACTION_ID);
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    void givenValidContributionAndCompareResultIsGreaterThanTwo_whenCreateContribsIsInvoked_thenNullIsReturn() {
-        when(compareContributionService.compareContribution(any())).thenReturn(3);
-        Contribution result = contributionService.createContribs(new CreateContributionRequest(), LAA_TRANSACTION_ID);
-        assertThat(result).isNull();
     }
 }
 
