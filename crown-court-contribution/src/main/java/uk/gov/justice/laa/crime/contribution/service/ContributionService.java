@@ -6,12 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
@@ -33,7 +31,6 @@ public class ContributionService {
     private final CorrespondenceRuleRepository correspondenceRuleRepository;
     private final MaatCourtDataService maatCourtDataService;
 
-    private final CompareContributionService compareContributionService;
 
     protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
         List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
@@ -220,9 +217,5 @@ public class ContributionService {
         return !contributionList.isEmpty();
     }
 
-    public Contribution createContribs(CreateContributionRequest request, String laaTransactionId) {
-        log.info("Inactivate existing Contribution and create a new Contribution");
-        return compareContributionService.compareContribution(ContributionDTOBuilder.build(request)) < 2 ?
-                maatCourtDataService.createContribution(request, laaTransactionId) : null;
-    }
+
 }
