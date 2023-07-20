@@ -12,7 +12,7 @@ databaseChangeLog:
   - include:
       file: db.changelog/changeset/06-contribution-rules-table-create.sql
   - include:
-      file: db.changelog/changeset/07-contribution-rules-insert
+      file: db.changelog/changeset/07-contribution-rules-insert.sql
   - include:
       file: db.changelog/changeset/08-contrib-appeal-rules-create.sql
   - include:
