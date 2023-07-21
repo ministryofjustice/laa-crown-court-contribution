@@ -53,6 +53,7 @@ dependencies {
     implementation "org.springframework.security:spring-security-oauth2-authorization-server:$versions.springauthserverVersion"
 
     implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:2.0.0"
+    implementation "org.liquibase:liquibase-core:4.20.0"
 
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
