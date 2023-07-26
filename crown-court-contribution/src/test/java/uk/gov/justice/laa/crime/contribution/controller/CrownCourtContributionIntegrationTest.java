@@ -32,6 +32,7 @@ import uk.gov.justice.laa.crime.contribution.model.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.util.MockWebServerStubs;
 
 import java.io.IOException;
@@ -98,15 +99,6 @@ class CrownCourtContributionIntegrationTest {
                 .setResponseCode(OK.code())
                 .setBody(objectMapper.writeValueAsString(TestModelDataBuilder.getRepOrderDTO())));
 
-        mockMaatApi.enqueue(new MockResponse()
-                .setHeader("Content-Type", MediaType.APPLICATION_JSON)
-                .setResponseCode(OK.code())
-                .setBody(objectMapper.writeValueAsString(BigDecimal.valueOf(250))));
-        mockMaatApi.enqueue(new MockResponse()
-                .setHeader("Content-Type", MediaType.APPLICATION_JSON)
-                .setResponseCode(OK.code())
-                .setBody(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.buildContribution()))));
-
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
                 .andExpect(status().isOk());
     }
@@ -115,7 +107,7 @@ class CrownCourtContributionIntegrationTest {
     void givenContributionsNeedUpdating_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
         Contribution newContribution = TestModelDataBuilder.buildContribution();
         newContribution.setUpfrontContributions(BigDecimal.valueOf(500));
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest().withCaseType(CaseType.APPEAL_CC);
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         mockMaatApi.enqueue(new MockResponse()
@@ -148,7 +140,7 @@ class CrownCourtContributionIntegrationTest {
         appealContributionRequest.setAssessments(List.of(assessment));
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
