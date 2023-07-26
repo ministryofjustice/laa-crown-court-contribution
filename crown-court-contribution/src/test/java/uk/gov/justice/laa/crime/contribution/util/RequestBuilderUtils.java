@@ -18,6 +18,7 @@ public class RequestBuilderUtils {
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.request(method, endpointUrl)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Laa-Transaction-Id", "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327")
                         .content(content);
         if (withAuth) {
             requestBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + MOCK_TOKEN);

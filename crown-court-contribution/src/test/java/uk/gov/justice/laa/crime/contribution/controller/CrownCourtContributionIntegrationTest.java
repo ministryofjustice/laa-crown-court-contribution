@@ -136,7 +136,7 @@ class CrownCourtContributionIntegrationTest {
                 .setResponseCode(OK.code())
                 .setBody(objectMapper.writeValueAsString(newContribution)));
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
                 .andExpect(status().isOk());
     }
 
@@ -162,7 +162,7 @@ class CrownCourtContributionIntegrationTest {
                 .setHeader("Content-Type", MediaType.APPLICATION_JSON)
                 .setResponseCode(NOT_IMPLEMENTED.code()));
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
