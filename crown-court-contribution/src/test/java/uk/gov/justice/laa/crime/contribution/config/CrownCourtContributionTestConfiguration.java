@@ -30,7 +30,7 @@ public class CrownCourtContributionTestConfiguration {
 
         Map<String, Object> claims = Map.of(
                 SUB, AUTH_ID,
-                "scope", "evidence/standard"
+                "scope", "ccc/standard"
         );
 
         return new Jwt(

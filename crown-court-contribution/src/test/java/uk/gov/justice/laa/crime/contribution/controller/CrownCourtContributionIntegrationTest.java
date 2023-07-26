@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
@@ -24,12 +25,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
+import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
+import uk.gov.justice.laa.crime.contribution.util.MockWebServerStubs;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -44,122 +47,47 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @RunWith(SpringRunner.class)
+@Import(CrownCourtContributionTestConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
 @DirtiesContext
 class CrownCourtContributionIntegrationTest {
-
-    private static final String CLIENT_CREDENTIALS = "client_credentials";
-    private static final String SCOPE_READ_WRITE = "READ_WRITE";
-    private static final String CLIENT_ID = "test-client";
-    private static final String CLIENT_SECRET = "secret";
-    private static final String LAA_TRANSACTION_ID = "999";
+    private static final boolean IS_VALID = true;
+    private static final String ERROR_MSG = "Call to service MAAT-API failed.";
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/appeal";
-    private static final String AUTH_URL = "/oauth2/token";
 
     private MockMvc mvc;
-    private MockWebServer mockMaatApi;
+    private static MockWebServer mockMaatApi;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
     private FilterChainProxy springSecurityFilterChain;
 
-    @MockBean
-    private CompareContributionService compareContributionService;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @BeforeAll
-    public void setUp() {
-        this.mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-                .addFilter(springSecurityFilterChain).build();
-    }
-
-    @BeforeEach
-    public void setupMaatApiServer() throws IOException {
+    public void initialiseMockWebServer() throws IOException {
         mockMaatApi = new MockWebServer();
         mockMaatApi.start(9999);
-
-        final Dispatcher dispatcher = new QueueDispatcher() {
-            @NotNull @Override
-            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
-                if (AUTH_URL.equals(request.getPath())) {
-                    return getOauthResponse();
-                }
-
-                var requestLine = request.getRequestLine();
-                if ("GET /favicon.ico HTTP/1.1".equals(requestLine)) {
-                    return new MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND);
-                }
-
-                return getResponseQueue().take();
-            }
-        };
-        mockMaatApi.setDispatcher(dispatcher);
+        mockMaatApi.setDispatcher(MockWebServerStubs.getDispatcher());
     }
 
-    @AfterEach
-    public void shutdownMaatApiServer() throws IOException {
+    @AfterAll
+    protected void shutdownMockWebServer() throws IOException {
         mockMaatApi.shutdown();
     }
 
-    private MockResponse getOauthResponse() {
-        Map<String, Object> token = Map.of(
-                "expires_in", 3600,
-                "token_type", "Bearer",
-                "access_token", UUID.randomUUID()
-        );
-        String responseBody;
-        MockResponse mockResponse = new MockResponse();
-        mockResponse.setResponseCode(OK.code());
-        mockResponse.setHeader("Content-Type", MediaType.APPLICATION_JSON);
-
-        try {
-            responseBody = objectMapper.writeValueAsString(token);
-        } catch(JsonProcessingException exception) {
-            throw new RuntimeException(exception);
-        }
-
-        return mockResponse.setBody(responseBody);
+    @BeforeEach
+    public void setup() {
+        this.mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+                .addFilter(springSecurityFilterChain).build();
     }
-
-    private String obtainAccessToken() throws Exception {
-        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", CLIENT_CREDENTIALS);
-        params.add("scope", SCOPE_READ_WRITE);
-
-        ResultActions result = mvc.perform(post(AUTH_URL)
-                        .params(params)
-                        .with(httpBasic(CLIENT_ID, CLIENT_SECRET)))
-                .andExpect(status().isOk());
-        String resultString = result.andReturn().getResponse().getContentAsString();
-
-        JacksonJsonParser jsonParser = new JacksonJsonParser();
-        return jsonParser.parseMap(resultString).get("access_token").toString();
-    }
-
-    private MockHttpServletRequestBuilder buildRequestGivenContent(HttpMethod method, String content, String endpointUrl,
-                                                                   boolean withAuth) throws Exception {
-        String endpoint = endpointUrl != null ? endpointUrl : ENDPOINT_URL;
-        MockHttpServletRequestBuilder requestBuilder =
-                MockMvcRequestBuilders.request(method, endpoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content);
-        requestBuilder.header("Laa-Transaction-Id", LAA_TRANSACTION_ID);
-
-        if (withAuth) {
-            final String accessToken = obtainAccessToken();
-            requestBuilder.header("Authorization", "Bearer " + accessToken);
-        }
-
-        return requestBuilder;
-    }
-
     @Test
     void givenContributionsDontNeedUpdating_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
@@ -179,7 +107,7 @@ class CrownCourtContributionIntegrationTest {
                 .setResponseCode(OK.code())
                 .setBody(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.buildContribution()))));
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
                 .andExpect(status().isOk());
     }
 
