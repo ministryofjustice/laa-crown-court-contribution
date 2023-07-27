@@ -75,6 +75,18 @@ class CrownCourtContributionIntegrationTest {
     }
 
     @Test
+    void givenAEmptyContent_whenCalculateAppealContributionIsInvoked_thenFailsBadRequest() throws Exception {
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenAEmptyOAuthToken_whenCalculateAppealContributionIsInvoked_thenFailsUnauthorizedAccess() throws Exception {
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, false))
+                .andExpect(status().isUnauthorized()).andReturn();
+    }
+
+    @Test
     void givenContributionsDontNeedUpdating_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
@@ -143,4 +155,5 @@ class CrownCourtContributionIntegrationTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
+
 }
