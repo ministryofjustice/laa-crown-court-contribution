@@ -17,7 +17,6 @@ public class CrownCourtContributionTestConfiguration {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-
         return new JwtDecoder() {
             @Override
             public Jwt decode(String token) {
@@ -27,7 +26,6 @@ public class CrownCourtContributionTestConfiguration {
     }
 
     public Jwt jwt() {
-
         Map<String, Object> claims = Map.of(
                 SUB, AUTH_ID,
                 "scope", "ccc/standard"

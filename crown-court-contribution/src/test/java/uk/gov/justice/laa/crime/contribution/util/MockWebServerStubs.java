@@ -15,10 +15,11 @@ import java.util.UUID;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class MockWebServerStubs {
+
     public static Dispatcher getDispatcher() {
-        final Dispatcher dispatcher = new QueueDispatcher() {
+        return new QueueDispatcher() {
             @Override
-            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
+            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
 
                 if ("/oauth2/token".equals(request.getPath())) {
                     return getOauthResponse();
@@ -32,7 +33,6 @@ public class MockWebServerStubs {
                 return getResponseQueue().take();
             }
         };
-        return dispatcher;
     }
 
     private static MockResponse getOauthResponse() {
@@ -42,6 +42,7 @@ public class MockWebServerStubs {
                 "token_type", "Bearer",
                 "access_token", UUID.randomUUID()
         );
+
         String responseBody;
         MockResponse response = new MockResponse();
         response.setResponseCode(OK.code());
