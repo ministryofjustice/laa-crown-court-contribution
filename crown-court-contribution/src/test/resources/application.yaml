@@ -31,6 +31,13 @@ spring:
             client-id: dummy-client
             client-secret: dummy-secret
             authorization-grant-type: client_credentials
+      resource-server:
+        jwt:
+          issuer-uri: ${contribution.security.issuer-uri}
+
+contribution:
+  security:
+    issuer-uri: http://localhost:${server.port}
 
 services:
   maat-api:

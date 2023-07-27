@@ -38,4 +38,6 @@ env:
       secretKeyRef:
         name: rds-postgresql-instance-output
         key: database_password
+  - name: JWT_ISSUER_URI
+    value: {{ .Values.jwt.issuerUri }}
 {{- end -}}
