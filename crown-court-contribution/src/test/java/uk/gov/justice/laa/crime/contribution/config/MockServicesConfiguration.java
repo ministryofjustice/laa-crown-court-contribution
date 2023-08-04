@@ -3,9 +3,7 @@ package uk.gov.justice.laa.crime.contribution.config;
 public class MockServicesConfiguration {
 
     public static ServicesConfiguration getConfiguration(int port) {
-
         String host = String.format("http://localhost:%s", port);
-
         ServicesConfiguration servicesConfiguration = new ServicesConfiguration();
         ServicesConfiguration.MaatApi maatApiConfiguration = new ServicesConfiguration.MaatApi();
 
@@ -32,7 +30,6 @@ public class MockServicesConfiguration {
         maatApiConfiguration.setContributionEndpoints(contributionEndpoints);
         maatApiConfiguration.setCorrespondenceStateEndpoints(correspondenceStateEndpoints);
         maatApiConfiguration.setRepOrderEndpoints(repOrderEndpoints);
-
         return servicesConfiguration;
     }
 }
