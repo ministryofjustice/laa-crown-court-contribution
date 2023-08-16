@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
@@ -18,7 +19,7 @@ class CreateContributionRequestMapperTest {
     @InjectSoftAssertions
     private SoftAssertions softly;
 
-    private CreateContributionRequestMapper mapper = new CreateContributionRequestMapper();
+    private final CreateContributionRequestMapper mapper = new CreateContributionRequestMapper();
 
     @Test
     void givenAValidAppealContributionRequest_whenMapIsInvoked_thenReturnCreateContributionRequest() {
