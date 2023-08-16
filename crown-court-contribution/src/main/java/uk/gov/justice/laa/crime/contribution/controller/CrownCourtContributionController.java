@@ -29,7 +29,6 @@ public class CrownCourtContributionController {
     private final CalculateContributionService calculateContributionService;
     private final CalculateContributionValidator calculateContributionValidator;
 
-
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Calculate Contribution")
     @ApiResponse(responseCode = "200",
@@ -50,10 +49,15 @@ public class CrownCourtContributionController {
             )
     )
     public ResponseEntity<CalculateContributionResponse> calculateContribution(
-            @Parameter(description = "Data required to calculate contributions", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CalculateContributionRequest.class)))
+            @Parameter(description = "Data required to calculate contributions",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = CalculateContributionRequest.class)
+                    )
+            )
             @Valid @RequestBody
             CalculateContributionRequest calculateContributionRequest,
             @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
+
         log.info("Received request to calculate contributions for ID {}", calculateContributionRequest.getApplId());
         calculateContributionValidator.validate(calculateContributionRequest);
         ContributionDTO contributionDTO = preProcessRequest(calculateContributionRequest);
