@@ -83,8 +83,8 @@ public class ContributionService {
         AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
 
         ContributionResponseDTO contributionResponse = new ContributionResponseDTO();
-        contributionResponse.setDoContribs('N');
-        contributionResponse.setCalcContribs('N');
+        contributionResponse.setDoContribs("N");
+        contributionResponse.setCalcContribs("N");
 
         AssessmentResponseDTO assessmentResponseDTO = getAssessmentResult(assessmentRequestDTO);
         request.setIojResult(assessmentResponseDTO.getIojResult());
@@ -93,14 +93,14 @@ public class ContributionService {
         if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY).contains(request.getCaseType())
                 || request.getEffectiveDate() != null
                 || (CaseType.APPEAL_CC.equals(request.getCaseType()) && PASS.equals(request.getIojResult()))) {
-            contributionResponse.setDoContribs('Y');
+            contributionResponse.setDoContribs("Y");
         }
 
-        if (contributionResponse.getDoContribs() == 'Y') {
+        if (contributionResponse.getDoContribs() == "Y") {
             CorrespondenceRuleAndTemplateInfo processedCases = getCoteInfo(request);
             if (processedCases == null) {
-                contributionResponse.setDoContribs('N');
-                contributionResponse.setCalcContribs('N');
+                contributionResponse.setDoContribs("N");
+                contributionResponse.setCalcContribs("N");
             } else {
                 contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
                 contributionResponse.setId(contributionResponseDTO.getId());
@@ -110,27 +110,18 @@ public class ContributionService {
                 contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
                 contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());
                 contributionResponse.setDoContribs(contributionResponseDTO.getDoContribs());
-
-                /*
-                                .id(request.getId())
-                .calcContribution(request.getCalcContribs())
-                .templateDesc(request.getDescription())
-                .correspondenceType(request.getCotyCorrespondenceType())
-                .upliftCote(request.getUpliftCoteId())
-                .reassessmentCoteId(request.getReassessmentCoteId());
-                 */
                 if (CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
                     contributionResponse.setCorrespondenceTypeDesc(CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()).getDescription());
                 }
             }
         }
 
-        if (request.getMonthlyContribs() > 0 || INEL.equals(request.getFullResult())) {
-            contributionResponse.setDoContribs('Y');
+        if (request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0 || INEL.equals(request.getFullResult())) {
+            contributionResponse.setDoContribs("Y");
         }
 
         if (CONTRIBUTION_YES.equals(request.getRemoveContribs())) {
-            contributionResponse.setCalcContribs('N');
+            contributionResponse.setCalcContribs("N");
         }
 
         return contributionResponse;
@@ -151,7 +142,6 @@ public class ContributionService {
     public boolean checkReassessment(RepOrderDTO repOrderDTO, final String laaTransactionId) {
         log.info("Check if reassessment is required for REP_ID={}", repOrderDTO.getId());
 
-        //RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
         long contributionCount = maatCourtDataService.getContributionCount(repOrderDTO.getId(), laaTransactionId);
         List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
         List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
@@ -180,37 +170,6 @@ public class ContributionService {
         return false;
     }
 
-/*    public boolean checkReassessment(final int repId, final String laaTransactionId) {
-        log.info("Check if reassessment is required for REP_ID={}", repId);
-
-        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
-        long contributionCount = maatCourtDataService.getContributionCount(repId, laaTransactionId);
-        List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
-        List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
-
-        if (contributionCount > 0) {
-            Optional<LocalDateTime> latestFinAssessmentDate = ofNullable(financialAssessments)
-                    .orElseGet(Collections::emptyList).stream()
-                    .map(FinancialAssessmentDTO::getDateCreated)
-                    .filter(Objects::nonNull)
-                    .max(LocalDateTime::compareTo);
-
-            Optional<LocalDateTime> latestPassportAssessmentDate = ofNullable(passportAssessments)
-                    .orElseGet(Collections::emptyList).stream()
-                    .map(PassportAssessmentDTO::getDateCreated)
-                    .filter(Objects::nonNull)
-                    .max(LocalDateTime::compareTo);
-
-            if (latestFinAssessmentDate.isPresent() && latestPassportAssessmentDate.isPresent()) {
-                if (latestFinAssessmentDate.get().isAfter(latestPassportAssessmentDate.get())) {
-                    return financialAssessments.stream().anyMatch(fa -> fa.getReplaced().equals("Y"));
-                } else {
-                    return passportAssessments.stream().anyMatch(pa -> pa.getReplaced().equals("Y"));
-                }
-            }
-        }
-        return false;
-    }*/
 
     public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {
 

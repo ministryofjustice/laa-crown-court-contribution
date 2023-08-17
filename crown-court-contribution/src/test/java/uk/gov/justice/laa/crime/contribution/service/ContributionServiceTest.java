@@ -71,27 +71,27 @@ class ContributionServiceTest {
     }
 
     private static Stream<Arguments> inValidContributionRequest() {
-        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, FAIL, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, 0, CONTRIBUTION_NO, PASS)));
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, FAIL, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, BigDecimal.ZERO, CONTRIBUTION_NO, PASS)));
     }
 
     private static Stream<Arguments> NoContributionRequest() {
-        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.EITHER_WAY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.EITHER_WAY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.CC_ALREADY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.CC_ALREADY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.COMMITAL, LocalDate.now(), PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.COMMITAL, LocalDate.now(), PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS))
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS))
 
         );
     }
 
     private static Stream<Arguments> contributionRequest() {
-        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, "INEL", PASS, 1, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, 1, CONTRIBUTION_YES, PASS))
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, "INEL", PASS, BigDecimal.ONE, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, BigDecimal.ONE, CONTRIBUTION_YES, PASS))
 
         );
     }
@@ -142,7 +142,7 @@ class ContributionServiceTest {
     void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnYesContribution(ContributionRequestDTO request) {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo());
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-        assertThat(response.getDoContribs()).isEqualTo('Y');
+        assertThat(response.getDoContribs()).isEqualTo("Y");
         assertThat(response.getId()).isEqualTo(1);
         assertThat(response.getCorrespondenceType()).isEqualTo("CONTRIBUTION_NOTICE");
         assertThat(response.getCorrespondenceTypeDesc()).isEqualTo("Contribution Notice");
@@ -156,7 +156,7 @@ class ContributionServiceTest {
     void givenAValidContributeRequestAndEmptyCorrespondence_whenCheckContribConditionIsInvoked_thenReturnYesContribution(ContributionRequestDTO request) {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo());
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-        assertThat(response.getDoContribs()).isEqualTo('Y');
+        assertThat(response.getDoContribs()).isEqualTo("Y");
         assertThat(response.getId()).isEqualTo(1);
         assertThat(response.getCorrespondenceType()).isEmpty();
     }
