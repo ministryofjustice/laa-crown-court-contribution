@@ -273,7 +273,7 @@ public class TestModelDataBuilder {
         return new AppealContributionRequest()
                 .withApplId(999)
                 .withRepId(999)
-                .withCaseType(CaseType.EITHER_WAY)
+                .withCaseType(CaseType.APPEAL_CC)
                 .withAppealType(AppealType.ACS)
                 .withUserCreated("TEST")
                 .withLastOutcome(buildLastOutcome())
