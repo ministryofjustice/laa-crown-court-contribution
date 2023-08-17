@@ -103,11 +103,24 @@ public class ContributionService {
                 contributionResponse.setCalcContribs('N');
             } else {
                 contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
-                contributionResponseDTO.setDoContribs(contributionResponse.getDoContribs());
-                contributionResponseDTO.setCalcContribs(contributionResponse.getCalcContribs());
+                contributionResponse.setId(contributionResponseDTO.getId());
+                contributionResponse.setCalcContribs(contributionResponseDTO.getCalcContribs());
+                contributionResponse.setTemplateDesc(contributionResponseDTO.getTemplateDesc());
+                contributionResponse.setCorrespondenceType(contributionResponseDTO.getCorrespondenceType());
+                contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
+                contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());
+                contributionResponse.setDoContribs(contributionResponseDTO.getDoContribs());
 
+                /*
+                                .id(request.getId())
+                .calcContribution(request.getCalcContribs())
+                .templateDesc(request.getDescription())
+                .correspondenceType(request.getCotyCorrespondenceType())
+                .upliftCote(request.getUpliftCoteId())
+                .reassessmentCoteId(request.getReassessmentCoteId());
+                 */
                 if (CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
-                    contributionResponseDTO.setCorrespondenceTypeDesc(CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()).getDescription());
+                    contributionResponse.setCorrespondenceTypeDesc(CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()).getDescription());
                 }
             }
         }
@@ -120,7 +133,7 @@ public class ContributionService {
             contributionResponse.setCalcContribs('N');
         }
 
-        return contributionResponseDTO;
+        return contributionResponse;
     }
 
     @Transactional
@@ -135,7 +148,39 @@ public class ContributionService {
 
     }
 
-    public boolean checkReassessment(final int repId, final String laaTransactionId) {
+    public boolean checkReassessment(RepOrderDTO repOrderDTO, final String laaTransactionId) {
+        log.info("Check if reassessment is required for REP_ID={}", repOrderDTO.getId());
+
+        //RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
+        long contributionCount = maatCourtDataService.getContributionCount(repOrderDTO.getId(), laaTransactionId);
+        List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
+        List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
+
+        if (contributionCount > 0) {
+            Optional<LocalDateTime> latestFinAssessmentDate = ofNullable(financialAssessments)
+                    .orElseGet(Collections::emptyList).stream()
+                    .map(FinancialAssessmentDTO::getDateCreated)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo);
+
+            Optional<LocalDateTime> latestPassportAssessmentDate = ofNullable(passportAssessments)
+                    .orElseGet(Collections::emptyList).stream()
+                    .map(PassportAssessmentDTO::getDateCreated)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo);
+
+            if (latestFinAssessmentDate.isPresent() && latestPassportAssessmentDate.isPresent()) {
+                if (latestFinAssessmentDate.get().isAfter(latestPassportAssessmentDate.get())) {
+                    return financialAssessments.stream().anyMatch(fa -> fa.getReplaced().equals("Y"));
+                } else {
+                    return passportAssessments.stream().anyMatch(pa -> pa.getReplaced().equals("Y"));
+                }
+            }
+        }
+        return false;
+    }
+
+/*    public boolean checkReassessment(final int repId, final String laaTransactionId) {
         log.info("Check if reassessment is required for REP_ID={}", repId);
 
         RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(repId, laaTransactionId);
@@ -165,7 +210,7 @@ public class ContributionService {
             }
         }
         return false;
-    }
+    }*/
 
     public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {
 
