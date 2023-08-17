@@ -46,12 +46,15 @@ services:
     contribution-endpoints:
       base-url: ${services.maat-api.assessments-domain}/contributions
       find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
-      get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal
+      summary-url: ${services.maat-api.assessments-domain}/contributions/{repId}/summary
+      get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal/caty-case-type/{caseType}/apty-code/{appealType}/cc-outcome/{outcome}/assessmentResult/{assessmentResult}
       get-contribution-count-url: ${services.maat-api.assessments-domain}/{repId}/contribution
       get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
     correspondence-state-endpoints:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
-      find-url: ${services.maat-api.correspondence-state-endpoints.base-url}/{repId}
+      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+    rep-order-endpoints:
+      find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
 
 retry-config:
   max-retries: 2
