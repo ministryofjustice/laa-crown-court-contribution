@@ -96,7 +96,7 @@ public class ContributionService {
             contributionResponse.setDoContribs("Y");
         }
 
-        if (contributionResponse.getDoContribs() == "Y") {
+        if (contributionResponse.getDoContribs().equals("Y")) {
             CorrespondenceRuleAndTemplateInfo processedCases = getCoteInfo(request);
             if (processedCases == null) {
                 contributionResponse.setDoContribs("N");
