@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import okhttp3.mockwebserver.MockResponse;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,10 +23,7 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -36,7 +32,6 @@ import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_IMPLEMENTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -68,7 +63,10 @@ class CrownCourtContributionIntegrationTest {
     private String getAppealAmountUrl;
 
     @Value("${services.maat-api.contribution-endpoints.find-url}")
-    private String getContributionUrl;
+    private String findContributionUrl;
+
+    @Value("${services.maat-api.contribution-endpoints.base-url}")
+    private String baseContributionUrl;
 
 
     @AfterEach
@@ -107,22 +105,8 @@ class CrownCourtContributionIntegrationTest {
                 .addFilter(springSecurityFilterChain).build();
     }
 
-    @Test
-    void givenAEmptyContent_whenCalculateContributionIsInvoked_thenFailsBadRequest() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenAEmptyOAuthToken_whenCalculateContributionIsInvoked_thenFailsUnauthorizedAccess() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, false))
-                .andExpect(status().isUnauthorized()).andReturn();
-    }
-
-    @Test
-    void givenAppealCaseWithSameContributions_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
-        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
+    private void setupAppealStubbing(AppealContributionRequest appealContributionRequest,
+                                     Contribution contribution) throws JsonProcessingException {
 
         var repOrderUrl = UriComponentsBuilder.fromUriString(getRepOrderUrl)
                 .build(appealContributionRequest.getRepId());
@@ -150,56 +134,75 @@ class CrownCourtContributionIntegrationTest {
                 )
         );
 
-        var contributionUrl = UriComponentsBuilder.fromUriString(getContributionUrl)
+        var findContributionUrl = UriComponentsBuilder.fromUriString(this.findContributionUrl)
                 .build(appealContributionRequest.getRepId());
 
-        wiremock.stubFor(get(urlPathEqualTo(contributionUrl.getPath()))
+        wiremock.stubFor(get(urlPathEqualTo(findContributionUrl.getPath()))
                 .willReturn(
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                                 .withBody(objectMapper.writeValueAsString(
-                                                List.of(
-                                                        Contribution.builder()
-                                                                .upfrontContributions(BigDecimal.ZERO)
-                                                                .build()
-                                                )
+                                                List.of(contribution)
                                         )
                                 )
                 )
+        );
+    }
+
+    @Test
+    void givenAEmptyContent_whenCalculateContributionIsInvoked_thenFailsBadRequest() throws Exception {
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenAEmptyOAuthToken_whenCalculateContributionIsInvoked_thenFailsUnauthorizedAccess() throws Exception {
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, false))
+                .andExpect(status().isUnauthorized()).andReturn();
+    }
+
+    @Test
+    void givenAppealCaseWithSameContributions_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
+        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
+
+        setupAppealStubbing(appealContributionRequest,
+                Contribution.builder()
+                        .upfrontContributions(BigDecimal.ZERO)
+                        .build()
         );
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
                 .andExpect(status().isOk());
     }
 
-//    @Test
-//    void givenContributionsNeedUpdating_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
-//        Contribution newContribution = TestModelDataBuilder.buildContribution();
-//        newContribution.setUpfrontContributions(BigDecimal.valueOf(500));
-//        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest().withCaseType(CaseType.APPEAL_CC);
-//        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
-//
-//        mockMaatApi.enqueue(new MockResponse()
-//                .setHeader("Content-Type", MediaType.APPLICATION_JSON)
-//                .setResponseCode(OK.code())
-//                .setBody(objectMapper.writeValueAsString(TestModelDataBuilder.getRepOrderDTO())));
-//
-//        mockMaatApi.enqueue(new MockResponse()
-//                .setHeader("Content-Type", MediaType.APPLICATION_JSON)
-//                .setResponseCode(OK.code())
-//                .setBody(objectMapper.writeValueAsString(BigDecimal.valueOf(500))));
-//        mockMaatApi.enqueue(new MockResponse()
-//                .setHeader("Content-Type", MediaType.APPLICATION_JSON)
-//                .setResponseCode(OK.code())
-//                .setBody(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.buildContribution()))));
-//        mockMaatApi.enqueue(new MockResponse()
-//                .setHeader("Content-Type", MediaType.APPLICATION_JSON)
-//                .setResponseCode(OK.code())
-//                .setBody(objectMapper.writeValueAsString(newContribution)));
-//
-//        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
-//                .andExpect(status().isOk());
-//    }
+    @Test
+    void givenAppealCaseWithDiffContributions_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
+        Contribution newContribution = TestModelDataBuilder.buildContribution();
+        newContribution.setUpfrontContributions(BigDecimal.valueOf(500));
+        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
+
+        setupAppealStubbing(appealContributionRequest,
+                Contribution.builder()
+                        .upfrontContributions(BigDecimal.TEN)
+                        .build()
+        );
+
+
+        var createContributionUrl = UriComponentsBuilder.fromUriString(this.baseContributionUrl).build();
+
+        wiremock.stubFor(post(urlPathEqualTo(createContributionUrl.getPath()))
+                .willReturn(
+                        WireMock.ok()
+                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                                .withBody(objectMapper.writeValueAsString(newContribution))
+                )
+        );
+
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
