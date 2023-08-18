@@ -58,7 +58,7 @@ class CompareContributionServiceTest {
     @Test
     void givenNoPreviousContributionAndIsReassessment_whenCompareContributionServiceIsInvoked_thenReturnZero() {
         when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean())).thenReturn(List.of());
-        when(contributionService.checkReassessment(anyInt(), anyString())).thenReturn(true);
+        when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         ContributionDTO contributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
                 null, null, null, null, "N", null);
@@ -86,7 +86,7 @@ class CompareContributionServiceTest {
     void givenActiveNonIdenticalContributionWithReassessment_whenCompareContributionServiceIsInvoked_thenReturnOne() {
         when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean())).
                 thenReturn(List.of(TestModelDataBuilder.buildContributionForCompareContributionService()));
-        when(contributionService.checkReassessment(anyInt(), anyString())).thenReturn(true);
+        when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         ContributionDTO contributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
                 BigDecimal.valueOf(250), BigDecimal.valueOf(1), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
@@ -164,7 +164,7 @@ class CompareContributionServiceTest {
                 thenReturn(List.of(TestModelDataBuilder.buildContributionForCompareContributionService()));
         when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString())).
                 thenReturn(CorrespondenceState.builder().status(CorrespondenceStatus.REASS.getStatus()).build());
-        when(contributionService.checkReassessment(anyInt(), anyString())).thenReturn(true);
+        when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         ContributionDTO contributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
                 BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
@@ -180,7 +180,7 @@ class CompareContributionServiceTest {
                 thenReturn(List.of(TestModelDataBuilder.buildContributionForCompareContributionService()));
         when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString())).
                 thenReturn(CorrespondenceState.builder().status(CorrespondenceStatus.CDS15.getStatus()).build());
-        when(contributionService.checkReassessment(anyInt(), anyString())).thenReturn(true);
+        when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         ContributionDTO contributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
                 BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);

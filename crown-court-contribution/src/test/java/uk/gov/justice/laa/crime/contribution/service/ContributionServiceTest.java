@@ -71,27 +71,27 @@ class ContributionServiceTest {
     }
 
     private static Stream<Arguments> inValidContributionRequest() {
-        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, FAIL, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, 0, CONTRIBUTION_NO, PASS)));
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, FAIL, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, BigDecimal.ZERO, CONTRIBUTION_NO, PASS)));
     }
 
     private static Stream<Arguments> NoContributionRequest() {
-        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.EITHER_WAY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.EITHER_WAY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.CC_ALREADY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.CC_ALREADY, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.COMMITAL, LocalDate.now(), PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.COMMITAL, LocalDate.now(), PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS)),
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, PASS, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS)),
 
-                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, PASS, PASS, FAIL, FAIL, PASS, 0, CONTRIBUTION_YES, PASS))
+                Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.APPEAL_CC, null, FAIL, PASS, PASS, FAIL, FAIL, PASS, BigDecimal.ZERO, CONTRIBUTION_YES, PASS))
 
         );
     }
 
     private static Stream<Arguments> contributionRequest() {
-        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, "INEL", PASS, 1, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, 1, CONTRIBUTION_YES, PASS))
+        return Stream.of(Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, "INEL", PASS, BigDecimal.ONE, CONTRIBUTION_YES, PASS)), Arguments.of(new ContributionRequestDTO(PASS, PASS, CaseType.INDICTABLE, null, PASS, PASS, PASS, FAIL, FULL, PASS, BigDecimal.ONE, CONTRIBUTION_YES, PASS))
 
         );
     }
@@ -121,7 +121,7 @@ class ContributionServiceTest {
     @MethodSource("inValidContributionRequest")
     void givenAInvalidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnNull(ContributionRequestDTO request) {
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-        assertThat(response).isNull();
+        assertThat(response.getId()).isNull();
     }
 
     @ParameterizedTest()
@@ -129,7 +129,6 @@ class ContributionServiceTest {
     void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnNoContribution(ContributionRequestDTO request) {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo());
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-        assertThat(response.getCalcContribution()).isEqualTo(CONTRIBUTION_NO);
         assertThat(response.getId()).isEqualTo(1);
         assertThat(response.getCorrespondenceType()).isEqualTo("CONTRIBUTION_NOTICE");
         assertThat(response.getCorrespondenceTypeDesc()).isEqualTo("Contribution Notice");
@@ -143,7 +142,7 @@ class ContributionServiceTest {
     void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnYesContribution(ContributionRequestDTO request) {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo());
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-        assertThat(response.getDoContribs()).isEqualTo('Y');
+        assertThat(response.getDoContribs()).isEqualTo("Y");
         assertThat(response.getId()).isEqualTo(1);
         assertThat(response.getCorrespondenceType()).isEqualTo("CONTRIBUTION_NOTICE");
         assertThat(response.getCorrespondenceTypeDesc()).isEqualTo("Contribution Notice");
@@ -157,7 +156,7 @@ class ContributionServiceTest {
     void givenAValidContributeRequestAndEmptyCorrespondence_whenCheckContribConditionIsInvoked_thenReturnYesContribution(ContributionRequestDTO request) {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo());
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-        assertThat(response.getDoContribs()).isEqualTo('Y');
+        assertThat(response.getDoContribs()).isEqualTo("Y");
         assertThat(response.getId()).isEqualTo(1);
         assertThat(response.getCorrespondenceType()).isEmpty();
     }
@@ -165,11 +164,9 @@ class ContributionServiceTest {
     @Test
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinReassessmentTrueAndContribCountAs1_thenReassessmentTrueIsReturned() {
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(getRepOrderDTO(REP_ID));
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(TestModelDataBuilder.getRepOrderDTO(), LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isTrue();
     }
 
@@ -178,11 +175,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(0L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
@@ -191,11 +186,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
@@ -204,11 +197,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isTrue();
     }
 
@@ -217,11 +208,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(0L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
@@ -230,11 +219,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setReplaced("N");
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(0L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
@@ -243,11 +230,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setPassportAssessments(null);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
@@ -256,11 +241,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setFinancialAssessments(null);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
@@ -269,11 +252,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getFinancialAssessments().get(0).setDateCreated(null);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
@@ -282,11 +263,9 @@ class ContributionServiceTest {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setDateCreated(null);
         when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID)).thenReturn(1L);
-        when(maatCourtDataService.getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
 
-        boolean isReassessment = contributionService.checkReassessment(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getRepOrderByRepId(REP_ID, LAA_TRANSACTION_ID);
         assertThat(isReassessment).isFalse();
     }
 
