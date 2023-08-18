@@ -47,7 +47,7 @@ public class CompareContributionService {
         if (isCds15WorkAround(repOrderDTO)) {
             setCorrespondenceStatus(CorrespondenceStatus.CDS15.getStatus(), repId, laaTransactionId);
         }
-        if (isReassessment(laaTransactionId, repId)) {
+        if (isReassessment(laaTransactionId, repOrderDTO)) {
             setCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId, laaTransactionId);
         }
         return 0;
@@ -58,7 +58,7 @@ public class CompareContributionService {
         Contribution contribution = contributions.get(0);
         if (contributionRecordsAreIdentical(contributionDTO, contribution)) {
             result = getResultOnIdenticalContributions(contributionDTO, repOrderDTO, laaTransactionId, repId);
-        } else if (isReassessment(laaTransactionId, repId)) {
+        } else if (isReassessment(laaTransactionId, repOrderDTO)) {
             result = 1;
             setCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId, laaTransactionId);
         }
@@ -89,7 +89,7 @@ public class CompareContributionService {
         if (isCds15WorkAround(repOrderDTO)) {
             result = getResultOnCds15WorkAround(laaTransactionId, repId, status);
         }
-        if (isReassessment(laaTransactionId, repId)) {
+        if (isReassessment(laaTransactionId, repOrderDTO)) {
             result = getResultOnReassessment(laaTransactionId, repId);
         }
         return result;
@@ -126,8 +126,8 @@ public class CompareContributionService {
         return contributionService.isCds15WorkAround(repOrderDTO);
     }
 
-    private boolean isReassessment(String laaTransactionId, int repId) {
-        return contributionService.checkReassessment(repId, laaTransactionId);
+    private boolean isReassessment(String laaTransactionId, RepOrderDTO repOrderDTO) {
+        return contributionService.checkReassessment(repOrderDTO, laaTransactionId);
     }
 
     private static boolean isStatusCds15(CorrespondenceState status) {
