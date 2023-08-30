@@ -12,10 +12,7 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.InitAssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.PassportAssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -481,7 +478,7 @@ class ContributionServiceTest {
     @Test
     void givenAInvalidTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
         Contribution contribution = TestModelDataBuilder.buildContribution();
-        contribution.setTransferStatus("NOT SENT");
+        contribution.setTransferStatus(TransferStatus.MANUAL);
         contribution.setMonthlyContributions(BigDecimal.ONE);
         when(maatCourtDataService.findContribution(any(), any(), any())).thenReturn(List.of(contribution));
         boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID, LAA_TRANSACTION_ID);
@@ -491,7 +488,7 @@ class ContributionServiceTest {
     @Test
     void givenAIValidContribution_whenHasContributionBeenSentIsInvoked_thenTrueIsReturn() {
         Contribution contribution = TestModelDataBuilder.buildContribution();
-        contribution.setTransferStatus("SENT");
+        contribution.setTransferStatus(TransferStatus.SENT);
         contribution.setMonthlyContributions(BigDecimal.ONE);
         when(maatCourtDataService.findContribution(any(), any(), any())).thenReturn(List.of(contribution));
         boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID, LAA_TRANSACTION_ID);

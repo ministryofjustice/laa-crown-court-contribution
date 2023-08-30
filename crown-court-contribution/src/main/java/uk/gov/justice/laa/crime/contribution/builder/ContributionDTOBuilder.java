@@ -6,38 +6,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
-
-import static java.util.Optional.ofNullable;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContributionDTOBuilder {
-
-
-
-    public static ContributionDTO build(final CreateContributionRequest request) {
-        ContributionDTO.ContributionDTOBuilder builder = ContributionDTO.builder()
-                .applId(request.getApplId())
-                .repId(request.getRepId())
-                .contributionFileId(request.getContributionFileId())
-                .effectiveDate(request.getEffectiveDate() != null ? request.getEffectiveDate().toLocalDate() : null)
-                .calcDate(request.getCalcDate() != null ? request.getCalcDate().toLocalDate() : null)
-                .contributionCap(request.getContributionCap())
-                .monthlyContributions(request.getMonthlyContributions())
-                .upfrontContributions(request.getUpfrontContributions())
-                .upliftApplied(request.getUpliftApplied())
-                .basedOn(request.getBasedOn())
-                .transferStatus(request.getTransferStatus() != null ? request.getTransferStatus().getValue() : null)
-                .dateUpliftApplied(request.getDateUpliftApplied() != null ? request.getDateUpliftApplied().toLocalDate() : null)
-                .dateUpliftRemoved(request.getDateUpliftRemoved() != null ? request.getDateUpliftRemoved().toLocalDate() : null)
-                .createContributionOrder(request.getCreateContributionOrder())
-                .correspondenceId(request.getCorrespondenceId());
-
-        return builder.build();
-
-    }
 
     public static ContributionDTO build(final CalculateContributionRequest request) {
         ContributionDTO.ContributionDTOBuilder builder = ContributionDTO.builder()
@@ -52,7 +25,7 @@ public class ContributionDTOBuilder {
                 .upfrontContributions(request.getUpfrontContributions())
                 .upliftApplied(request.getUpliftApplied())
                 .basedOn(request.getBasedOn())
-                .transferStatus(request.getTransferStatus())
+                .transferStatus(request.getTransferStatus() != null ? request.getTransferStatus() : null)
                 .dateUpliftApplied(DateUtil.parseLocalDate(request.getDateUpliftApplied()))
                 .dateUpliftRemoved(DateUtil.parseLocalDate(request.getDateUpliftRemoved()))
                 .dateCreated(request.getDateCreated())
@@ -70,7 +43,13 @@ public class ContributionDTOBuilder {
                 .assessments(request.getAssessments())
                 .appealType(request.getAppealType())
                 .lastOutcome(request.getLastOutcome())
-                .magCourtOutcome(request.getMagCourtOutcome());
+                .removeContribs(request.getRemoveContributions())
+                .committalDate(DateUtil.parseLocalDate(request.getCommittalDate()))
+                .magCourtOutcome(request.getMagCourtOutcome())
+                .crownCourtSummary(request.getCrownCourtSummary())
+                .disposableIncomeAfterCrownHardship(request.getDisposableIncomeAfterCrownHardship())
+                .disposableIncomeAfterMagHardship(request.getDisposableIncomeAfterMagHardship())
+                .totalAnnualDisposableIncome(request.getTotalAnnualDisposableIncome());
 
         return builder.build();
 
@@ -82,8 +61,8 @@ public class ContributionDTOBuilder {
                 .applId(contribution.getApplId())
                 .repId(contribution.getRepId())
                 .contributionFileId(contribution.getContributionFileId())
-                .effectiveDate(ofNullable(contribution.getEffectiveDate()).orElse(null))
-                .calcDate(ofNullable(contribution.getCalcDate()).orElse(null))
+                .effectiveDate(contribution.getEffectiveDate())
+                .calcDate(contribution.getCalcDate())
                 .contributionCap(contribution.getContributionCap())
                 .monthlyContributions(contribution.getMonthlyContributions())
                 .upfrontContributions(contribution.getUpfrontContributions())

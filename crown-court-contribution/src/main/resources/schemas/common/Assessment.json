@@ -18,6 +18,15 @@
       "type": "object",
       "description": "The assessment result",
       "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult"
+    },
+    "assessmentDate": {
+      "type": "string",
+      "description": "Assessment Date",
+      "format": "date-time"
+    },
+    "newWorkReason": {
+      "description": "New Work Reason",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.NewWorkReason"
     }
   },
   "additionalProperties": false,

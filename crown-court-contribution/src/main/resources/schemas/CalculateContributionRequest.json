@@ -52,8 +52,9 @@
       "description": "Based On"
     },
     "transferStatus": {
-      "type": "string",
-      "description": "Transfer status"
+      "type": "object",
+      "description": "Transfer status",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus"
     },
     "dateUpliftApplied": {
       "type": "string",
@@ -149,6 +150,32 @@
       "items": {
         "$ref": "common/Assessment.json"
       }
+    },
+    "removeContributions": {
+      "type": "string",
+      "description": "Indicator to Remove Contributions"
+    },
+    "committalDate": {
+      "type": "string",
+      "description": "Committal date",
+      "format": "date-time"
+    },
+    "crownCourtSummary": {
+      "type": "object",
+      "description": "Crown Court Summary",
+      "$ref": "apiCrownCourtSummary.json"
+    },
+    "disposableIncomeAfterCrownHardship": {
+      "type": "number",
+      "description": "Disposable Income after Crown Court Hardship Review"
+    },
+    "disposableIncomeAfterMagHardship": {
+      "type": "number",
+      "description": "Disposable Income after Mags Court Hardship Review"
+    },
+    "totalAnnualDisposableIncome": {
+      "type": "number",
+      "description": "Total Annual Disposable Income"
     }
   },
   "additionalProperties": false,

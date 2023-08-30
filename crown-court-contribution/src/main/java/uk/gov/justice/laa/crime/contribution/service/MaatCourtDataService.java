@@ -10,9 +10,7 @@ import org.springframework.util.MultiValueMap;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
-import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
+import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
 
 import java.math.BigDecimal;
@@ -45,9 +43,9 @@ public class MaatCourtDataService {
         return response;
     }
 
-    public Contribution createContribution(CreateContributionRequest request, String laaTransactionId) {
+    public Contribution createContribution(CreateContributionRequest createContributionRequest, String laaTransactionId) {
         Contribution response = maatAPIClient.post(
-                request,
+                createContributionRequest,
                 new ParameterizedTypeReference<Contribution>() {},
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId)
@@ -152,6 +150,17 @@ public class MaatCourtDataService {
                 configuration.getMaatApi().getContributionEndpoints().getSummaryUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 repId
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
+    public ContributionCalcParametersDTO getContributionCalcParameters(String effectiveDate, String laaTransactionId) {
+        ContributionCalcParametersDTO response = maatAPIClient.get(
+                new ParameterizedTypeReference<ContributionCalcParametersDTO>() {},
+                configuration.getMaatApi().getContributionEndpoints().getContribsParametersUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                effectiveDate
         );
         log.info(RESPONSE_STRING, response);
         return response;

@@ -23,7 +23,7 @@
     },
     "effectiveDate": {
       "type": "string",
-      "format": "date-time",
+      "format": "date",
       "description": "The date the current contribution entry was made effective, based on the date set of the last outcome"
     },
     "calcDate": {
@@ -108,6 +108,14 @@
     "ccOutcomeCount": {
       "type": "integer",
       "description": "The count of crown court outcomes"
+    },
+    "seHistoryId": {
+      "type": "integer",
+      "description": "The se history ID"
+    },
+    "totalMonths": {
+      "type": "integer",
+      "description": "Total months"
     },
     "seHistoryId": {
       "type": "integer",

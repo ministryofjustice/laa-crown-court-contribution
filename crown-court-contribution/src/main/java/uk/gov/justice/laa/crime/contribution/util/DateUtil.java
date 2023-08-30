@@ -13,4 +13,10 @@ public final class DateUtil {
     public static LocalDate parseLocalDate(final LocalDateTime date) {
         return date != null ? date.toLocalDate() : null;
     }
+
+    public static LocalDateTime convertDateToDateTime(LocalDate date) {
+        if (date != null) {
+            return date.atTime(0, 0);
+        } else return null;
+    }
 }

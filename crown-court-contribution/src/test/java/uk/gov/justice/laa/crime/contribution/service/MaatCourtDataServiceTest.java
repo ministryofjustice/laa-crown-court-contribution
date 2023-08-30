@@ -14,6 +14,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
@@ -132,5 +134,13 @@ class MaatCourtDataServiceTest {
 
         verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<List<ContributionsSummaryDTO>>() {}),
                 anyString(), anyMap(), anyInt());
+    }
+
+    @Test
+    void givenAValidEffectiveDate_whenGetContributionCalcParametersIsInvoked_thenContributionCalcParametersAreReturned() {
+        maatCourtDataService.getContributionCalcParameters(TestModelDataBuilder.TEST_DATE.toString(), LAA_TRANSACTION_ID);
+
+        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<ContributionCalcParametersDTO>() {}),
+                anyString(), anyMap(), anyString());
     }
 }
