@@ -20,6 +20,14 @@ env:
     value: {{ .Values.maatApi.clientId }}
   - name: MAAT_API_OAUTH_CLIENT_SECRET
     value: {{ .Values.maatApi.clientSecret }}
+  - name: HARDSHIP_API_BASE_URL
+    value: {{ .Values.hardshipApi.baseUrl }}
+  - name: HARDSHIP_API_OAUTH_URL
+    value: {{ .Values.hardshipApi.oauthUrl }}
+  - name: HARDSHIP_API_OAUTH_CLIENT_ID
+    value: {{ .Values.hardshipApi.clientId }}
+  - name: HARDSHIP_API_OAUTH_CLIENT_SECRET
+    value: {{ .Values.hardshipApi.clientSecret }}
   - name: DATASOURCE_HOST_PORT
     valueFrom:
       secretKeyRef:

@@ -6,6 +6,7 @@ public class MockServicesConfiguration {
         String host = String.format("http://localhost:%s", port);
         ServicesConfiguration servicesConfiguration = new ServicesConfiguration();
         ServicesConfiguration.MaatApi maatApiConfiguration = new ServicesConfiguration.MaatApi();
+        ServicesConfiguration.HardshipApi hardshipApiConfiguration = new ServicesConfiguration.HardshipApi();
 
         ServicesConfiguration.MaatApi.ContributionEndpoints contributionEndpoints =
                 new ServicesConfiguration.MaatApi.ContributionEndpoints(
@@ -14,7 +15,8 @@ public class MockServicesConfiguration {
                         "/contributions/{repId}/summary",
                         "/contribution-appeal",
                         "/{repId}/contribution",
-                        "/rep-orders/{repId}"
+                        "/rep-orders/{repId}",
+                        "/contribution-calc-params/{effectiveDate}"
                 );
 
         ServicesConfiguration.MaatApi.CorrespondenceStateEndpoints correspondenceStateEndpoints =
@@ -25,11 +27,18 @@ public class MockServicesConfiguration {
         ServicesConfiguration.MaatApi.RepOrderEndpoints repOrderEndpoints =
                 new ServicesConfiguration.MaatApi.RepOrderEndpoints("/rep-orders/cc-outcome/reporder/{repId}");
 
+        ServicesConfiguration.HardshipApi.HardshipEndpoints hardshipEndpoints =
+                new ServicesConfiguration.HardshipApi.HardshipEndpoints("/api/internal/v1/hardship/calculate-hardship-for-detail");
+
         maatApiConfiguration.setBaseUrl(host);
         servicesConfiguration.setMaatApi(maatApiConfiguration);
         maatApiConfiguration.setContributionEndpoints(contributionEndpoints);
         maatApiConfiguration.setCorrespondenceStateEndpoints(correspondenceStateEndpoints);
         maatApiConfiguration.setRepOrderEndpoints(repOrderEndpoints);
+
+        hardshipApiConfiguration.setBaseUrl(host);
+        servicesConfiguration.setHardshipApi(hardshipApiConfiguration);
+        hardshipApiConfiguration.setHardshipEndpoints(hardshipEndpoints);
         return servicesConfiguration;
     }
 }

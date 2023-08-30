@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +27,7 @@ public class Contribution {
     private BigDecimal upfrontContributions;
     private String upliftApplied;
     private String basedOn;
-    private String transferStatus;
+    private TransferStatus transferStatus;
     private LocalDate dateUpliftApplied;
     private LocalDate dateUpliftRemoved;
     private LocalDateTime dateCreated;
@@ -40,4 +41,5 @@ public class Contribution {
     private Boolean latest;
     private Integer ccOutcomeCount;
     private Integer seHistoryId;
+    private String calculationRan;
 }

@@ -52,7 +52,6 @@ public class ContributionService {
                 .orElse(request.getIojResult()));
 
         if (StringUtils.isNotBlank(request.getPassportResult())) {
-
             if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
                 response.setMeansResult(Constants.PASSPORT);
             } else if (Constants.FAIL.equals(request.getPassportResult())) {
@@ -135,8 +134,6 @@ public class ContributionService {
                 contributionRequestDTO.getMagCourtOutcome(),
                 contributionRequestDTO.getCrownCourtOutcome(),
                 contributionRequestDTO.getInitResult());
-
-
     }
 
     public boolean checkReassessment(RepOrderDTO repOrderDTO, final String laaTransactionId) {
@@ -203,7 +200,6 @@ public class ContributionService {
         return isOutcomeChanged;
     }
 
-
     public boolean hasApplicationStatusChanged(RepOrderDTO repOrderDTO, CaseType caseType, String status) {
         log.info("Get applicant details from Crime Apply datastore");
         return CaseType.INDICTABLE.equals(caseType) && repOrderDTO != null
@@ -214,12 +210,11 @@ public class ContributionService {
     public boolean hasContributionBeenSent(final int repId, final String laaTransactionId) {
         List<Contribution> contribList = maatCourtDataService.findContribution(repId, laaTransactionId, Boolean.FALSE);
         List<Contribution> contributionList = Optional.ofNullable(contribList).orElse(Collections.emptyList()).stream().filter(
-                contribution -> ("SENT".equals(contribution.getTransferStatus()) &&
+                contribution -> (TransferStatus.SENT.equals(contribution.getTransferStatus()) &&
                         contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0)
         ).toList();
 
         return !contributionList.isEmpty();
     }
-
 
 }

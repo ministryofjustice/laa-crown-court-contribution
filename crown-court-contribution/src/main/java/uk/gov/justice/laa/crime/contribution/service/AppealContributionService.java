@@ -37,7 +37,7 @@ public class AppealContributionService {
         return AssessmentResult.FAIL;
     }
 
-    public ContributionDTO calculateContribution(ContributionDTO contributionDTO, String laaTransactionId) {
+    public ContributionDTO calculateAppealContribution(ContributionDTO contributionDTO, String laaTransactionId) {
         AssessmentResult assessmentResult = determineAssessmentResult(contributionDTO.getAssessments());
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(contributionDTO, assessmentResult);

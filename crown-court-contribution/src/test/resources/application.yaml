@@ -26,8 +26,14 @@ spring:
         provider:
           maat-api:
             token-uri: http://localhost:9999/oauth2/token
+          hardship:
+            token-uri: http://localhost:9999/oauth2/token
         registration:
           maat-api:
+            client-id: dummy-client
+            client-secret: dummy-secret
+            authorization-grant-type: client_credentials
+          hardship:
             client-id: dummy-client
             client-secret: dummy-secret
             authorization-grant-type: client_credentials
@@ -50,11 +56,16 @@ services:
       get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal/caty-case-type/{caseType}/apty-code/{appealType}/cc-outcome/{outcome}/assessmentResult/{assessmentResult}
       get-contribution-count-url: ${services.maat-api.assessments-domain}/{repId}/contribution
       get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
+      get-contribs-parameters-url: ${services.maat-api.assessments-domain}/contribution-calc-params/{effectiveDate}
     correspondence-state-endpoints:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
       find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
     rep-order-endpoints:
       find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
+  hardship-api:
+    base-url: http://localhost:9999
+    hardship-endpoints:
+      calculate-hardship-for-detail-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/calculate-hardship-for-detail
 
 retry-config:
   max-retries: 2

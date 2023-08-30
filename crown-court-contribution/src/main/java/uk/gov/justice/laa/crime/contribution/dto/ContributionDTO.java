@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.contribution.model.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.LastOutcome__1;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,7 +35,7 @@ public class ContributionDTO {
     private BigDecimal upfrontContributions;
     private String upliftApplied;
     private String basedOn;
-    private String transferStatus;
+    private TransferStatus transferStatus;
     private LocalDate dateUpliftApplied;
     private LocalDate dateUpliftRemoved;
     private LocalDateTime dateCreated;
@@ -53,5 +55,11 @@ public class ContributionDTO {
     private LastOutcome__1 lastOutcome;
     private MagCourtOutcome magCourtOutcome;
     private RepOrderDTO repOrderDTO;
-
+    private String removeContribs;
+    private LocalDate committalDate;
+    private String applicationStatus;
+    private ApiCrownCourtSummary crownCourtSummary;
+    private BigDecimal disposableIncomeAfterCrownHardship;
+    private BigDecimal disposableIncomeAfterMagHardship;
+    private BigDecimal totalAnnualDisposableIncome;
 }

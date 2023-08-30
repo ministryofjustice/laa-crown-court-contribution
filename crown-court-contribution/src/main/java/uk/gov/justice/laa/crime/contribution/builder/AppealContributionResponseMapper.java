@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 
 import java.time.LocalDate;
 
@@ -20,27 +19,27 @@ public class AppealContributionResponseMapper {
                 .withId(contribution.getId())
                 .withApplId(contribution.getApplId())
                 .withRepId(contribution.getRepId())
-                .withContributionFileId(ofNullable(contribution.getContributionFileId()).orElse(null))
+                .withContributionFileId(contribution.getContributionFileId())
                 .withEffectiveDate(contribution.getEffectiveDate().atStartOfDay())
                 .withCalcDate(contribution.getCalcDate().atStartOfDay())
                 .withContributionCap(contribution.getContributionCap())
                 .withMonthlyContributions(contribution.getMonthlyContributions())
-                .withUpfrontContributions(ofNullable(contribution.getUpfrontContributions()).orElse(null))
-                .withUpliftApplied(ofNullable(contribution.getUpliftApplied()).orElse(null))
-                .withBasedOn(ofNullable(contribution.getBasedOn()).orElse(null))
-                .withTransferStatus(ofNullable(contribution.getTransferStatus()).map(TransferStatus::getFrom).orElse(null))
+                .withUpfrontContributions(contribution.getUpfrontContributions())
+                .withUpliftApplied(contribution.getUpliftApplied())
+                .withBasedOn(contribution.getBasedOn())
+                .withTransferStatus(contribution.getTransferStatus())
                 .withDateUpliftApplied(ofNullable(contribution.getDateUpliftApplied()).map(LocalDate::atStartOfDay).orElse(null))
                 .withDateUpliftRemoved(ofNullable(contribution.getDateUpliftRemoved()).map(LocalDate::atStartOfDay).orElse(null))
                 .withDateCreated(contribution.getDateCreated())
                 .withUserCreated(contribution.getUserCreated())
-                .withDateModified(ofNullable(contribution.getDateModified()).orElse(null))
-                .withUserModified(ofNullable(contribution.getUserModified()).orElse(null))
-                .withCreateContributionOrder(ofNullable(contribution.getCreateContributionOrder()).orElse(null))
-                .withCorrespondenceId(ofNullable(contribution.getCorrespondenceId()).orElse(null))
-                .withActive(ofNullable(contribution.getActive()).orElse(null))
+                .withDateModified(contribution.getDateModified())
+                .withUserModified(contribution.getUserModified())
+                .withCreateContributionOrder(contribution.getCreateContributionOrder())
+                .withCorrespondenceId(contribution.getCorrespondenceId())
+                .withActive(contribution.getActive())
                 .withReplacedDate(ofNullable(contribution.getReplacedDate()).map(LocalDate::atStartOfDay).orElse(null))
-                .withLatest(ofNullable(contribution.getLatest()).orElse(null))
-                .withCcOutcomeCount(ofNullable(contribution.getCcOutcomeCount()).orElse(null))
-                .withSeHistoryId(ofNullable(contribution.getSeHistoryId()).orElse(null));
+                .withLatest(contribution.getLatest())
+                .withCcOutcomeCount(contribution.getCcOutcomeCount())
+                .withSeHistoryId(contribution.getSeHistoryId());
     }
 }

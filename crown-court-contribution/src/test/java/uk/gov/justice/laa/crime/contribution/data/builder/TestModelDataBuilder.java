@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.data.builder;
 
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
@@ -25,7 +26,12 @@ public class TestModelDataBuilder {
     public static final Integer CORRESPONDENCE_ID = 1;
     public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
 
+    public static final LocalDate CALC_DATE = LocalDate.of(2023, 8, 28);
+    public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2023, 7, 20);
+    public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2023, 8, 20);
     public static final String LAA_TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
+    public static final LocalDate COMMITTAL_DATE = LocalDate.of(2023, 8, 8);
+
 
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
 
@@ -236,7 +242,7 @@ public class TestModelDataBuilder {
                 .upfrontContributions(BigDecimal.valueOf(250))
                 .upliftApplied("NS")
                 .basedOn("Means")
-                .transferStatus("NOT SENT")
+                .transferStatus(TransferStatus.MANUAL)
                 .dateUpliftApplied(LocalDate.now())
                 .dateUpliftRemoved(LocalDate.now())
                 .dateCreated(LocalDateTime.now())
@@ -367,7 +373,12 @@ public class TestModelDataBuilder {
                 .assessments(List.of(buildAssessment()))
                 .lastOutcome(buildLastOutcome_1())
                 .userCreated("TEST")
-                .repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
+                .repOrderDTO(getRepOrderDTOForCaseType(caseType))
+                .calcDate(CALC_DATE)
+                .dateUpliftApplied(UPLIFT_APPLIED_DATE)
+                .dateUpliftRemoved(UPLIFT_REMOVED_DATE)
+                .transferStatus(TransferStatus.REQUESTED)
+                .build();
 
     }
 
@@ -394,4 +405,30 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static ApiCalculateHardshipByDetailRequest getApiCalculateHardshipByDetailRequest() {
+        return new ApiCalculateHardshipByDetailRequest()
+                .withDetailType("TEST")
+                .withRepId(REP_ID)
+                .withLaaTransactionId(LAA_TRANSACTION_ID);
+    }
+
+    public static CalculateContributionResponse getCalculateContributionResponse() {
+        return new CalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.N)
+                .withEffectiveDate(COMMITTAL_DATE.toString())
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withTotalMonths(0);
+    }
+
+    public static ContributionDTO getContributionDTOForCalcContribs() {
+        return ContributionDTO.builder()
+                .committalDate(COMMITTAL_DATE)
+                .assessments(List.of(new Assessment()
+                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentDate(TEST_DATE)))
+                .caseType(CaseType.INDICTABLE)
+                .magCourtOutcome(MagCourtOutcome.COMMITTED)
+                .build();
+    }
 }
