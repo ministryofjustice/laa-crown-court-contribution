@@ -12,7 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
@@ -59,7 +59,7 @@ class CrownCourtContributionControllerTest {
 
         when(calculateContributionValidator.validate(any(CalculateContributionRequest.class))).thenReturn(Optional.empty());
 
-        when(calculateContributionService.calculateContribution(any(ContributionDTO.class), any()))
+        when(calculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
                 .thenReturn(new CalculateContributionResponse());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
@@ -87,7 +87,7 @@ class CrownCourtContributionControllerTest {
 
         when(calculateContributionValidator.validate(any(CalculateContributionRequest.class)))
                 .thenReturn(Optional.empty());
-        when(calculateContributionService.calculateContribution(any(ContributionDTO.class), any()))
+        when(calculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
                 .thenThrow(new APIClientException("Test api client exception"));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))

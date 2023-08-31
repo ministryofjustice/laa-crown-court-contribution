@@ -353,14 +353,14 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static ContributionDTO getContributionDTOForCompareContributionService(String caseType,
-                                                                                  BigDecimal contributionCap,
-                                                                                  BigDecimal upfrontContributions,
-                                                                                  BigDecimal monthlyContributions,
-                                                                                  LocalDate effectiveDate,
-                                                                                  String isActive,
-                                                                                  MagCourtOutcome magCourtOutcome) {
-        return ContributionDTO.builder()
+    public static CalculateContributionDTO getContributionDTOForCompareContributionService(String caseType,
+                                                                                           BigDecimal contributionCap,
+                                                                                           BigDecimal upfrontContributions,
+                                                                                           BigDecimal monthlyContributions,
+                                                                                           LocalDate effectiveDate,
+                                                                                           String isActive,
+                                                                                           MagCourtOutcome magCourtOutcome) {
+        return CalculateContributionDTO.builder()
                 .repId(123)
                 .applId(123)
                 .laaTransactionId("123456")
@@ -421,8 +421,8 @@ public class TestModelDataBuilder {
                 .withTotalMonths(0);
     }
 
-    public static ContributionDTO getContributionDTOForCalcContribs() {
-        return ContributionDTO.builder()
+    public static CalculateContributionDTO getContributionDTOForCalcContribs() {
+        return CalculateContributionDTO.builder()
                 .committalDate(COMMITTAL_DATE)
                 .assessments(List.of(new Assessment()
                         .withAssessmentType(AssessmentType.PASSPORT)

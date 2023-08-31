@@ -6,7 +6,7 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
@@ -44,12 +44,12 @@ class CreateContributionRequestMapperTest {
     @Test
     void givenAValidContributionDTO_whenMapIsInvoked_thenReturnCreateContributionRequest() {
 
-        ContributionDTO contributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
                 new BigDecimal(500), null, null,
                 TestModelDataBuilder.TEST_DATE.toLocalDate(), "N", null);
 
         BigDecimal appealContributionAmount = BigDecimal.valueOf(500);
-        CreateContributionRequest request = mapper.map(contributionDTO, appealContributionAmount);
+        CreateContributionRequest request = mapper.map(calculateContributionDTO, appealContributionAmount);
 
         softly.assertThat(request.getRepId()).isEqualTo(123);
         softly.assertThat(request.getApplId()).isEqualTo(123);

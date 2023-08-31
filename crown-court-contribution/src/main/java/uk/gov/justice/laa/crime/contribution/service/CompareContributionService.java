@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
@@ -27,17 +27,17 @@ public class CompareContributionService {
     private final ContributionService contributionService;
 
     @Transactional
-    public int compareContribution(ContributionDTO contributionDTO) {
-        String laaTransactionId = contributionDTO.getLaaTransactionId();
-        int repId = contributionDTO.getRepId();
-        RepOrderDTO repOrderDTO = contributionDTO.getRepOrderDTO();
+    public int compareContribution(CalculateContributionDTO calculateContributionDTO) {
+        String laaTransactionId = calculateContributionDTO.getLaaTransactionId();
+        int repId = calculateContributionDTO.getRepId();
+        RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, laaTransactionId, false);
         List<Contribution> activeContribution = Optional.ofNullable(contributions).orElse(Collections.emptyList()).stream()
                 .filter(isActiveContribution(repId)).toList();
         if (activeContribution.isEmpty()) {
             return getResultOnNoPreviousContribution(repOrderDTO, laaTransactionId, repId);
         }
-        return getResultOnActiveContribution(contributionDTO, repOrderDTO, laaTransactionId, repId, activeContribution);
+        return getResultOnActiveContribution(calculateContributionDTO, repOrderDTO, laaTransactionId, repId, activeContribution);
     }
 
     private int getResultOnNoPreviousContribution(RepOrderDTO repOrderDTO, String laaTransactionId, int repId) {
@@ -53,11 +53,11 @@ public class CompareContributionService {
         return 0;
     }
 
-    private int getResultOnActiveContribution(ContributionDTO contributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, int repId, List<Contribution> contributions) {
+    private int getResultOnActiveContribution(CalculateContributionDTO calculateContributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, int repId, List<Contribution> contributions) {
         int result = 2;
         Contribution contribution = contributions.get(0);
-        if (contributionRecordsAreIdentical(contributionDTO, contribution)) {
-            result = getResultOnIdenticalContributions(contributionDTO, repOrderDTO, laaTransactionId, repId);
+        if (contributionRecordsAreIdentical(calculateContributionDTO, contribution)) {
+            result = getResultOnIdenticalContributions(calculateContributionDTO, repOrderDTO, laaTransactionId, repId);
         } else if (isReassessment(laaTransactionId, repOrderDTO)) {
             result = 1;
             setCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId, laaTransactionId);
@@ -65,9 +65,9 @@ public class CompareContributionService {
         return result;
     }
 
-    private int getResultOnIdenticalContributions(ContributionDTO contributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, int repId) {
+    private int getResultOnIdenticalContributions(CalculateContributionDTO calculateContributionDTO, RepOrderDTO repOrderDTO, String laaTransactionId, int repId) {
         CorrespondenceState status = maatCourtDataService.findCorrespondenceState(repId, laaTransactionId);
-        MagCourtOutcome magCourtOutcome = contributionDTO.getMagCourtOutcome();
+        MagCourtOutcome magCourtOutcome = calculateContributionDTO.getMagCourtOutcome();
         String mcooOutcome = magCourtOutcome == null ? null : magCourtOutcome.getOutcome();
         if (magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(repOrderDTO, status, mcooOutcome)) {
             setCorrespondenceStatus(CorrespondenceStatus.APPEAL_CC.getStatus(), repId, laaTransactionId);
@@ -153,7 +153,7 @@ public class CompareContributionService {
                         && isStatusAppealCC(status));
     }
 
-    private static boolean contributionRecordsAreIdentical(ContributionDTO compareContributionDTO, Contribution contribution) {
+    private static boolean contributionRecordsAreIdentical(CalculateContributionDTO compareContributionDTO, Contribution contribution) {
         return contribution.getContributionCap().compareTo(compareContributionDTO.getContributionCap()) == 0 &&
                 contribution.getUpfrontContributions().compareTo(compareContributionDTO.getUpfrontContributions()) == 0 &&
                 contribution.getMonthlyContributions().compareTo(compareContributionDTO.getMonthlyContributions()) == 0 &&

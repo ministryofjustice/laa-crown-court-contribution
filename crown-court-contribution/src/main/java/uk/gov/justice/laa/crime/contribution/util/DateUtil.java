@@ -14,6 +14,11 @@ public final class DateUtil {
         return date != null ? date.toLocalDate() : null;
     }
 
+    public static String getLocalDateString(final LocalDate date) {
+        return date != null ? date.toString() : null;
+    }
+
+
     public static LocalDateTime convertDateToDateTime(LocalDate date) {
         if (date != null) {
             return date.atTime(0, 0);
