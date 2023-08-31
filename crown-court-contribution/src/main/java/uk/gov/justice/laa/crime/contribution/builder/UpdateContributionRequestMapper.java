@@ -2,7 +2,7 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.UpdateContributionRequest;
 
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
@@ -10,23 +10,23 @@ import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToD
 @Component
 @AllArgsConstructor
 public class UpdateContributionRequestMapper {
-    public UpdateContributionRequest map(CalculateContributionDTO calculateContributionDTO) {
+    public UpdateContributionRequest map(Contribution contribution) {
         return new UpdateContributionRequest()
-                .withId(calculateContributionDTO.getId())
-                .withUserModified(calculateContributionDTO.getUserModified())
-                .withCorrespondenceId(calculateContributionDTO.getCorrespondenceId())
-                .withContributionCap(calculateContributionDTO.getContributionCap())
-                .withBasedOn(calculateContributionDTO.getBasedOn())
-                .withCalcDate(convertDateToDateTime(calculateContributionDTO.getCalcDate()))
-                .withMonthlyContributions(calculateContributionDTO.getMonthlyContributions())
-                .withCreateContributionOrder(calculateContributionDTO.getCreateContributionOrder())
-                .withUpfrontContributions(calculateContributionDTO.getUpfrontContributions())
-                .withEffectiveDate(convertDateToDateTime(calculateContributionDTO.getEffectiveDate()))
-                .withContributionFileId(calculateContributionDTO.getContributionFileId())
-                .withContributionCap(calculateContributionDTO.getContributionCap())
-                .withUpliftApplied(calculateContributionDTO.getUpliftApplied())
-                .withDateUpliftApplied(convertDateToDateTime(calculateContributionDTO.getDateUpliftApplied()))
-                .withDateUpliftRemoved(convertDateToDateTime(calculateContributionDTO.getDateUpliftRemoved()))
-                .withTransferStatus(calculateContributionDTO.getTransferStatus());
+                .withId(contribution.getId())
+                .withUserModified(contribution.getUserModified())
+                .withCorrespondenceId(contribution.getCorrespondenceId())
+                .withContributionCap(contribution.getContributionCap())
+                .withBasedOn(contribution.getBasedOn())
+                .withCalcDate(convertDateToDateTime(contribution.getCalcDate()))
+                .withMonthlyContributions(contribution.getMonthlyContributions())
+                .withCreateContributionOrder(contribution.getCreateContributionOrder())
+                .withUpfrontContributions(contribution.getUpfrontContributions())
+                .withEffectiveDate(convertDateToDateTime(contribution.getEffectiveDate()))
+                .withContributionFileId(contribution.getContributionFileId())
+                .withContributionCap(contribution.getContributionCap())
+                .withUpliftApplied(contribution.getUpliftApplied())
+                .withDateUpliftApplied(convertDateToDateTime(contribution.getDateUpliftApplied()))
+                .withDateUpliftRemoved(convertDateToDateTime(contribution.getDateUpliftRemoved()))
+                .withTransferStatus(contribution.getTransferStatus());
     }
 }
