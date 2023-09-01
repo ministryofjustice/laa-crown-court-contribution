@@ -34,7 +34,7 @@ public class CalculateContributionService {
     private final ContributionService contributionService;
     private final ContributionSummaryMapper contributionSummaryMapper;
     private final UpdateContributionRequestMapper updateContributionRequestMapper;
-    private final List<MagCourtOutcome> EARLY_TRANSFER_MAG_OUTCOMES = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
+    private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
             MagCourtOutcome.COMMITTED_FOR_TRIAL,
             MagCourtOutcome.APPEAL_TO_CC);
 
@@ -49,10 +49,6 @@ public class CalculateContributionService {
         } else {
             response = getCalculateContributionResponse(calculateContributionDTO, laaTransactionId, repOrderDTO);
         }
-
-        // Separate End point required to call from MAAT application
-//        List<ContributionSummary> contributionSummary = getContributionSummaries(calculateContributionDTO, laaTransactionId);
-//        response.setContributionsSummary(contributionSummary);
 
         return response;
     }
@@ -102,17 +98,25 @@ public class CalculateContributionService {
             response.setUpfrontContributions(BigDecimal.ZERO);
         }
 
-        Contribution currentContribution = new Contribution();
+        Contribution currentContribution = null;
+        TransferStatus currentTransferStatus = null;
+        Integer currentContributionFileId = null;
         final Integer contributionId = calculateContributionDTO.getId();
         if (contributionId != null) {
             List<Contribution> contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, false);
             currentContribution = contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst().orElse(null);
+            if (currentContribution != null) {
+                currentTransferStatus = currentContribution.getTransferStatus();
+                currentContributionFileId = currentContribution.getContributionFileId();
+            } else {
+                log.error("C3 Service: Current Contribution Is NULL.");
+            }
         }
 
         if ((calculateContributionDTO.getMonthlyContributions() != null && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString())) {
-            if (currentContribution != null && TransferStatus.REQUESTED.equals(currentContribution.getTransferStatus())) {
-                TransferStatus transferStatus = (currentContribution.getContributionFileId() == null) ? null : TransferStatus.SENT;
+            if (TransferStatus.REQUESTED.equals(currentTransferStatus)) {
+                TransferStatus transferStatus = (currentContributionFileId == null) ? null : TransferStatus.SENT;
                 UpdateContributionRequest updateContributionRequest = updateContributionRequestMapper.map(currentContribution);
                 updateContributionRequest.setTransferStatus(transferStatus);
                 maatCourtDataService.updateContribution(updateContributionRequest, laaTransactionId);
@@ -120,29 +124,26 @@ public class CalculateContributionService {
             // TODO - revisit the createContribs logic - do we need to change the input?
             createContribs(calculateContributionDTO, laaTransactionId);
         } else {
-            if (!TransferStatus.REQUESTED.equals(currentContribution.getTransferStatus())
+            if ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
                     && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                     || contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), calculateContributionDTO.getLaaTransactionId())
-                    || contributionService.isCds15WorkAround(repOrderDTO))) {
-                // TODO - revisit the createContribs logic - do we need to change the input?
-                createContribs(calculateContributionDTO, laaTransactionId);
-            } else if (isReassessment) {
+                    || contributionService.isCds15WorkAround(repOrderDTO))) || isReassessment) {
                 createContribs(calculateContributionDTO, laaTransactionId);
             }
-            if (TransferStatus.REQUESTED.equals((currentContribution.getTransferStatus()))
+            if (TransferStatus.REQUESTED.equals((currentTransferStatus))
                     && CaseType.APPEAL_CC.equals(calculateContributionDTO.getCaseType())) {
                 createContribs(calculateContributionDTO, laaTransactionId);
             }
         }
 
-        // TODO - new endpoint to get the Latest SENT contribution
-
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution)) {
-            maatCourtDataService.updateContribution(new UpdateContributionRequest()
-                    .withId(currentContribution.getId())
-                    .withTransferStatus(TransferStatus.REQUESTED)
-                    .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
+            if (currentContribution != null) {
+                maatCourtDataService.updateContribution(new UpdateContributionRequest()
+                        .withId(currentContribution.getId())
+                        .withTransferStatus(TransferStatus.REQUESTED)
+                        .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
+            }
         }
 
         //ToDo - Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
@@ -158,7 +159,7 @@ public class CalculateContributionService {
                 || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().equals(latestSentContribution.getEffectiveDate().toString())
                 && BigDecimal.ZERO.compareTo(response.getMonthlyContributions()) < 0)
                 || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId(), laaTransactionId))
-                && EARLY_TRANSFER_MAG_OUTCOMES.contains(calculateContributionDTO.getMagCourtOutcome()))
+                && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome()))
                 || contributionService.hasContributionBeenSent(calculateContributionDTO.getRepId(), laaTransactionId);
     }
 
