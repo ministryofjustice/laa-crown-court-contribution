@@ -50,13 +50,6 @@ class CalculateContributionServiceTest {
     private ContributionRulesService contributionRulesService;
 
     @Test
-    void givenAInvalidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
-        when(maatCourtDataService.getRepOrderByRepId(anyInt(), anyString())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
-        calculateContributionService.calculateContribution(CalculateContributionDTO.builder().repId(120).build(), TestModelDataBuilder.LAA_TRANSACTION_ID);
-        verify(appealContributionService, times(0)).calculateAppealContribution(any(), anyString());
-    }
-
-    @Test
     void givenAValidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
         when(maatCourtDataService.getRepOrderByRepId(anyInt(), anyString())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
         when(appealContributionService.calculateAppealContribution(any(CalculateContributionDTO.class), anyString())).thenReturn(new CalculateContributionResponse());

@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,9 +34,11 @@ public class CalculateContributionService {
     private final ContributionService contributionService;
     private final ContributionSummaryMapper contributionSummaryMapper;
     private final UpdateContributionRequestMapper updateContributionRequestMapper;
-    private final List<MagCourtOutcome> EARLY_TRANSFER_MAG_OUTCOMES = List.of(MagCourtOutcome.SENT_FOR_TRIAL, MagCourtOutcome.COMMITTED_FOR_TRIAL, MagCourtOutcome.APPEAL_TO_CC);
+    private final List<MagCourtOutcome> EARLY_TRANSFER_MAG_OUTCOMES = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
+            MagCourtOutcome.COMMITTED_FOR_TRIAL,
+            MagCourtOutcome.APPEAL_TO_CC);
 
-    public CalculateContributionResponse    calculateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+    public CalculateContributionResponse calculateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
         CalculateContributionResponse response;
 
         RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(calculateContributionDTO.getRepId(), laaTransactionId);
@@ -55,7 +56,6 @@ public class CalculateContributionService {
 
         return response;
     }
-
 
     public CalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
                                                                           final String laaTransactionId,
@@ -82,7 +82,6 @@ public class CalculateContributionService {
         return response;
     }
 
-
     public CalculateContributionResponse doContribs(final CalculateContributionDTO calculateContributionDTO,
                                                     final String laaTransactionId,
                                                     final ContributionResponseDTO contributionResponseDTO,
@@ -107,13 +106,12 @@ public class CalculateContributionService {
         final Integer contributionId = calculateContributionDTO.getId();
         if (contributionId != null) {
             List<Contribution> contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, false);
-            Optional<Contribution> contributionOptional = contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst();
-            currentContribution = contributionOptional.isPresent() ? contributionOptional.get() : null;
+            currentContribution = contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst().orElse(null);
         }
 
         if ((calculateContributionDTO.getMonthlyContributions() != null && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
-                || !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate())) {
-            if (TransferStatus.REQUESTED.equals(currentContribution.getTransferStatus())) {
+                || !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString())) {
+            if (currentContribution != null && TransferStatus.REQUESTED.equals(currentContribution.getTransferStatus())) {
                 TransferStatus transferStatus = (currentContribution.getContributionFileId() == null) ? null : TransferStatus.SENT;
                 UpdateContributionRequest updateContributionRequest = updateContributionRequestMapper.map(currentContribution);
                 updateContributionRequest.setTransferStatus(transferStatus);
@@ -140,7 +138,6 @@ public class CalculateContributionService {
         // TODO - new endpoint to get the Latest SENT contribution
 
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
-
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution)) {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
                     .withId(currentContribution.getId())
@@ -153,26 +150,24 @@ public class CalculateContributionService {
     }
 
     public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,
-                                            final String laaTransactionId,
-                                            final CalculateContributionResponse response,
-                                            final Contribution latestSentContribution) {
+                                           final String laaTransactionId,
+                                           final CalculateContributionResponse response,
+                                           final Contribution latestSentContribution) {
         return ((response.getMonthlyContributions().compareTo(latestSentContribution.getMonthlyContributions()) != 0
                 || response.getUpfrontContributions().compareTo(latestSentContribution.getUpfrontContributions()) != 0
-                || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().equals(latestSentContribution.getEffectiveDate())
+                || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().equals(latestSentContribution.getEffectiveDate().toString())
                 && BigDecimal.ZERO.compareTo(response.getMonthlyContributions()) < 0)
                 || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId(), laaTransactionId))
                 && EARLY_TRANSFER_MAG_OUTCOMES.contains(calculateContributionDTO.getMagCourtOutcome()))
                 || contributionService.hasContributionBeenSent(calculateContributionDTO.getRepId(), laaTransactionId);
     }
 
-
-    public List<ContributionSummary> getContributionSummaries(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+    public List<ContributionSummary> getContributionSummaries(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
         List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(calculateContributionDTO.getRepId(), laaTransactionId);
         return contribSummaryList.stream().map(contributionSummaryMapper::map).toList();
     }
 
-
-    public Contribution createContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+    public Contribution createContribs(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
         log.info("Inactivate existing Contribution and create a new Contribution");
         CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO);
         if (compareContributionService.compareContribution(calculateContributionDTO) < 2) {
@@ -180,7 +175,9 @@ public class CalculateContributionService {
         } else return null;
     }
 
-    public CalculateContributionResponse calcContribs(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO, String laaTransactionId) {
+    public CalculateContributionResponse calcContribs(final CalculateContributionDTO calculateContributionDTO,
+                                                      final ContributionResponseDTO contributionResponseDTO,
+                                                      final String laaTransactionId) {
         CalculateContributionResponse response = new CalculateContributionResponse();
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO = maatCourtDataService.getContributionCalcParameters(assEffectiveDate.toString(), laaTransactionId);
@@ -220,7 +217,10 @@ public class CalculateContributionService {
         return response;
     }
 
-    public BigDecimal calculateAnnualDisposableIncome(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, CrownCourtOutcome crownCourtOutcome, boolean isContributionRuleApplicable) {
+    public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,
+                                                      final String laaTransactionId,
+                                                      final CrownCourtOutcome crownCourtOutcome,
+                                                      boolean isContributionRuleApplicable) {
         BigDecimal annualDisposableIncome = calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
         if (isContributionRuleApplicable) {
             annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO, annualDisposableIncome);
@@ -267,7 +267,9 @@ public class CalculateContributionService {
         return annualDisposableIncome;
     }
 
-    public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO, final BigDecimal monthlyContributions, final LocalDate assEffectiveDate) {
+    public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
+                                                         final BigDecimal monthlyContributions,
+                                                         final LocalDate assEffectiveDate) {
         NewWorkReason newWorkReason = getNewWorkReason(calculateContributionDTO);
         if (NewWorkReason.FMA == newWorkReason) {
             return assEffectiveDate.toString();

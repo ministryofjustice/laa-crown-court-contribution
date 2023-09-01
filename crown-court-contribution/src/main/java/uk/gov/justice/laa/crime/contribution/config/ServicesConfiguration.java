@@ -62,21 +62,18 @@ public class ServicesConfiguration {
             private String contribsParametersUrl;
 
             @NotNull
-            private String findLatestSentContributionUrl
-
+            private String findLatestSentContributionUrl;
         }
 
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
         public static class CorrespondenceStateEndpoints {
-
             @NotNull
             private String baseUrl;
 
             @NotNull
             private String findUrl;
-
         }
 
         @Data
@@ -92,7 +89,6 @@ public class ServicesConfiguration {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class HardshipApi {
-
         @NotNull
         private String baseUrl;
 
@@ -103,14 +99,8 @@ public class ServicesConfiguration {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class HardshipEndpoints {
-
             @NotNull
             private String calculateHardshipForDetailUrl;
-
         }
-
-
     }
-
-
 }
