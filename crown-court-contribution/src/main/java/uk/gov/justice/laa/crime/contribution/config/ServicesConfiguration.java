@@ -61,6 +61,9 @@ public class ServicesConfiguration {
             @NotNull
             private String contribsParametersUrl;
 
+            @NotNull
+            private String findLatestSentContributionUrl
+
         }
 
         @Data

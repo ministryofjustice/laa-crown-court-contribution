@@ -37,7 +37,7 @@ public class CalculateContributionService {
     private final UpdateContributionRequestMapper updateContributionRequestMapper;
     private final List<MagCourtOutcome> EARLY_TRANSFER_MAG_OUTCOMES = List.of(MagCourtOutcome.SENT_FOR_TRIAL, MagCourtOutcome.COMMITTED_FOR_TRIAL, MagCourtOutcome.APPEAL_TO_CC);
 
-    public CalculateContributionResponse calculateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+    public CalculateContributionResponse    calculateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
         CalculateContributionResponse response;
 
         RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(calculateContributionDTO.getRepId(), laaTransactionId);
@@ -138,8 +138,8 @@ public class CalculateContributionService {
         }
 
         // TODO - new endpoint to get the Latest SENT contribution
-        List<Contribution> contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, true);
-        Contribution latestSentContribution = contributionsList.get(0);
+
+        Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
 
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution)) {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
