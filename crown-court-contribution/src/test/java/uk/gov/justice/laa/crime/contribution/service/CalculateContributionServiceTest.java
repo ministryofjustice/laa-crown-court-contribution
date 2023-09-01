@@ -48,6 +48,9 @@ class CalculateContributionServiceTest {
     @Mock
     private ContributionRulesService contributionRulesService;
 
+    @Mock
+    private ContributionService contributionService;
+
     @Test
     void givenAValidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
         when(maatCourtDataService.getRepOrderByRepId(anyInt(), anyString())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
@@ -513,4 +516,84 @@ class CalculateContributionServiceTest {
                 .isEqualTo(BigDecimal.TEN);
     }
 
+    @Test
+    void givenContributionSent_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .build();
+        CalculateContributionResponse response = new CalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        when(contributionService.hasContributionBeenSent(anyInt(), anyString())).thenReturn(true);
+        assertThat(calculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isTrue();
+    }
+
+    @Test
+    void givenContributionIsNotSent_whenIsEarlyTransferRequiredIsInvoked_FalseIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .build();
+        CalculateContributionResponse response = new CalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        when(contributionService.hasContributionBeenSent(anyInt(), anyString())).thenReturn(false);
+        assertThat(calculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isFalse();
+    }
+
+    @Test
+    void givenCCOutcomeChangedAdMagOutcomeIsSentForTrail_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .magCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
+                .build();
+        CalculateContributionResponse response = new CalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        when(contributionService.hasCCOutcomeChanged(anyInt(), anyString())).thenReturn(true);
+        assertThat(calculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isTrue();
+    }
+
+    @Test
+    void givenMonthlyContributionsNotEqualAdMagOutcomeIsCommittedForTrail_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .magCourtOutcome(MagCourtOutcome.COMMITTED_FOR_TRIAL)
+                .build();
+        CalculateContributionResponse response = new CalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .monthlyContributions(BigDecimal.ONE)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        assertThat(calculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isTrue();
+    }
+
+    @Test
+    void givenUpfrontContributionsNotEqualAdMagOutcomeIsAppealToCC_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
+                .build();
+        CalculateContributionResponse response = new CalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ONE)
+                .build();
+        assertThat(calculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isTrue();
+    }
 }

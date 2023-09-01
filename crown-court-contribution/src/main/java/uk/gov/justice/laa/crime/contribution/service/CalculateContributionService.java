@@ -137,13 +137,11 @@ public class CalculateContributionService {
         }
 
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
-        if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution)) {
-            if (currentContribution != null) {
+        if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
                 maatCourtDataService.updateContribution(new UpdateContributionRequest()
                         .withId(currentContribution.getId())
                         .withTransferStatus(TransferStatus.REQUESTED)
                         .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
-            }
         }
 
         //ToDo - Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
