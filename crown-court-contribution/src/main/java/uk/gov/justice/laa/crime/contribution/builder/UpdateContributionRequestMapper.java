@@ -23,7 +23,6 @@ public class UpdateContributionRequestMapper {
                 .withUpfrontContributions(contribution.getUpfrontContributions())
                 .withEffectiveDate(convertDateToDateTime(contribution.getEffectiveDate()))
                 .withContributionFileId(contribution.getContributionFileId())
-                .withContributionCap(contribution.getContributionCap())
                 .withUpliftApplied(contribution.getUpliftApplied())
                 .withDateUpliftApplied(convertDateToDateTime(contribution.getDateUpliftApplied()))
                 .withDateUpliftRemoved(convertDateToDateTime(contribution.getDateUpliftRemoved()))
