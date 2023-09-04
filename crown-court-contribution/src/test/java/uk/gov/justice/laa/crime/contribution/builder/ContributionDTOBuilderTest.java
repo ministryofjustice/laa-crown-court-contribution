@@ -7,15 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionDTOBuilderTest {
@@ -65,7 +59,17 @@ class ContributionDTOBuilderTest {
 
     @Test
     void givenAValidCreateContributionRequest_whenBuildIsInvoked_thenReturnCalculateContributionDTO() {
-        CreateContributionRequest createContributionRequest = TestModelDataBuilder.getCreateContributionRequest();
+        CreateContributionRequest createContributionRequest = TestModelDataBuilder.getCreateContributionRequest(TransferStatus.REQUESTED, TestModelDataBuilder.TEST_DATE);
+        validateContributionDTOBuilder(createContributionRequest);
+    }
+
+    @Test
+    void givenCreateContributionRequestWithNullDate_whenBuildIsInvoked_thenReturnCalculateContributionDTO() {
+        CreateContributionRequest createContributionRequest = TestModelDataBuilder.getCreateContributionRequest(null, null);
+        validateContributionDTOBuilder(createContributionRequest);
+    }
+
+    private void validateContributionDTOBuilder(CreateContributionRequest createContributionRequest) {
         CalculateContributionDTO calculateContributionDTO = ContributionDTOBuilder.build(createContributionRequest);
         softly.assertThat(calculateContributionDTO.getContributionCap()).isEqualTo(createContributionRequest.getContributionCap());
         softly.assertThat(calculateContributionDTO.getMonthlyContributions()).isEqualTo(createContributionRequest.getMonthlyContributions());
@@ -75,10 +79,10 @@ class ContributionDTOBuilderTest {
         softly.assertThat(calculateContributionDTO.getBasedOn()).isEqualTo(createContributionRequest.getBasedOn());
         softly.assertThat(calculateContributionDTO.getRepId()).isEqualTo(createContributionRequest.getRepId());
         softly.assertThat(calculateContributionDTO.getApplId()).isEqualTo(createContributionRequest.getApplId());
-        softly.assertThat(calculateContributionDTO.getCalcDate()).isEqualTo(createContributionRequest.getCalcDate().toLocalDate());
-        softly.assertThat(calculateContributionDTO.getDateUpliftApplied()).isEqualTo(createContributionRequest.getDateUpliftApplied().toLocalDate());
-        softly.assertThat(calculateContributionDTO.getDateUpliftRemoved()).isEqualTo(createContributionRequest.getDateUpliftRemoved().toLocalDate());
-        softly.assertThat(calculateContributionDTO.getEffectiveDate()).isEqualTo(createContributionRequest.getEffectiveDate().toLocalDate());
+        softly.assertThat(calculateContributionDTO.getCalcDate()).isEqualTo((createContributionRequest.getDateUpliftRemoved() != null) ? createContributionRequest.getCalcDate().toLocalDate() : null);
+        softly.assertThat(calculateContributionDTO.getDateUpliftApplied()).isEqualTo((createContributionRequest.getDateUpliftApplied() != null) ? createContributionRequest.getDateUpliftApplied().toLocalDate() : null);
+        softly.assertThat(calculateContributionDTO.getDateUpliftRemoved()).isEqualTo((createContributionRequest.getDateUpliftRemoved() != null) ? createContributionRequest.getDateUpliftRemoved().toLocalDate() : null);
+        softly.assertThat(calculateContributionDTO.getEffectiveDate()).isEqualTo((createContributionRequest.getDateUpliftRemoved() != null) ? createContributionRequest.getEffectiveDate().toLocalDate() : null);
         softly.assertThat(calculateContributionDTO.getContributionCap()).isEqualTo(createContributionRequest.getContributionCap());
         softly.assertThat(calculateContributionDTO.getUpliftApplied()).isEqualTo(createContributionRequest.getUpliftApplied());
         softly.assertThat(calculateContributionDTO.getTransferStatus()).isEqualTo(createContributionRequest.getTransferStatus());
@@ -87,6 +91,5 @@ class ContributionDTOBuilderTest {
         softly.assertThat(calculateContributionDTO.getCorrespondenceId()).isEqualTo(createContributionRequest.getCorrespondenceId());
         softly.assertAll();
     }
-
 
 }

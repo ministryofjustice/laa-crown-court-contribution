@@ -58,22 +58,22 @@ public class TestModelDataBuilder {
                 .passportResult(PASS).build();
     }
 
-    public static CreateContributionRequest getCreateContributionRequest(){
+    public static CreateContributionRequest getCreateContributionRequest(TransferStatus tranferStatus, LocalDateTime dateTime){
         return new CreateContributionRequest()
                 .withRepId(REP_ID)
                 .withApplId(123)
                 .withUserCreated(TEST_USER)
                 .withContributionFileId(123)
-                .withEffectiveDate(TEST_DATE)
-                .withCalcDate(TEST_DATE)
+                .withEffectiveDate(dateTime)
+                .withCalcDate(dateTime)
                 .withContributionCap(BigDecimal.valueOf(250))
                 .withMonthlyContributions(BigDecimal.valueOf(250))
                 .withUpfrontContributions(BigDecimal.valueOf(250))
                 .withUpliftApplied("N")
                 .withBasedOn("N")
-                .withTransferStatus(TransferStatus.SENT)
-                .withDateUpliftApplied(TEST_DATE)
-                .withDateUpliftRemoved(TEST_DATE)
+                .withTransferStatus(tranferStatus)
+                .withDateUpliftApplied(dateTime)
+                .withDateUpliftRemoved(dateTime)
                 .withCreateContributionOrder("N")
                 .withCorrespondenceId(123);
         }
