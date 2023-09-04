@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.UpdateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
@@ -32,7 +31,6 @@ public class CalculateContributionService {
     private final ContributionRulesService contributionRulesService;
     private final CreateContributionRequestMapper createContributionRequestMapper;
     private final ContributionService contributionService;
-    private final ContributionSummaryMapper contributionSummaryMapper;
     private final UpdateContributionRequestMapper updateContributionRequestMapper;
     private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
             MagCourtOutcome.COMMITTED_FOR_TRIAL,
@@ -123,17 +121,8 @@ public class CalculateContributionService {
             }
             // TODO - revisit the createContribs logic - do we need to change the input?
             createContribs(calculateContributionDTO, laaTransactionId);
-        } else {
-            if ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
-                    && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
-                    || contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), calculateContributionDTO.getLaaTransactionId())
-                    || contributionService.isCds15WorkAround(repOrderDTO))) || isReassessment) {
-                createContribs(calculateContributionDTO, laaTransactionId);
-            }
-            if (TransferStatus.REQUESTED.equals((currentTransferStatus))
-                    && CaseType.APPEAL_CC.equals(calculateContributionDTO.getCaseType())) {
-                createContribs(calculateContributionDTO, laaTransactionId);
-            }
+        } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
+            createContribs(calculateContributionDTO, laaTransactionId);
         }
 
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
@@ -146,6 +135,17 @@ public class CalculateContributionService {
 
         //ToDo - Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
         return response;
+    }
+
+    public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
+                                                 final boolean isReassessment,
+                                                 final RepOrderDTO repOrderDTO,
+                                                 final TransferStatus currentTransferStatus) {
+        return ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
+                && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
+                || contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), calculateContributionDTO.getLaaTransactionId())
+                || contributionService.isCds15WorkAround(repOrderDTO))) || isReassessment) || (TransferStatus.REQUESTED.equals(currentTransferStatus)
+                && CaseType.APPEAL_CC.equals(calculateContributionDTO.getCaseType()));
     }
 
     public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,

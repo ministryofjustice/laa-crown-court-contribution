@@ -8,10 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
+import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
@@ -647,5 +644,93 @@ class CalculateContributionServiceTest {
                 .upfrontContributions(BigDecimal.ONE)
                 .build();
         assertThat(calculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isTrue();
+    }
+
+    @Test
+    void givenTransferRequestedAndAppealCC_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.APPEAL_CC)
+                .build();
+        assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, false, null, TransferStatus.REQUESTED)).isTrue();
+    }
+
+    @Test
+    void givenTransferRequestedAndIndictableCase_whenIsCreateContributionRequiredIsInvoked_FalseIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.INDICTABLE)
+                .build();
+        assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, false, null, TransferStatus.REQUESTED)).isFalse();
+    }
+
+    @Test
+    void givenTransferSentAndAppealCC_whenIsCreateContributionRequiredIsInvoked_FalseIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.APPEAL_CC)
+                .build();
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
+                .id(1234)
+                        .build();
+        when(contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.APPEAL_CC, null)).thenReturn(false);
+        when(contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), null)).thenReturn(false);
+        when(contributionService.isCds15WorkAround(repOrderDTO)).thenReturn(false);
+        assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, false, repOrderDTO, TransferStatus.SENT)).isFalse();
+    }
+
+    @Test
+    void givenTransferSentAndApplicationStatusChanged_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.INDICTABLE)
+                .build();
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
+                .id(1234)
+                .build();
+        when(contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, null)).thenReturn(true);
+        assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, false, repOrderDTO, TransferStatus.SENT)).isTrue();
+    }
+
+    @Test
+    void givenReassessmentAndTransferRequested_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
+        assertThat(calculateContributionService.isCreateContributionRequired(null, true, null, TransferStatus.REQUESTED)).isTrue();
+    }
+
+    @Test
+    void givenReassessmentAndTransferSent_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.APPEAL_CC)
+                .build();
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
+                .id(1234)
+                .build();
+        when(contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.APPEAL_CC, null)).thenReturn(false);
+        when(contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), null)).thenReturn(false);
+        when(contributionService.isCds15WorkAround(repOrderDTO)).thenReturn(false);
+        assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, true, repOrderDTO, TransferStatus.SENT)).isTrue();
+    }
+
+    @Test
+    void givenTransferSentAndCCOutcomeChanged_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.INDICTABLE)
+                .build();
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
+                .id(1234)
+                .build();
+        when(contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, null)).thenReturn(false);
+        when(contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), null)).thenReturn(true);
+        assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, true, repOrderDTO, TransferStatus.SENT)).isTrue();
+    }
+
+    @Test
+    void givenTransferSentAndCds15Workaround_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.INDICTABLE)
+                .build();
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
+                .id(1234)
+                .build();
+        when(contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, null)).thenReturn(false);
+        when(contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), null)).thenReturn(false);
+        when(contributionService.isCds15WorkAround(repOrderDTO)).thenReturn(true);
+        assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, true, repOrderDTO, TransferStatus.SENT)).isTrue();
     }
 }
