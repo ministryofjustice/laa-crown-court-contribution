@@ -451,6 +451,72 @@ class CalculateContributionServiceTest {
     }
 
     @Test
+    void givenUpliftCoteNotNullAndUpliftIsRemoved_whenCalcContribsIsInvoked_validResponseIsReturned() {
+        when(contributionRulesService.getActiveCCOutcome(any())).thenReturn(CrownCourtOutcome.SUCCESSFUL);
+        when(contributionRulesService.isContributionRuleApplicable(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL))
+                .thenReturn(false);
+        when(maatCourtDataService.getContributionCalcParameters(anyString(), anyString()))
+                .thenReturn(ContributionCalcParametersDTO.builder()
+                        .upliftedIncomePercent(BigDecimal.TEN)
+                        .minUpliftedMonthlyAmount(BigDecimal.ONE)
+                        .disposableIncomePercent(BigDecimal.TEN)
+                        .minimumMonthlyAmount(BigDecimal.valueOf(100))
+                        .upfrontTotalMonths(1)
+                        .build());
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
+        calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 1, 9));
+        calculateContributionDTO.setDateUpliftRemoved(LocalDate.of(2023, 2, 9));
+        calculateContributionDTO.setContributionCap(BigDecimal.TEN);
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .calcContribs(Constants.Y)
+                .upliftCote(1)
+                .build();
+        CalculateContributionResponse actualResponse = calculateContributionService.calcContribs(calculateContributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID);
+        CalculateContributionResponse expectedResponse = TestModelDataBuilder.getCalculateContributionResponse();
+        expectedResponse.setMonthlyContributions(BigDecimal.ZERO);
+        expectedResponse.setUpfrontContributions(BigDecimal.ZERO);
+        expectedResponse.setUpliftApplied(Constants.N);
+        expectedResponse.setTotalMonths(null);
+        expectedResponse.setContributionCap(BigDecimal.TEN);
+        expectedResponse.setBasedOn("Means");
+        assertThat(actualResponse).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    void givenUpliftIsRemovedAndAnnualDisposableIncome_whenCalcContribsIsInvoked_validResponseIsReturned() {
+        when(contributionRulesService.getActiveCCOutcome(any())).thenReturn(CrownCourtOutcome.SUCCESSFUL);
+        when(contributionRulesService.isContributionRuleApplicable(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL))
+                .thenReturn(false);
+        when(maatCourtDataService.getContributionCalcParameters(anyString(), anyString()))
+                .thenReturn(ContributionCalcParametersDTO.builder()
+                        .upliftedIncomePercent(BigDecimal.TEN)
+                        .minUpliftedMonthlyAmount(BigDecimal.ONE)
+                        .disposableIncomePercent(BigDecimal.TEN)
+                        .minimumMonthlyAmount(BigDecimal.valueOf(100))
+                        .upfrontTotalMonths(1)
+                        .build());
+        BigDecimal contributionCap = BigDecimal.valueOf(12);
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
+        calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 1, 9));
+        calculateContributionDTO.setDateUpliftRemoved(LocalDate.of(2023, 2, 9));
+        calculateContributionDTO.setContributionCap(contributionCap);
+        calculateContributionDTO.setDisposableIncomeAfterCrownHardship(BigDecimal.valueOf(20000));
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .calcContribs(Constants.Y)
+                .upliftCote(1)
+                .build();
+        CalculateContributionResponse actualResponse = calculateContributionService.calcContribs(calculateContributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID);
+        CalculateContributionResponse expectedResponse = TestModelDataBuilder.getCalculateContributionResponse();
+        expectedResponse.setMonthlyContributions(contributionCap);
+        expectedResponse.setUpfrontContributions(contributionCap);
+        expectedResponse.setUpliftApplied(Constants.N);
+        expectedResponse.setTotalMonths(null);
+        expectedResponse.setContributionCap(contributionCap);
+        expectedResponse.setBasedOn("Offence Type");
+        assertThat(actualResponse).isEqualTo(expectedResponse);
+    }
+
+    @Test
     void givenDisposableIncomeAfterCrownHardship_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .disposableIncomeAfterCrownHardship(BigDecimal.TEN)

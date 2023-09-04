@@ -138,10 +138,10 @@ public class CalculateContributionService {
 
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
-                maatCourtDataService.updateContribution(new UpdateContributionRequest()
-                        .withId(currentContribution.getId())
-                        .withTransferStatus(TransferStatus.REQUESTED)
-                        .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
+            maatCourtDataService.updateContribution(new UpdateContributionRequest()
+                    .withId(currentContribution.getId())
+                    .withTransferStatus(TransferStatus.REQUESTED)
+                    .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
         }
 
         //ToDo - Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
@@ -159,11 +159,6 @@ public class CalculateContributionService {
                 || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId(), laaTransactionId))
                 && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome()))
                 || contributionService.hasContributionBeenSent(calculateContributionDTO.getRepId(), laaTransactionId);
-    }
-
-    public List<ContributionSummary> getContributionSummaries(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
-        List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(calculateContributionDTO.getRepId(), laaTransactionId);
-        return contribSummaryList.stream().map(contributionSummaryMapper::map).toList();
     }
 
     public Contribution createContribs(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
