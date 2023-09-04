@@ -15,9 +15,9 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.service.CalculateContributionService;
+import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
 import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
@@ -46,7 +46,7 @@ class CrownCourtContributionControllerTest {
     private CalculateContributionValidator calculateContributionValidator;
 
     @MockBean
-    private CalculateContributionService calculateContributionService;
+    private MaatCalculateContributionService maatCalculateContributionService;
 
     @MockBean
     private CompareContributionService compareContributionService;
@@ -57,10 +57,10 @@ class CrownCourtContributionControllerTest {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(calculateContributionValidator.validate(any(CalculateContributionRequest.class))).thenReturn(Optional.empty());
+        when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class))).thenReturn(Optional.empty());
 
-        when(calculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
-                .thenReturn(new CalculateContributionResponse());
+        when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
+                .thenReturn(new MaatCalculateContributionResponse());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isOk())
@@ -72,7 +72,7 @@ class CrownCourtContributionControllerTest {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(calculateContributionValidator.validate(any(CalculateContributionRequest.class)))
+        when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class)))
                 .thenThrow(new ValidationException("Test validation exception"));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
@@ -85,9 +85,9 @@ class CrownCourtContributionControllerTest {
         AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(calculateContributionValidator.validate(any(CalculateContributionRequest.class)))
+        when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class)))
                 .thenReturn(Optional.empty());
-        when(calculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
+        when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
                 .thenThrow(new APIClientException("Test api client exception"));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))

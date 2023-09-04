@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.service.CalculateContributionService;
+import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
 
@@ -26,14 +26,14 @@ import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionVal
 @RequestMapping("api/internal/v1/contribution/appeal")
 public class CrownCourtContributionController {
 
-    private final CalculateContributionService calculateContributionService;
+    private final MaatCalculateContributionService maatCalculateContributionService;
     private final CalculateContributionValidator calculateContributionValidator;
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Calculate Contribution")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = CalculateContributionResponse.class)
+                    schema = @Schema(implementation = MaatCalculateContributionResponse.class)
             )
     )
     @ApiResponse(responseCode = "400",
@@ -48,24 +48,24 @@ public class CrownCourtContributionController {
                     schema = @Schema(implementation = ErrorDTO.class)
             )
     )
-    public ResponseEntity<CalculateContributionResponse> calculateContribution(
+    public ResponseEntity<MaatCalculateContributionResponse> calculateContribution(
             @Parameter(description = "Data required to calculate contributions",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = CalculateContributionRequest.class)
+                            schema = @Schema(implementation = MaatCalculateContributionRequest.class)
                     )
             )
             @Valid @RequestBody
-            CalculateContributionRequest calculateContributionRequest,
+            MaatCalculateContributionRequest maatCalculateContributionRequest,
             @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
 
-        log.info("Received request to calculate contributions for ID {}", calculateContributionRequest.getApplId());
-        calculateContributionValidator.validate(calculateContributionRequest);
-        CalculateContributionDTO calculateContributionDTO = preProcessRequest(calculateContributionRequest);
-        return ResponseEntity.ok(calculateContributionService.calculateContribution(calculateContributionDTO, laaTransactionId));
+        log.info("Received request to calculate contributions for ID {}", maatCalculateContributionRequest.getApplId());
+        calculateContributionValidator.validate(maatCalculateContributionRequest);
+        CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
+        return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO, laaTransactionId));
     }
 
-    private CalculateContributionDTO preProcessRequest(CalculateContributionRequest calculateContributionRequest) {
-        return ContributionDTOBuilder.build(calculateContributionRequest);
+    private CalculateContributionDTO preProcessRequest(MaatCalculateContributionRequest maatCalculateContributionRequest) {
+        return ContributionDTOBuilder.build(maatCalculateContributionRequest);
     }
 
 }

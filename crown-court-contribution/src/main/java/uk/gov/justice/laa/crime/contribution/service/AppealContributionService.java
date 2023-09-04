@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionResponseBuilder;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
@@ -35,7 +34,7 @@ public class AppealContributionService {
         return AssessmentResult.FAIL;
     }
 
-    public CalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+    public MaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);

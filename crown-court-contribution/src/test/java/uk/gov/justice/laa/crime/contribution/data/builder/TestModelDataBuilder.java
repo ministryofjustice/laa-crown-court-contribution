@@ -309,8 +309,8 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
-    public static CalculateContributionRequest buildCalculateContributionRequest() {
-        return new CalculateContributionRequest()
+    public static MaatCalculateContributionRequest buildCalculateContributionRequest() {
+        return new MaatCalculateContributionRequest()
                 .withApplId(999)
                 .withRepId(999)
                 .withCaseType(CaseType.EITHER_WAY)
@@ -435,8 +435,8 @@ public class TestModelDataBuilder {
                 .withLaaTransactionId(LAA_TRANSACTION_ID);
     }
 
-    public static CalculateContributionResponse getCalculateContributionResponse() {
-        return new CalculateContributionResponse()
+    public static MaatCalculateContributionResponse getCalculateContributionResponse() {
+        return new MaatCalculateContributionResponse()
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpliftApplied(Constants.N)
                 .withEffectiveDate(COMMITTAL_DATE.toString())

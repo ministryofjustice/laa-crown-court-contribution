@@ -18,47 +18,47 @@ class AppealContributionValidatorTest {
 
     @Test
     void givenValidRequest_whenValidateIsInvoked_thenNoExceptionIsRaised() {
-        CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
 
-        assertThat(calculateContributionValidator.validate(calculateContributionRequest)).isEmpty();
+        assertThat(calculateContributionValidator.validate(maatCalculateContributionRequest)).isEmpty();
     }
 
     @Test
     void givenEmptyOutcome_whenValidateIsInvoked_thenNoExceptionIsRaised() {
-        CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
-        calculateContributionRequest.setLastOutcome(null);
+        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        maatCalculateContributionRequest.setLastOutcome(null);
 
-        assertThat(calculateContributionValidator.validate(calculateContributionRequest)).isEmpty();
+        assertThat(calculateContributionValidator.validate(maatCalculateContributionRequest)).isEmpty();
     }
 
     @Test
     void givenEmptyOutDateSet_whenValidateIsInvoked_thenNoExceptionIsRaised() {
-        CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
-        calculateContributionRequest.getLastOutcome().setDateSet(null);
+        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        maatCalculateContributionRequest.getLastOutcome().setDateSet(null);
 
-        assertThat(calculateContributionValidator.validate(calculateContributionRequest)).isEmpty();
+        assertThat(calculateContributionValidator.validate(maatCalculateContributionRequest)).isEmpty();
     }
 
     @Test
     void givenIncorrectOutcomeDateSet_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
-        CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         LastOutcome__1 lastOutcome = TestModelDataBuilder.buildLastOutcome_1();
         lastOutcome.setDateSet(LocalDateTime.now().plusDays(1));
-        calculateContributionRequest.setLastOutcome(lastOutcome);
+        maatCalculateContributionRequest.setLastOutcome(lastOutcome);
 
-        assertThatThrownBy(() -> calculateContributionValidator.validate(calculateContributionRequest))
+        assertThatThrownBy(() -> calculateContributionValidator.validate(maatCalculateContributionRequest))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("The dateSet for lastOutcome is invalid");
     }
 
     @Test
     void givenNoCompleteAssessment_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
-        CalculateContributionRequest calculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         Assessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.withStatus(AssessmentStatus.IN_PROGRESS);
-        calculateContributionRequest.setAssessments(List.of(assessment));
+        maatCalculateContributionRequest.setAssessments(List.of(assessment));
 
-        assertThatThrownBy(() -> calculateContributionValidator.validate(calculateContributionRequest))
+        assertThatThrownBy(() -> calculateContributionValidator.validate(maatCalculateContributionRequest))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("There must be at least one COMPLETE assessment");
     }

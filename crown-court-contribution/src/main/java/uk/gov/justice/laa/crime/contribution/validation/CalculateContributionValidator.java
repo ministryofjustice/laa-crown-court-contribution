@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.validation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
 import java.time.LocalDateTime;
@@ -13,16 +13,16 @@ import java.util.Optional;
 @Component
 public class CalculateContributionValidator {
 
-    public Optional<Void> validate(CalculateContributionRequest calculateContributionRequest) {
+    public Optional<Void> validate(MaatCalculateContributionRequest maatCalculateContributionRequest) {
         log.debug("Performing validation against calculate contributions request");
-        if (calculateContributionRequest != null
-                    && calculateContributionRequest.getLastOutcome() != null
-                    && calculateContributionRequest.getLastOutcome().getDateSet() != null
-                    && calculateContributionRequest.getLastOutcome().getDateSet().isAfter(LocalDateTime.now())) {
+        if (maatCalculateContributionRequest != null
+                    && maatCalculateContributionRequest.getLastOutcome() != null
+                    && maatCalculateContributionRequest.getLastOutcome().getDateSet() != null
+                    && maatCalculateContributionRequest.getLastOutcome().getDateSet().isAfter(LocalDateTime.now())) {
                 throw new ValidationException("The dateSet for lastOutcome is invalid");
             }
 
-        boolean isNoCompletedAssessment = calculateContributionRequest.getAssessments()
+        boolean isNoCompletedAssessment = maatCalculateContributionRequest.getAssessments()
                 .stream()
                 .filter(assessment -> assessment.getStatus() == AssessmentStatus.COMPLETE)
                 .toList()
