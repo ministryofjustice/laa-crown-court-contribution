@@ -112,7 +112,8 @@ public class CalculateContributionService {
         }
 
         if ((calculateContributionDTO.getMonthlyContributions() != null && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
-                || !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString())) {
+                || (response.getEffectiveDate() != null && !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString()))
+        ) {
             if (TransferStatus.REQUESTED.equals(currentTransferStatus)) {
                 TransferStatus transferStatus = (currentContributionFileId == null) ? null : TransferStatus.SENT;
                 UpdateContributionRequest updateContributionRequest = updateContributionRequestMapper.map(currentContribution);
@@ -157,7 +158,7 @@ public class CalculateContributionService {
                 || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().equals(latestSentContribution.getEffectiveDate().toString())
                 && BigDecimal.ZERO.compareTo(response.getMonthlyContributions()) < 0)
                 || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId(), laaTransactionId))
-                && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome()))
+                && (calculateContributionDTO.getMagCourtOutcome() != null && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome())))
                 || contributionService.hasContributionBeenSent(calculateContributionDTO.getRepId(), laaTransactionId);
     }
 
@@ -187,16 +188,16 @@ public class CalculateContributionService {
             BigDecimal monthlyContributions = calculateUpliftedMonthlyAmount(annualDisposableIncome, contributionCalcParametersDTO);
             response.setMonthlyContributions(monthlyContributions);
             response.setUpliftApplied(Constants.Y);
-        } else if (contributionResponseDTO.getCalcContribs().equals(Constants.N)) {
+        } else if (Constants.N.equals(contributionResponseDTO.getCalcContribs())) {
             response.setMonthlyContributions(BigDecimal.ZERO);
             response.setUpfrontContributions(BigDecimal.ZERO);
             response.setUpliftApplied(Constants.N);
             response.setBasedOn(null);
             response.setTotalMonths(0);
         } else {
-            BigDecimal monthlyContributions = calculateDisposableContribution(annualDisposableIncome, contributionCalcParametersDTO);
+            BigDecimal monthlyContributions = calculateDisposableContribution(annualDisposableIncome, contributionCalcParametersDTO.getDisposableIncomePercent(), contributionCalcParametersDTO.getMinimumMonthlyAmount());
             response.setUpliftApplied(Constants.N);
-            if (monthlyContributions.compareTo(calculateContributionDTO.getContributionCap()) > 0) {
+            if (calculateContributionDTO.getContributionCap() != null && monthlyContributions.compareTo(calculateContributionDTO.getContributionCap()) > 0) {
                 response.setMonthlyContributions(calculateContributionDTO.getContributionCap());
                 response.setBasedOn("Offence Type");
             } else {
@@ -293,18 +294,20 @@ public class CalculateContributionService {
      */
     public static BigDecimal calculateUpfrontContributions(final BigDecimal monthlyContributions, final BigDecimal contributionCap, final Integer upfrontTotalMonths) {
         BigDecimal upfrontContribution = monthlyContributions.multiply(BigDecimal.valueOf(upfrontTotalMonths));
-        if (upfrontContribution.compareTo(contributionCap) < 0) {
+        if (contributionCap != null && upfrontContribution.compareTo(contributionCap) < 0) {
             return upfrontContribution;
         } else return contributionCap;
     }
 
-    public static BigDecimal calculateDisposableContribution(final BigDecimal annualDisposableIncome, final ContributionCalcParametersDTO contributionCalcParametersDTO) {
+    public static BigDecimal calculateDisposableContribution(final BigDecimal annualDisposableIncome,
+                                                             final BigDecimal disposableIncomePercent,
+                                                             final BigDecimal minimumMonthlyAmount) {
         BigDecimal monthlyContributionsCalc = annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
-                .multiply(contributionCalcParametersDTO.getDisposableIncomePercent())
+                .multiply(disposableIncomePercent)
                 .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR);
         BigDecimal monthlyContributions = (monthlyContributionsCalc.compareTo(BigDecimal.ZERO) > 0) ? monthlyContributionsCalc : BigDecimal.ZERO;
 
-        if (monthlyContributions.compareTo(contributionCalcParametersDTO.getMinimumMonthlyAmount()) < 0) {
+        if (monthlyContributions.compareTo(minimumMonthlyAmount) < 0) {
             return BigDecimal.ZERO;
         } else return monthlyContributions;
     }
