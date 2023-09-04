@@ -58,6 +58,13 @@ class MaatCourtDataServiceTest {
     }
 
     @Test
+    void givenValidRepId_whenFindLatestSentContributionContributionIsInvoked_thenResponseIsReturned() {
+        maatCourtDataService.findLatestSentContribution(TEST_REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataClient).get(any(), anyString(), anyMap(), any(), anyInt());
+    }
+
+
+    @Test
     void givenValidParams_whenCreateContributionIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.createContribution(new CreateContributionRequest(), LAA_TRANSACTION_ID);
         verify(maatCourtDataClient).post(
