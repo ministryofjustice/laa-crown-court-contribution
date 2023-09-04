@@ -33,6 +33,8 @@ public class TestModelDataBuilder {
     public static final LocalDate COMMITTAL_DATE = LocalDate.of(2023, 8, 8);
     public static final Integer CONTRIBUTION_ID = 999;
 
+    public static final String TEST_USER = "TEST_USER";
+
 
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
 
@@ -55,6 +57,26 @@ public class TestModelDataBuilder {
                 .hardshipResult(PASS)
                 .passportResult(PASS).build();
     }
+
+    public static CreateContributionRequest getCreateContributionRequest(){
+        return new CreateContributionRequest()
+                .withRepId(REP_ID)
+                .withApplId(123)
+                .withUserCreated(TEST_USER)
+                .withContributionFileId(123)
+                .withEffectiveDate(TEST_DATE)
+                .withCalcDate(TEST_DATE)
+                .withContributionCap(BigDecimal.valueOf(250))
+                .withMonthlyContributions(BigDecimal.valueOf(250))
+                .withUpfrontContributions(BigDecimal.valueOf(250))
+                .withUpliftApplied("N")
+                .withBasedOn("N")
+                .withTransferStatus(TransferStatus.SENT)
+                .withDateUpliftApplied(TEST_DATE)
+                .withDateUpliftRemoved(TEST_DATE)
+                .withCreateContributionOrder("N")
+                .withCorrespondenceId(123);
+        }
 
     public static CorrespondenceRuleAndTemplateInfo getCorrespondenceRuleAndTemplateInfo() {
         return new CorrespondenceRuleAndTemplateInfo() {

@@ -104,6 +104,7 @@ public class ContributionDTOBuilder {
                 .dateUpliftApplied(request.getDateUpliftApplied() != null ? request.getDateUpliftApplied().toLocalDate() : null)
                 .dateUpliftRemoved(request.getDateUpliftRemoved() != null ? request.getDateUpliftRemoved().toLocalDate() : null)
                 .createContributionOrder(request.getCreateContributionOrder())
+                .userCreated(request.getUserCreated())
                 .correspondenceId(request.getCorrespondenceId());
 
         return builder.build();
