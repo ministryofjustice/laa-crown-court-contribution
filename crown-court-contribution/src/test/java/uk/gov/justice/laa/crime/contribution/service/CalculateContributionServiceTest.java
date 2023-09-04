@@ -213,14 +213,7 @@ class CalculateContributionServiceTest {
     void givenUpfrontContributionGreater_whenCalculateUpfrontContributionsIsInvoked_thenContributionCapIsReturned() {
         BigDecimal contributionCap = BigDecimal.valueOf(80);
         BigDecimal monthlyContributions = BigDecimal.valueOf(83);
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .monthlyContributions(monthlyContributions)
-                .contributionCap(contributionCap)
-                .build();
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .upfrontTotalMonths(2)
-                .build();
-        assertThat(CalculateContributionService.calculateUpfrontContributions(calculateContributionDTO, contributionCalcParametersDTO))
+        assertThat(CalculateContributionService.calculateUpfrontContributions(monthlyContributions, contributionCap, 2))
                 .isEqualTo(contributionCap);
     }
 
@@ -228,14 +221,7 @@ class CalculateContributionServiceTest {
     void givenUpfrontContributionSmaller_whenCalculateUpfrontContributionsIsInvoked_thenUpfrontContributionIsReturned() {
         BigDecimal contributionCap = BigDecimal.valueOf(80);
         BigDecimal monthlyContributions = BigDecimal.valueOf(75);
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .monthlyContributions(monthlyContributions)
-                .contributionCap(contributionCap)
-                .build();
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .upfrontTotalMonths(1)
-                .build();
-        assertThat(CalculateContributionService.calculateUpfrontContributions(calculateContributionDTO, contributionCalcParametersDTO))
+        assertThat(CalculateContributionService.calculateUpfrontContributions(monthlyContributions, contributionCap, 1))
                 .isEqualTo(monthlyContributions);
     }
 

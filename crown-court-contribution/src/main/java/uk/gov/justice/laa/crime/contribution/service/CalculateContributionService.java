@@ -208,7 +208,7 @@ public class CalculateContributionService {
                 response.setMonthlyContributions(monthlyContributions);
                 response.setBasedOn("Means");
             }
-            response.setUpfrontContributions(calculateUpfrontContributions(calculateContributionDTO, contributionCalcParametersDTO));
+            response.setUpfrontContributions(calculateUpfrontContributions(response.getMonthlyContributions(), calculateContributionDTO.getContributionCap(), contributionCalcParametersDTO.getUpfrontTotalMonths()));
         }
 
         response.setContributionCap(calculateContributionDTO.getContributionCap()); // TODO refactor the request to pass the offenceType object for Contribs Cap
@@ -296,11 +296,11 @@ public class CalculateContributionService {
      * //                      := least(p_application_object.crown_court_overview_object.contributions_object.monthly_contribs * v_UPFRONT_TOTAL_MONTHS
      * //                ,p_application_object.offence_type_object.contribs_cap);
      */
-    public static BigDecimal calculateUpfrontContributions(final CalculateContributionDTO calculateContributionDTO, final ContributionCalcParametersDTO contributionCalcParametersDTO) {
-        BigDecimal upfrontContribution = calculateContributionDTO.getMonthlyContributions().multiply(BigDecimal.valueOf(contributionCalcParametersDTO.getUpfrontTotalMonths()));
-        if (upfrontContribution.compareTo(calculateContributionDTO.getContributionCap()) < 0) {
+    public static BigDecimal calculateUpfrontContributions(final BigDecimal monthlyContributions, final BigDecimal contributionCap, final Integer upfrontTotalMonths) {
+        BigDecimal upfrontContribution = monthlyContributions.multiply(BigDecimal.valueOf(upfrontTotalMonths));
+        if (upfrontContribution.compareTo(contributionCap) < 0) {
             return upfrontContribution;
-        } else return calculateContributionDTO.getContributionCap();
+        } else return contributionCap;
     }
 
     public static BigDecimal calculateDisposableContribution(final BigDecimal annualDisposableIncome, final ContributionCalcParametersDTO contributionCalcParametersDTO) {
