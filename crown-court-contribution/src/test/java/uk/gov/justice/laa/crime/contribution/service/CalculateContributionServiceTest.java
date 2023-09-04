@@ -733,4 +733,17 @@ class CalculateContributionServiceTest {
         when(contributionService.isCds15WorkAround(repOrderDTO)).thenReturn(true);
         assertThat(calculateContributionService.isCreateContributionRequired(calculateContributionDTO, true, repOrderDTO, TransferStatus.SENT)).isTrue();
     }
+
+    @Test
+    void givenIndictableCase_whenCalculateContributionIsInvoked_validResponseIsReturned() {
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
+        when(maatCourtDataService.getRepOrderByRepId(null, TestModelDataBuilder.LAA_TRANSACTION_ID)).thenReturn(repOrderDTO);
+        when(contributionService.checkReassessment(repOrderDTO, TestModelDataBuilder.LAA_TRANSACTION_ID)).thenReturn(true);
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .assessments(List.of())
+                .build();
+        when(contributionService.checkContribsCondition(any())).thenReturn(ContributionResponseDTO.builder().build());
+        CalculateContributionResponse calculateContributionResponse = new CalculateContributionResponse();
+        assertThat(calculateContributionService.calculateContribution(calculateContributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID)).isEqualTo(calculateContributionResponse);
+    }
 }
