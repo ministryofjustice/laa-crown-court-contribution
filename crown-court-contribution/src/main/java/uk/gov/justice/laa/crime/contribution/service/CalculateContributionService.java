@@ -97,21 +97,10 @@ public class CalculateContributionService {
             response.setUpfrontContributions(BigDecimal.ZERO);
         }
 
-        Contribution currentContribution = null;
-        TransferStatus currentTransferStatus = null;
-        Integer currentContributionFileId = null;
-
-        currentContribution = getCurrentContribution(calculateContributionDTO, laaTransactionId);
-
-        if (currentContribution != null) {
-            currentTransferStatus = currentContribution.getTransferStatus();
-            currentContributionFileId = currentContribution.getContributionFileId();
-        } else {
-            log.error("C3 Service: Current Contribution Is NULL.");
-        }
+        Contribution currentContribution = getCurrentContribution(calculateContributionDTO, laaTransactionId);
 
         verifyAndCreateContribs(calculateContributionDTO, laaTransactionId, isReassessment, repOrderDTO,
-                response, currentTransferStatus, currentContributionFileId, currentContribution);
+                response, currentContribution);
 
         verifyAndUpdateContribution(calculateContributionDTO, laaTransactionId, response, currentContribution);
 
@@ -122,8 +111,17 @@ public class CalculateContributionService {
     private void verifyAndCreateContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId,
                                          boolean isReassessment, RepOrderDTO repOrderDTO,
                                          CalculateContributionResponse response,
-                                         TransferStatus currentTransferStatus, Integer currentContributionFileId,
                                          Contribution currentContribution) {
+        TransferStatus currentTransferStatus = null;
+        Integer currentContributionFileId = null;
+
+        if (currentContribution != null) {
+             currentTransferStatus = currentContribution.getTransferStatus();
+             currentContributionFileId = currentContribution.getContributionFileId();
+        }   else {
+            log.error("C3 Service: Current Contribution Is NULL.");
+
+        }
         if ((calculateContributionDTO.getMonthlyContributions() != null
                 && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (response.getEffectiveDate() != null && !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString()))
