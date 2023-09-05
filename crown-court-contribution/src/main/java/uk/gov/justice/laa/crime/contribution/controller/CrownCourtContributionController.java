@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.CalculateContributionResponse;
@@ -60,11 +60,11 @@ public class CrownCourtContributionController {
 
         log.info("Received request to calculate contributions for ID {}", calculateContributionRequest.getApplId());
         calculateContributionValidator.validate(calculateContributionRequest);
-        ContributionDTO contributionDTO = preProcessRequest(calculateContributionRequest);
-        return ResponseEntity.ok(calculateContributionService.calculateContribution(contributionDTO, laaTransactionId));
+        CalculateContributionDTO calculateContributionDTO = preProcessRequest(calculateContributionRequest);
+        return ResponseEntity.ok(calculateContributionService.calculateContribution(calculateContributionDTO, laaTransactionId));
     }
 
-    private ContributionDTO preProcessRequest(CalculateContributionRequest calculateContributionRequest) {
+    private CalculateContributionDTO preProcessRequest(CalculateContributionRequest calculateContributionRequest) {
         return ContributionDTOBuilder.build(calculateContributionRequest);
     }
 

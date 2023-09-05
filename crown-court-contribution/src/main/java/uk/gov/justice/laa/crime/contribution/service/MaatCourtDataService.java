@@ -43,6 +43,20 @@ public class MaatCourtDataService {
         return response;
     }
 
+
+    public Contribution findLatestSentContribution(Integer repId, String laaTransactionId) {
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        Contribution response = maatAPIClient.get(
+                new ParameterizedTypeReference<Contribution>() {},
+                configuration.getMaatApi().getContributionEndpoints().getFindLatestSentContributionUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                queryParams,
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
     public Contribution createContribution(CreateContributionRequest createContributionRequest, String laaTransactionId) {
         Contribution response = maatAPIClient.post(
                 createContributionRequest,

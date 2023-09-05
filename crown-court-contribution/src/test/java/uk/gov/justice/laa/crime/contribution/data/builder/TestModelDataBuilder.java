@@ -31,6 +31,9 @@ public class TestModelDataBuilder {
     public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2023, 8, 20);
     public static final String LAA_TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
     public static final LocalDate COMMITTAL_DATE = LocalDate.of(2023, 8, 8);
+    public static final Integer CONTRIBUTION_ID = 999;
+
+    public static final String TEST_USER = "TEST_USER";
 
 
     public static AssessmentRequestDTO getAssessmentRequestDTO() {
@@ -54,6 +57,26 @@ public class TestModelDataBuilder {
                 .hardshipResult(PASS)
                 .passportResult(PASS).build();
     }
+
+    public static CreateContributionRequest getCreateContributionRequest(TransferStatus tranferStatus, LocalDateTime dateTime){
+        return new CreateContributionRequest()
+                .withRepId(REP_ID)
+                .withApplId(123)
+                .withUserCreated(TEST_USER)
+                .withContributionFileId(123)
+                .withEffectiveDate(dateTime)
+                .withCalcDate(dateTime)
+                .withContributionCap(BigDecimal.valueOf(250))
+                .withMonthlyContributions(BigDecimal.valueOf(250))
+                .withUpfrontContributions(BigDecimal.valueOf(250))
+                .withUpliftApplied("N")
+                .withBasedOn("N")
+                .withTransferStatus(tranferStatus)
+                .withDateUpliftApplied(dateTime)
+                .withDateUpliftRemoved(dateTime)
+                .withCreateContributionOrder("N")
+                .withCorrespondenceId(123);
+        }
 
     public static CorrespondenceRuleAndTemplateInfo getCorrespondenceRuleAndTemplateInfo() {
         return new CorrespondenceRuleAndTemplateInfo() {
@@ -353,14 +376,14 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static ContributionDTO getContributionDTOForCompareContributionService(String caseType,
-                                                                                  BigDecimal contributionCap,
-                                                                                  BigDecimal upfrontContributions,
-                                                                                  BigDecimal monthlyContributions,
-                                                                                  LocalDate effectiveDate,
-                                                                                  String isActive,
-                                                                                  MagCourtOutcome magCourtOutcome) {
-        return ContributionDTO.builder()
+    public static CalculateContributionDTO getContributionDTOForCompareContributionService(String caseType,
+                                                                                           BigDecimal contributionCap,
+                                                                                           BigDecimal upfrontContributions,
+                                                                                           BigDecimal monthlyContributions,
+                                                                                           LocalDate effectiveDate,
+                                                                                           String isActive,
+                                                                                           MagCourtOutcome magCourtOutcome) {
+        return CalculateContributionDTO.builder()
                 .repId(123)
                 .applId(123)
                 .laaTransactionId("123456")
@@ -421,14 +444,29 @@ public class TestModelDataBuilder {
                 .withTotalMonths(0);
     }
 
-    public static ContributionDTO getContributionDTOForCalcContribs() {
-        return ContributionDTO.builder()
+    public static CalculateContributionDTO getContributionDTOForCalcContribs() {
+        return CalculateContributionDTO.builder()
                 .committalDate(COMMITTAL_DATE)
                 .assessments(List.of(new Assessment()
                         .withAssessmentType(AssessmentType.PASSPORT)
                         .withAssessmentDate(TEST_DATE)))
                 .caseType(CaseType.INDICTABLE)
                 .magCourtOutcome(MagCourtOutcome.COMMITTED)
+                .build();
+    }
+
+    public static ContributionsSummaryDTO getContributionSummaryDTO() {
+        return ContributionsSummaryDTO.builder()
+                .id(CONTRIBUTION_ID)
+                .monthlyContributions(BigDecimal.TEN)
+                .upfrontContributions(BigDecimal.ONE)
+                .basedOn("Means")
+                .upliftApplied(Constants.Y)
+                .effectiveDate(TEST_DATE.toLocalDate())
+                .calcDate(CALC_DATE)
+                .fileName("TEST")
+                .dateSent(LocalDate.of(2023, 1, 1))
+                .dateReceived(LocalDate.of(2023, 2, 2))
                 .build();
     }
 }

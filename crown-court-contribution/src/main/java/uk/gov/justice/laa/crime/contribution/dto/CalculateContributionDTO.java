@@ -21,7 +21,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContributionDTO {
+public class CalculateContributionDTO {
 
     private String laaTransactionId;
     private Integer id;

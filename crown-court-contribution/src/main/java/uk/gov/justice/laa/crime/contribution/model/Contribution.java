@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Contribution {
-
     private Integer id;
     private Integer applId;
     private Integer repId;
@@ -41,5 +40,4 @@ public class Contribution {
     private Boolean latest;
     private Integer ccOutcomeCount;
     private Integer seHistoryId;
-    private String calculationRan;
 }
