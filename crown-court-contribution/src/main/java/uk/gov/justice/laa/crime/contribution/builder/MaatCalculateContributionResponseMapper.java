@@ -13,10 +13,12 @@ import java.math.BigDecimal;
 public class MaatCalculateContributionResponseMapper {
 
     public static MaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
-                                                          BigDecimal contributionCap, String effectiveDate) {
+                                                        BigDecimal contributionCap, String effectiveDate,
+                                                        Integer totalMonths) {
         MaatCalculateContributionResponse maatCalculateContributionResponse = new MaatCalculateContributionResponse();
         maatCalculateContributionResponse.withContributionCap(contributionCap);
         maatCalculateContributionResponse.withEffectiveDate(effectiveDate);
+        maatCalculateContributionResponse.withTotalMonths(totalMonths);
         maatCalculateContributionResponse.withMonthlyContributions(apiCalculateContributionResponse.getMonthlyContributions());
         maatCalculateContributionResponse.withUpfrontContributions(apiCalculateContributionResponse.getUpfrontContributions());
         maatCalculateContributionResponse.withUpliftApplied(apiCalculateContributionResponse.getUpliftApplied());

@@ -388,7 +388,7 @@ class MaatCalculateContributionServiceTest {
 
     @Test
     void givenCalcContribsAsN_whenCalcContribsIsInvoked_validResponseIsReturned() {
-        MaatCalculateContributionResponse maatCalculateContributionResponse = TestModelDataBuilder.getMaatCalculateContributionResponse().withTotalMonths(null);
+        MaatCalculateContributionResponse maatCalculateContributionResponse = TestModelDataBuilder.getMaatCalculateContributionResponse();
         CalculateContributionDTO calculateContributionDTO = setupDataForCalcContribsTests();
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .calcContribs(Constants.N)
@@ -410,7 +410,7 @@ class MaatCalculateContributionServiceTest {
 
     @Test
     void givenUpliftCoteNotNullAndCalcContribsAsN_whenCalcContribsIsInvoked_validResponseIsReturned() {
-        MaatCalculateContributionResponse maatCalculateContributionResponse = TestModelDataBuilder.getMaatCalculateContributionResponse().withTotalMonths(null);
+        MaatCalculateContributionResponse maatCalculateContributionResponse = TestModelDataBuilder.getMaatCalculateContributionResponse();
         CalculateContributionDTO calculateContributionDTO = setupDataForCalcContribsTests();
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .calcContribs(Constants.N)
@@ -445,7 +445,6 @@ class MaatCalculateContributionServiceTest {
         maatCalculateContributionResponse.setMonthlyContributions(BigDecimal.ONE);
         maatCalculateContributionResponse.setUpfrontContributions(BigDecimal.ZERO);
         maatCalculateContributionResponse.setUpliftApplied(Constants.Y);
-        maatCalculateContributionResponse.setTotalMonths(null);
         assertThat(maatCalculateContributionService.calcContribs(calculateContributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID))
                 .isEqualTo(maatCalculateContributionResponse);
     }

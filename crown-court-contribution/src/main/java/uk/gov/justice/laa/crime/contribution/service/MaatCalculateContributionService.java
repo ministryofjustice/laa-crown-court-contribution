@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,7 +90,7 @@ public class MaatCalculateContributionService {
                                                         final RepOrderDTO repOrderDTO) {
         MaatCalculateContributionResponse response = new MaatCalculateContributionResponse();
 
-        // TODO use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
+        //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
         if (Constants.Y.equals(contributionResponseDTO.getCalcContribution()) ||
                 contributionResponseDTO.getTemplate() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0) ||
@@ -101,22 +102,33 @@ public class MaatCalculateContributionService {
             response.setUpfrontContributions(BigDecimal.ZERO);
         }
 
-        Contribution currentContribution = null;
+        Contribution currentContribution = getCurrentContribution(calculateContributionDTO, laaTransactionId);
+
+        verifyAndCreateContribs(calculateContributionDTO, laaTransactionId, isReassessment, repOrderDTO,
+                response, currentContribution);
+
+        verifyAndUpdateContribution(calculateContributionDTO, laaTransactionId, response, currentContribution);
+
+        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
+        return response;
+    }
+
+    private void verifyAndCreateContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId,
+                                         boolean isReassessment, RepOrderDTO repOrderDTO,
+                                         MaatCalculateContributionResponse response,
+                                         Contribution currentContribution) {
         TransferStatus currentTransferStatus = null;
         Integer currentContributionFileId = null;
-        final Integer contributionId = calculateContributionDTO.getId();
-        if (contributionId != null) {
-            List<Contribution> contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, false);
-            currentContribution = contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst().orElse(null);
-            if (currentContribution != null) {
-                currentTransferStatus = currentContribution.getTransferStatus();
-                currentContributionFileId = currentContribution.getContributionFileId();
-            } else {
-                log.error("C3 Service: Current Contribution Is NULL.");
-            }
-        }
 
-        if ((calculateContributionDTO.getMonthlyContributions() != null && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
+        if (currentContribution != null) {
+            currentTransferStatus = currentContribution.getTransferStatus();
+            currentContributionFileId = currentContribution.getContributionFileId();
+        } else {
+            log.error("C3 Service: Current Contribution Is NULL.");
+
+        }
+        if ((calculateContributionDTO.getMonthlyContributions() != null
+                && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (response.getEffectiveDate() != null && !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString()))
         ) {
             if (TransferStatus.REQUESTED.equals(currentTransferStatus)) {
@@ -125,12 +137,14 @@ public class MaatCalculateContributionService {
                 updateContributionRequest.setTransferStatus(transferStatus);
                 maatCourtDataService.updateContribution(updateContributionRequest, laaTransactionId);
             }
-            // TODO - revisit the createContribs logic - do we need to change the input?
+            //Revisit the createContribs logic - do we need to change the input?
             createContribs(calculateContributionDTO, laaTransactionId);
         } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
             createContribs(calculateContributionDTO, laaTransactionId);
         }
+    }
 
+    private void verifyAndUpdateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, MaatCalculateContributionResponse response, Contribution currentContribution) {
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
@@ -138,15 +152,21 @@ public class MaatCalculateContributionService {
                     .withTransferStatus(TransferStatus.REQUESTED)
                     .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
         }
+    }
 
-        //ToDo - Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
-        return response;
+    public Contribution getCurrentContribution(CalculateContributionDTO calculateContributionDTO, final String laaTransactionId){
+        final Integer contributionId = calculateContributionDTO.getId();
+        List<Contribution> contributionsList = new ArrayList<>();
+        if (contributionId != null) {
+            contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, false);
+        }
+        return contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst().orElse(null);
     }
 
     public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
-                                                 final boolean isReassessment,
-                                                 final RepOrderDTO repOrderDTO,
-                                                 final TransferStatus currentTransferStatus) {
+                                                final boolean isReassessment,
+                                                final RepOrderDTO repOrderDTO,
+                                                final TransferStatus currentTransferStatus) {
         return ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
                 && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), calculateContributionDTO.getLaaTransactionId())
@@ -185,6 +205,7 @@ public class MaatCalculateContributionService {
                 calculateContributionDTO.getMagCourtOutcome(), crownCourtOutcome);
 
         BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, laaTransactionId, crownCourtOutcome, isContributionRuleApplicable);
+        Integer totalMonths = Constants.N.equals(contributionResponseDTO.getCalcContribs()) ? 0:null;
 
         ApiCalculateContributionRequest apiCalculateContributionRequest = calculateContributionRequestMapper.map(contributionCalcParametersDTO,
                 annualDisposableIncome, isUpliftApplied(calculateContributionDTO, contributionResponseDTO),
@@ -194,7 +215,7 @@ public class MaatCalculateContributionService {
         return MaatCalculateContributionResponseMapper.map(calculateContributionService.calcualteContibution(apiCalculateContributionRequest),
                 calculateContributionDTO.getContributionCap(),
                 getEffectiveDateByNewWorkReason(calculateContributionDTO,
-                        calculateContributionDTO.getContributionCap(), assEffectiveDate));
+                        calculateContributionDTO.getContributionCap(), assEffectiveDate), totalMonths);
     }
 
     private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {

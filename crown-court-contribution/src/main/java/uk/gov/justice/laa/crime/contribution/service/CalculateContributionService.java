@@ -27,18 +27,18 @@ public class CalculateContributionService {
             BigDecimal monthlyContributions = CalculateContributionUtil.calculateMonthlyContribution(request.getAnnualDisposableIncome(),
                     request.getDisposableIncomePercent(),
                     request.getMinimumMonthlyAmount());
-            if (monthlyContributions.compareTo(request.getContributionCap()) > 0) {
-                monthlyContributions = request.getContributionCap();
-                response.setMonthlyContributions(monthlyContributions);
-                response.setBasedOn(Constants.OFFENCE_TYPE);
-            }
             response.setUpliftApplied(Constants.N);
-            response.setMonthlyContributions(monthlyContributions);
-            response.setBasedOn(Constants.MEANS);
+            BigDecimal contributionCap = request.getContributionCap();
+            if (contributionCap != null && monthlyContributions.compareTo(contributionCap) > 0) {
+                response.setMonthlyContributions(contributionCap);
+                response.setBasedOn(Constants.OFFENCE_TYPE);
+            } else {
+                response.setMonthlyContributions(monthlyContributions);
+                response.setBasedOn(Constants.MEANS);
+            }
             response.setUpfrontContributions(CalculateContributionUtil.calculateUpfrontContributions(monthlyContributions,
                     request.getContributionCap(), request.getUpfrontTotalMonths()));
         }
         return response;
     }
-
 }
