@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionResponseBuilder;
+import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
@@ -47,10 +47,10 @@ public class AppealContributionService {
             CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
             Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);
             log.info("Contribution data has been updated");
-            return CalculateContributionResponseBuilder.build(newContribution);
+            return MaatCalculateContributionResponseBuilder.build(newContribution);
         }
         log.info("Contribution data is already up to date");
-        return CalculateContributionResponseBuilder.build(currContribution);
+        return MaatCalculateContributionResponseBuilder.build(currContribution);
     }
 
 }

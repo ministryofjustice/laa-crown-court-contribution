@@ -435,13 +435,20 @@ public class TestModelDataBuilder {
                 .withLaaTransactionId(LAA_TRANSACTION_ID);
     }
 
-    public static MaatCalculateContributionResponse getCalculateContributionResponse() {
+    public static MaatCalculateContributionResponse getMaatCalculateContributionResponse() {
         return new MaatCalculateContributionResponse()
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpliftApplied(Constants.N)
                 .withEffectiveDate(COMMITTAL_DATE.toString())
                 .withUpfrontContributions(BigDecimal.ZERO)
                 .withTotalMonths(0);
+    }
+
+    public static ApiCalculateContributionResponse getCalculateContributionResponse() {
+        return new ApiCalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.N)
+                .withUpfrontContributions(BigDecimal.ZERO);
     }
 
     public static CalculateContributionDTO getContributionDTOForCalcContribs() {

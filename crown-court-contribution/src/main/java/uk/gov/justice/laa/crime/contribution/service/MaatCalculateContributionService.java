@@ -3,7 +3,9 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.builder.UpdateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
@@ -25,13 +27,16 @@ public class MaatCalculateContributionService {
 
     private final MaatCourtDataService maatCourtDataService;
     private final CrimeHardshipService crimeHardshipService;
-
     private final AppealContributionService appealContributionService;
     private final CompareContributionService compareContributionService;
     private final ContributionRulesService contributionRulesService;
+    private final CalculateContributionService calculateContributionService;
+
     private final CreateContributionRequestMapper createContributionRequestMapper;
     private final ContributionService contributionService;
     private final UpdateContributionRequestMapper updateContributionRequestMapper;
+    private final CalculateContributionRequestMapper calculateContributionRequestMapper;
+
     private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
             MagCourtOutcome.COMMITTED_FOR_TRIAL,
             MagCourtOutcome.APPEAL_TO_CC);
@@ -173,7 +178,6 @@ public class MaatCalculateContributionService {
     public MaatCalculateContributionResponse calcContribs(final CalculateContributionDTO calculateContributionDTO,
                                                           final ContributionResponseDTO contributionResponseDTO,
                                                           final String laaTransactionId) {
-        MaatCalculateContributionResponse response = new MaatCalculateContributionResponse();
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO = maatCourtDataService.getContributionCalcParameters(assEffectiveDate.toString(), laaTransactionId);
         CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtSummary());
@@ -182,34 +186,21 @@ public class MaatCalculateContributionService {
 
         BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, laaTransactionId, crownCourtOutcome, isContributionRuleApplicable);
 
-        if (contributionResponseDTO.getUpliftCote() != null &&
-                calculateContributionDTO.getDateUpliftApplied() != null &&
-                calculateContributionDTO.getDateUpliftRemoved() == null) {
-            BigDecimal monthlyContributions = calculateUpliftedMonthlyAmount(annualDisposableIncome, contributionCalcParametersDTO);
-            response.setMonthlyContributions(monthlyContributions);
-            response.setUpliftApplied(Constants.Y);
-        } else if (Constants.N.equals(contributionResponseDTO.getCalcContribs())) {
-            response.setMonthlyContributions(BigDecimal.ZERO);
-            response.setUpfrontContributions(BigDecimal.ZERO);
-            response.setUpliftApplied(Constants.N);
-            response.setBasedOn(null);
-            response.setTotalMonths(0);
-        } else {
-            BigDecimal monthlyContributions = calculateDisposableContribution(annualDisposableIncome, contributionCalcParametersDTO.getDisposableIncomePercent(), contributionCalcParametersDTO.getMinimumMonthlyAmount());
-            response.setUpliftApplied(Constants.N);
-            if (calculateContributionDTO.getContributionCap() != null && monthlyContributions.compareTo(calculateContributionDTO.getContributionCap()) > 0) {
-                response.setMonthlyContributions(calculateContributionDTO.getContributionCap());
-                response.setBasedOn("Offence Type");
-            } else {
-                response.setMonthlyContributions(monthlyContributions);
-                response.setBasedOn("Means");
-            }
-            response.setUpfrontContributions(calculateUpfrontContributions(response.getMonthlyContributions(), calculateContributionDTO.getContributionCap(), contributionCalcParametersDTO.getUpfrontTotalMonths()));
-        }
+        ApiCalculateContributionRequest apiCalculateContributionRequest = calculateContributionRequestMapper.map(contributionCalcParametersDTO,
+                annualDisposableIncome, isUpliftApplied(calculateContributionDTO, contributionResponseDTO),
+                calculateContributionDTO.getContributionCap());
 
-        response.setContributionCap(calculateContributionDTO.getContributionCap()); // TODO refactor the request to pass the offenceType object for Contribs Cap
-        response.setEffectiveDate(getEffectiveDateByNewWorkReason(calculateContributionDTO, response.getMonthlyContributions(), assEffectiveDate));
-        return response;
+        // TODO refactor the request to pass the offenceType object for Contribs Cap
+        return MaatCalculateContributionResponseMapper.map(calculateContributionService.calcualteContibution(apiCalculateContributionRequest),
+                calculateContributionDTO.getContributionCap(),
+                getEffectiveDateByNewWorkReason(calculateContributionDTO,
+                        calculateContributionDTO.getContributionCap(), assEffectiveDate));
+    }
+
+    private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {
+        return contributionResponseDTO.getUpliftCote() != null &&
+                calculateContributionDTO.getDateUpliftApplied() != null &&
+                calculateContributionDTO.getDateUpliftRemoved() == null;
     }
 
     public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,

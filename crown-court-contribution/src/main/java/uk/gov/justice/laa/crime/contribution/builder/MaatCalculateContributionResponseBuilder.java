@@ -11,7 +11,7 @@ import static uk.gov.justice.laa.crime.contribution.util.DateUtil.getLocalDateSt
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CalculateContributionResponseBuilder {
+public class MaatCalculateContributionResponseBuilder {
 
     public static MaatCalculateContributionResponse build(Contribution contribution) {
         MaatCalculateContributionResponse maatCalculateContributionResponse = new MaatCalculateContributionResponse();

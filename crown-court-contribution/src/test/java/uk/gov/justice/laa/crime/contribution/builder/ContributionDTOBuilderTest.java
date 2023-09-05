@@ -19,10 +19,13 @@ class ContributionDTOBuilderTest {
 
     @Test
     void givenAValidContribution_whenBuildIsInvoked_thenReturnCalculateContributionDTO() {
-
         Contribution contribution = TestModelDataBuilder.getContribution();
         CalculateContributionDTO calculateContributionDTO = ContributionDTOBuilder.build(contribution);
+        assertFields(calculateContributionDTO, contribution);
+        assertDateFields(calculateContributionDTO, contribution);
+    }
 
+    private void assertFields(CalculateContributionDTO calculateContributionDTO, Contribution contribution) {
         softly.assertThat(calculateContributionDTO.getId()).isEqualTo(contribution.getId());
         softly.assertThat(calculateContributionDTO.getContributionCap()).isEqualTo(contribution.getContributionCap());
         softly.assertThat(calculateContributionDTO.getMonthlyContributions()).isEqualTo(contribution.getMonthlyContributions());
@@ -31,28 +34,31 @@ class ContributionDTOBuilderTest {
         softly.assertThat(calculateContributionDTO.getActive()).isEqualTo(contribution.getActive());
         softly.assertThat(calculateContributionDTO.getCreateContributionOrder()).isEqualTo(contribution.getCreateContributionOrder());
         softly.assertThat(calculateContributionDTO.getBasedOn()).isEqualTo(contribution.getBasedOn());
-        softly.assertThat(calculateContributionDTO.getReplacedDate()).isEqualTo(contribution.getReplacedDate());
         softly.assertThat(calculateContributionDTO.getRepId()).isEqualTo(contribution.getRepId());
         softly.assertThat(calculateContributionDTO.getApplId()).isEqualTo(contribution.getApplId());
         softly.assertThat(calculateContributionDTO.getCalcDate()).isEqualTo(contribution.getCalcDate());
         softly.assertThat(calculateContributionDTO.getCcOutcomeCount()).isEqualTo(contribution.getCcOutcomeCount());
-        softly.assertThat(calculateContributionDTO.getDateCreated()).isEqualTo(contribution.getDateCreated());
-        softly.assertThat(calculateContributionDTO.getDateModified()).isEqualTo(contribution.getDateModified());
-        softly.assertThat(calculateContributionDTO.getDateUpliftApplied()).isEqualTo(contribution.getDateUpliftApplied());
-        softly.assertThat(calculateContributionDTO.getDateUpliftRemoved()).isEqualTo(contribution.getDateUpliftRemoved());
-        softly.assertThat(calculateContributionDTO.getEffectiveDate()).isEqualTo(contribution.getEffectiveDate());
         softly.assertThat(calculateContributionDTO.getContributionCap()).isEqualTo(contribution.getContributionCap());
         softly.assertThat(calculateContributionDTO.getUpliftApplied()).isEqualTo(contribution.getUpliftApplied());
         softly.assertThat(calculateContributionDTO.getTransferStatus()).isEqualTo(contribution.getTransferStatus());
         softly.assertThat(calculateContributionDTO.getUserCreated()).isEqualTo(contribution.getUserCreated());
-        softly.assertThat(calculateContributionDTO.getDateModified()).isEqualTo(contribution.getDateModified());
         softly.assertThat(calculateContributionDTO.getUserModified()).isEqualTo(contribution.getUserModified());
         softly.assertThat(calculateContributionDTO.getCreateContributionOrder()).isEqualTo(contribution.getCreateContributionOrder());
         softly.assertThat(calculateContributionDTO.getCorrespondenceId()).isEqualTo(contribution.getCorrespondenceId());
         softly.assertThat(calculateContributionDTO.getActive()).isEqualTo(contribution.getActive());
         softly.assertThat(calculateContributionDTO.getLatest()).isEqualTo(contribution.getLatest());
         softly.assertThat(calculateContributionDTO.getSeHistoryId()).isEqualTo(contribution.getSeHistoryId());
+        softly.assertAll();
+    }
 
+    private void assertDateFields(CalculateContributionDTO calculateContributionDTO, Contribution contribution) {
+        softly.assertThat(calculateContributionDTO.getReplacedDate()).isEqualTo(contribution.getReplacedDate());
+        softly.assertThat(calculateContributionDTO.getDateCreated()).isEqualTo(contribution.getDateCreated());
+        softly.assertThat(calculateContributionDTO.getDateModified()).isEqualTo(contribution.getDateModified());
+        softly.assertThat(calculateContributionDTO.getDateUpliftApplied()).isEqualTo(contribution.getDateUpliftApplied());
+        softly.assertThat(calculateContributionDTO.getDateUpliftRemoved()).isEqualTo(contribution.getDateUpliftRemoved());
+        softly.assertThat(calculateContributionDTO.getEffectiveDate()).isEqualTo(contribution.getEffectiveDate());
+        softly.assertThat(calculateContributionDTO.getDateModified()).isEqualTo(contribution.getDateModified());
         softly.assertAll();
     }
 
