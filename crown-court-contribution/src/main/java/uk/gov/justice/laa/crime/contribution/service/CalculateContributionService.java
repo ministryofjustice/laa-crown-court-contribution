@@ -84,7 +84,7 @@ public class CalculateContributionService {
                                                     final RepOrderDTO repOrderDTO) {
         CalculateContributionResponse response = new CalculateContributionResponse();
 
-        // TODO use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
+        //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
         if (Constants.Y.equals(contributionResponseDTO.getCalcContribution()) ||
                 contributionResponseDTO.getTemplate() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0) ||
@@ -120,7 +120,7 @@ public class CalculateContributionService {
                 updateContributionRequest.setTransferStatus(transferStatus);
                 maatCourtDataService.updateContribution(updateContributionRequest, laaTransactionId);
             }
-            // TODO - revisit the createContribs logic - do we need to change the input?
+            //Revisit the createContribs logic - do we need to change the input?
             createContribs(calculateContributionDTO, laaTransactionId);
         } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
             createContribs(calculateContributionDTO, laaTransactionId);
@@ -134,7 +134,7 @@ public class CalculateContributionService {
                     .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
         }
 
-        //ToDo - Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
+        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
         return response;
     }
 
@@ -207,7 +207,8 @@ public class CalculateContributionService {
             response.setUpfrontContributions(calculateUpfrontContributions(response.getMonthlyContributions(), calculateContributionDTO.getContributionCap(), contributionCalcParametersDTO.getUpfrontTotalMonths()));
         }
 
-        response.setContributionCap(calculateContributionDTO.getContributionCap()); // TODO refactor the request to pass the offenceType object for Contribs Cap
+        response.setContributionCap(calculateContributionDTO.getContributionCap());
+        // Refactor the request to pass the offenceType object for Contribs Cap
         response.setEffectiveDate(getEffectiveDateByNewWorkReason(calculateContributionDTO, response.getMonthlyContributions(), assEffectiveDate));
         return response;
     }
