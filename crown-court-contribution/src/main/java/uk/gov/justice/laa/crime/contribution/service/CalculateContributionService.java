@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,18 +100,16 @@ public class CalculateContributionService {
         Contribution currentContribution = null;
         TransferStatus currentTransferStatus = null;
         Integer currentContributionFileId = null;
-        final Integer contributionId = calculateContributionDTO.getId();
-        if (contributionId != null) {
-            List<Contribution> contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, false);
-            currentContribution = contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst().orElse(null);
-            if (currentContribution != null) {
-                currentTransferStatus = currentContribution.getTransferStatus();
-                currentContributionFileId = currentContribution.getContributionFileId();
-            } else {
-                log.error("C3 Service: Current Contribution Is NULL.");
-            }
-        }
 
+        currentContribution = getCurrentContribution(calculateContributionDTO, laaTransactionId);
+
+        if (currentContribution != null) {
+            currentTransferStatus = currentContribution.getTransferStatus();
+            currentContributionFileId = currentContribution.getContributionFileId();
+        } else {
+            log.error("C3 Service: Current Contribution Is NULL.");
+        }
+        
         if ((calculateContributionDTO.getMonthlyContributions() != null && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (response.getEffectiveDate() != null && !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString()))
         ) {
@@ -136,6 +135,15 @@ public class CalculateContributionService {
 
         //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
         return response;
+    }
+
+    public Contribution getCurrentContribution(CalculateContributionDTO calculateContributionDTO, final String laaTransactionId){
+        final Integer contributionId = calculateContributionDTO.getId();
+        List<Contribution> contributionsList = new ArrayList<>();
+        if (contributionId != null) {
+            contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, false);
+        }
+        return contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst().orElse(null);
     }
 
     public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
