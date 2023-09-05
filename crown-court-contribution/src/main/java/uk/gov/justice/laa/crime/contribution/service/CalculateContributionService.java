@@ -110,7 +110,22 @@ public class CalculateContributionService {
             log.error("C3 Service: Current Contribution Is NULL.");
         }
 
-        if ((calculateContributionDTO.getMonthlyContributions() != null && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
+        verifyAndCreateContribs(calculateContributionDTO, laaTransactionId, isReassessment, repOrderDTO,
+                response, currentTransferStatus, currentContributionFileId, currentContribution);
+
+        verifyAndUpdateContribution(calculateContributionDTO, laaTransactionId, response, currentContribution);
+
+        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
+        return response;
+    }
+
+    private void verifyAndCreateContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId,
+                                         boolean isReassessment, RepOrderDTO repOrderDTO,
+                                         CalculateContributionResponse response,
+                                         TransferStatus currentTransferStatus, Integer currentContributionFileId,
+                                         Contribution currentContribution) {
+        if ((calculateContributionDTO.getMonthlyContributions() != null
+                && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (response.getEffectiveDate() != null && !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString()))
         ) {
             if (TransferStatus.REQUESTED.equals(currentTransferStatus)) {
@@ -124,11 +139,6 @@ public class CalculateContributionService {
         } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
             createContribs(calculateContributionDTO, laaTransactionId);
         }
-
-        verifyAndUpdateContribution(calculateContributionDTO, laaTransactionId, response, currentContribution);
-
-        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
-        return response;
     }
 
     private void verifyAndUpdateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, CalculateContributionResponse response, Contribution currentContribution) {
