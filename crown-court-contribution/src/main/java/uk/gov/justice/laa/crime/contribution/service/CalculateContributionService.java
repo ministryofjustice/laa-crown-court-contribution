@@ -109,7 +109,7 @@ public class CalculateContributionService {
         } else {
             log.error("C3 Service: Current Contribution Is NULL.");
         }
-        
+
         if ((calculateContributionDTO.getMonthlyContributions() != null && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (response.getEffectiveDate() != null && !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString()))
         ) {
@@ -125,6 +125,13 @@ public class CalculateContributionService {
             createContribs(calculateContributionDTO, laaTransactionId);
         }
 
+        verifyAndUpdateContribution(calculateContributionDTO, laaTransactionId, response, currentContribution);
+
+        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
+        return response;
+    }
+
+    private void verifyAndUpdateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, CalculateContributionResponse response, Contribution currentContribution) {
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
@@ -132,9 +139,6 @@ public class CalculateContributionService {
                     .withTransferStatus(TransferStatus.REQUESTED)
                     .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
         }
-
-        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
-        return response;
     }
 
     public Contribution getCurrentContribution(CalculateContributionDTO calculateContributionDTO, final String laaTransactionId){
