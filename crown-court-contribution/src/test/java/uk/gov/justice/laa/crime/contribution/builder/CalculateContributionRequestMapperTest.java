@@ -12,7 +12,7 @@ import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionReque
 import java.math.BigDecimal;
 
 @ExtendWith(SoftAssertionsExtension.class)
-public class CalculateContributionRequestMapperTest {
+class CalculateContributionRequestMapperTest {
     @InjectSoftAssertions
     private SoftAssertions softly;
 
