@@ -45,10 +45,6 @@ public class CalculateContributionUtil {
     }
 
     private static boolean checkNull(BigDecimal... values){
-        if(Arrays.stream(values).anyMatch(Objects::isNull)){
-            return true;
-        }
-        return false;
+        return Arrays.stream(values).anyMatch(Objects::isNull);
     }
-
 }

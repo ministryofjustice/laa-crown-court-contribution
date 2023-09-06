@@ -499,4 +499,14 @@ public class TestModelDataBuilder {
                 .dateReceived(LocalDate.of(2023, 2, 2))
                 .build();
     }
+
+    public static ContributionCalcParametersDTO getContributionCalcParametersDTO() {
+        return ContributionCalcParametersDTO.builder()
+                .disposableIncomePercent(BigDecimal.TEN)
+                .minUpliftedMonthlyAmount(new BigDecimal(50))
+                .minimumMonthlyAmount(new BigDecimal(100))
+                .upfrontTotalMonths(12)
+                .upliftedIncomePercent(BigDecimal.ONE)
+                .build();
+    }
 }

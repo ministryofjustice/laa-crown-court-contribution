@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
@@ -9,10 +10,10 @@ import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContrib
 import java.math.BigDecimal;
 
 @Component
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class MaatCalculateContributionResponseMapper {
 
-    public static MaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
+    public MaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
                                                         BigDecimal contributionCap, String effectiveDate,
                                                         Integer totalMonths) {
         MaatCalculateContributionResponse maatCalculateContributionResponse = new MaatCalculateContributionResponse();

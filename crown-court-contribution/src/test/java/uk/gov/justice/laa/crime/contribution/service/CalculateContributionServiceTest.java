@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 
@@ -9,7 +10,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CalculateContributionServiceTest {
+class CalculateContributionServiceTest {
 
     @Test
     void giveValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMonthlyContributionWhenGreaterThanMinUpliftedMonthlyAmount() {
@@ -23,7 +24,7 @@ public class CalculateContributionServiceTest {
                 .withUpliftedIncomePercent(new BigDecimal(10));
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isGreaterThan(minUpliftedMonthlyAmount);
-        assertEquals(response.getUpliftApplied(), "Y");
+        assertEquals(Constants.Y, response.getUpliftApplied());
     }
 
     @Test
@@ -38,7 +39,7 @@ public class CalculateContributionServiceTest {
                 .withUpliftedIncomePercent(new BigDecimal(10));
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(minUpliftedMonthlyAmount);
-        assertEquals(response.getUpliftApplied(), "Y");
+        assertEquals(Constants.Y, response.getUpliftApplied());
     }
 
     @Test
@@ -56,8 +57,8 @@ public class CalculateContributionServiceTest {
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
-        assertEquals(response.getUpliftApplied(), "N");
-        assertEquals(response.getBasedOn(), "Means");
+        assertEquals(Constants.N, response.getUpliftApplied());
+        assertEquals(Constants.MEANS, response.getBasedOn());
     }
 
     @Test
@@ -76,8 +77,8 @@ public class CalculateContributionServiceTest {
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(new BigDecimal(83));
         assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
-        assertEquals(response.getUpliftApplied(), "N");
-        assertEquals(response.getBasedOn(), "Means");
+        assertEquals(Constants.N, response.getUpliftApplied());
+        assertEquals(Constants.MEANS, response.getBasedOn());
     }
 
     @Test
@@ -96,7 +97,7 @@ public class CalculateContributionServiceTest {
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(contributionCap);
         assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
-        assertEquals(response.getUpliftApplied(), "N");
-        assertEquals(response.getBasedOn(), "Offence Type");
+        assertEquals(Constants.N, response.getUpliftApplied());
+        assertEquals(Constants.OFFENCE_TYPE, response.getBasedOn());
     }
 }

@@ -2,18 +2,16 @@ package uk.gov.justice.laa.crime.contribution.util;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
-public class CalculateContributionUtilTest {
+class CalculateContributionUtilTest {
     @Test
     void givenMonthlyContributionsSmaller_whenCalculateDisposableContributionIsInvoked_thenZeroIsReturned() {
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
@@ -99,7 +97,10 @@ public class CalculateContributionUtilTest {
     }
 
     private static Stream<Arguments> calculateUpfrontContributions() {
-        return Stream.of(Arguments.of(BigDecimal.ZERO, null, 1), Arguments.of(null, BigDecimal.ZERO, null), Arguments.of(null, BigDecimal.ZERO, 1));
+        return Stream.of(Arguments.of(BigDecimal.ZERO, null, 1),
+                Arguments.of(null, BigDecimal.ZERO, null),
+                Arguments.of(null, BigDecimal.ZERO, 1),
+                Arguments.of(BigDecimal.ZERO, BigDecimal.ZERO, null));
     }
 
 }

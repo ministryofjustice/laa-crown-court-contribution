@@ -21,10 +21,6 @@
       "type": "number",
       "description": "Contribution Cap"
     },
-    "calcContribs": {
-      "type": "boolean",
-      "description": "Currently has a fixed value of 'false'."
-    },
     "upfrontTotalMonths": {
       "type": "integer",
       "description": "upfront Total Months"
