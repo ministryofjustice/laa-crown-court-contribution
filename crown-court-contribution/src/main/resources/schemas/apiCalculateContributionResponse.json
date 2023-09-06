@@ -7,22 +7,18 @@
   "properties": {
     "monthlyContributions": {
       "type": "number",
-      "default": 0.0,
       "description": "The monthly contribution amount"
     },
     "upfrontContributions": {
       "type": "number",
-      "default": 0.0,
       "description": "The upfront contribution amount"
     },
     "upliftApplied": {
       "type": "string",
-      "default": "N",
       "description": "Indicates if an income uplift was applied"
     },
     "basedOn": {
-      "type": ["string",null],
-      "default": null,
+      "type": "string",
       "description": "Indicates what the contributions are based on (e.g. Means assessment)"
     }
   },

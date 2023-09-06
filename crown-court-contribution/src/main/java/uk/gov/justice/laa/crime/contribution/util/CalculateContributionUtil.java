@@ -4,11 +4,15 @@ import lombok.experimental.UtilityClass;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.Objects;
 
 @UtilityClass
 public class CalculateContributionUtil {
 
     public BigDecimal calculateMonthlyContribution(final BigDecimal annualDisposableIncome, final BigDecimal disposableIncomePercent, final BigDecimal minimumMonthlyAmount) {
+        if(checkNull(annualDisposableIncome, disposableIncomePercent, minimumMonthlyAmount))
+            return null;
         BigDecimal monthlyContributionsCalc = annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
                 .multiply(disposableIncomePercent)
                 .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR);
@@ -19,15 +23,18 @@ public class CalculateContributionUtil {
         return monthlyContribution;
     }
 
-    public BigDecimal calculateUpfrontContributions(final BigDecimal monthlyContributions, final BigDecimal contributionCap, final int upfrontTotalMonths) {
+    public BigDecimal calculateUpfrontContributions(final BigDecimal monthlyContributions, final BigDecimal contributionCap, final Integer upfrontTotalMonths) {
+        if(checkNull(monthlyContributions, contributionCap) || upfrontTotalMonths == null)
+            return null;
         BigDecimal upfrontContribution = monthlyContributions.multiply(BigDecimal.valueOf(upfrontTotalMonths));
         if (upfrontContribution.compareTo(contributionCap) < 0) {
             return upfrontContribution;
-        }
-        return contributionCap;
+        } else return contributionCap;
     }
 
     public BigDecimal calculateUpliftedMonthlyAmount(final BigDecimal annualDisposableIncome, final BigDecimal upliftedIncomePercent, final BigDecimal minUpliftedMonthlyAmount) {
+        if(checkNull(annualDisposableIncome, upliftedIncomePercent, minUpliftedMonthlyAmount))
+            return null;
         BigDecimal monthlyContributionsCalc = annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
                 .multiply(upliftedIncomePercent)
                 .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR);
@@ -36,4 +43,12 @@ public class CalculateContributionUtil {
         }
         return minUpliftedMonthlyAmount;
     }
+
+    private static boolean checkNull(BigDecimal... values){
+        if(Arrays.stream(values).anyMatch(Objects::isNull)){
+            return true;
+        }
+        return false;
+    }
+
 }

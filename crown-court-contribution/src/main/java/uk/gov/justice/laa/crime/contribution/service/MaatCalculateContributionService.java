@@ -39,6 +39,7 @@ public class MaatCalculateContributionService {
     private final ContributionService contributionService;
     private final UpdateContributionRequestMapper updateContributionRequestMapper;
     private final CalculateContributionRequestMapper calculateContributionRequestMapper;
+    private final MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
 
     private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
             MagCourtOutcome.COMMITTED_FOR_TRIAL,
@@ -213,8 +214,8 @@ public class MaatCalculateContributionService {
                 annualDisposableIncome, isUpliftApplied(calculateContributionDTO, contributionResponseDTO),
                 calculateContributionDTO.getContributionCap());
 
-        // TODO refactor the request to pass the offenceType object for Contribs Cap
-        return MaatCalculateContributionResponseMapper.map(calculateContributionService.calcualteContibution(apiCalculateContributionRequest),
+        // Revisit the request to pass the offenceType object for Contribs Cap
+        return maatCalculateContributionResponseMapper.map(calculateContributionService.calcualteContibution(apiCalculateContributionRequest),
                 calculateContributionDTO.getContributionCap(),
                 getEffectiveDateByNewWorkReason(calculateContributionDTO,
                         calculateContributionDTO.getContributionCap(), assEffectiveDate), totalMonths);
@@ -298,50 +299,6 @@ public class MaatCalculateContributionService {
                 .map(Assessment::getNewWorkReason)
                 .orElse(calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
                         .map(Assessment::getNewWorkReason).orElse(null));
-    }
-
-    /**
-     * This method calculates the upfront contributions based on the below logic:
-     * //        p_application_object.crown_court_overview_object.contributions_object.upfront_contribs
-     * //                      := least(p_application_object.crown_court_overview_object.contributions_object.monthly_contribs * v_UPFRONT_TOTAL_MONTHS
-     * //                ,p_application_object.offence_type_object.contribs_cap);
-     */
-    public static BigDecimal calculateUpfrontContributions(final BigDecimal monthlyContributions, final BigDecimal contributionCap, final Integer upfrontTotalMonths) {
-        BigDecimal upfrontContribution = monthlyContributions.multiply(BigDecimal.valueOf(upfrontTotalMonths));
-        if (contributionCap != null && upfrontContribution.compareTo(contributionCap) < 0) {
-            return upfrontContribution;
-        } else return contributionCap;
-    }
-
-    public static BigDecimal calculateDisposableContribution(final BigDecimal annualDisposableIncome,
-                                                             final BigDecimal disposableIncomePercent,
-                                                             final BigDecimal minimumMonthlyAmount) {
-        BigDecimal monthlyContributionsCalc = annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
-                .multiply(disposableIncomePercent)
-                .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR);
-        BigDecimal monthlyContributions = (monthlyContributionsCalc.compareTo(BigDecimal.ZERO) > 0) ? monthlyContributionsCalc : BigDecimal.ZERO;
-
-        if (monthlyContributions.compareTo(minimumMonthlyAmount) < 0) {
-            return BigDecimal.ZERO;
-        } else return monthlyContributions;
-    }
-
-    /**
-     * This method calculates the uplifted monthly amount based on the following logic:
-     * //        p_application_object.crown_court_overview_object.contributions_object.monthly_contribs
-     * //               := floor(greatest(
-     * //               (v_annual_disposable_income/12)  * (v_UPLIFTED_INCOME_PERCENT / 100), v_MIN_UPLIFTED_MONTHLY_AMOUNT)
-     * //               );
-     */
-    public static BigDecimal calculateUpliftedMonthlyAmount(final BigDecimal annualDisposableIncome, final ContributionCalcParametersDTO contributionCalcParametersDTO) {
-        BigDecimal monthlyContributionsCalc = annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
-                .multiply(contributionCalcParametersDTO.getUpliftedIncomePercent())
-                .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR);
-        if (monthlyContributionsCalc.compareTo(contributionCalcParametersDTO.getMinUpliftedMonthlyAmount()) > 0) {
-            return monthlyContributionsCalc;
-        } else {
-            return contributionCalcParametersDTO.getMinUpliftedMonthlyAmount();
-        }
     }
 
     /**
