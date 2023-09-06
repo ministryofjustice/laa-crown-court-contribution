@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,8 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class CalculateContributionService {
-    public ApiCalculateContributionResponse calcualteContibution(ApiCalculateContributionRequest request) {
+    public ApiCalculateContributionResponse calculateContribution(ApiCalculateContributionRequest request) {
+        log.info("Start: CalculateContributionService");
         ApiCalculateContributionResponse response = new ApiCalculateContributionResponse();
         if(request.getUpliftApplied()) {
             BigDecimal monthlyContributions = CalculateContributionUtil.calculateUpliftedMonthlyAmount(request.getAnnualDisposableIncome(),

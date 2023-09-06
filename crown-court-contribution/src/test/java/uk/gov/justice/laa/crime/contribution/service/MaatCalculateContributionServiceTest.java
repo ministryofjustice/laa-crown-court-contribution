@@ -332,7 +332,7 @@ class MaatCalculateContributionServiceTest {
                 .calcContribs(Constants.N)
                 .build();
         when(calculateContributionRequestMapper.map(any(), any(), any(), any())).thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
-        when(calculateContributionService.calcualteContibution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
+        when(calculateContributionService.calculateContribution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
         assertThat(maatCalculateContributionService.calcContribs(calculateContributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID))
                 .isEqualTo(maatCalculateContributionResponse);
     }
@@ -355,7 +355,7 @@ class MaatCalculateContributionServiceTest {
                 .upliftCote(1)
                 .build();
         when(calculateContributionRequestMapper.map(any(), any(), any(), any())).thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
-        when(calculateContributionService.calcualteContibution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
+        when(calculateContributionService.calculateContribution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
         assertThat(maatCalculateContributionService.calcContribs(calculateContributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID))
                 .isEqualTo(maatCalculateContributionResponse);
     }
@@ -373,7 +373,7 @@ class MaatCalculateContributionServiceTest {
                         .minUpliftedMonthlyAmount(BigDecimal.ONE)
                         .build());
         when(calculateContributionRequestMapper.map(any(), any(), any(), any())).thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
-        when(calculateContributionService.calcualteContibution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse()
+        when(calculateContributionService.calculateContribution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse()
                 .withMonthlyContributions(BigDecimal.ONE).withUpliftApplied(Constants.Y));
         calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 9, 9));
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
@@ -401,7 +401,7 @@ class MaatCalculateContributionServiceTest {
                         .upfrontTotalMonths(1)
                         .build());
         when(calculateContributionRequestMapper.map(any(), any(), any(), any())).thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
-        when(calculateContributionService.calcualteContibution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
+        when(calculateContributionService.calculateContribution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 1, 9));
         calculateContributionDTO.setDateUpliftRemoved(LocalDate.of(2023, 2, 9));
@@ -445,7 +445,7 @@ class MaatCalculateContributionServiceTest {
                 .upliftCote(1)
                 .build();
         when(calculateContributionRequestMapper.map(any(), any(), any(), any())).thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
-        when(calculateContributionService.calcualteContibution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse()
+        when(calculateContributionService.calculateContribution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse()
                 .withMonthlyContributions(new BigDecimal(12))
                 .withBasedOn(Constants.OFFENCE_TYPE)
                 .withUpfrontContributions(new BigDecimal(12)));
@@ -724,7 +724,7 @@ class MaatCalculateContributionServiceTest {
                         .upfrontContributions(BigDecimal.ONE)
                 .build());
         when(calculateContributionRequestMapper.map(any(), any(), any(), any())).thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
-        when(calculateContributionService.calcualteContibution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
+        when(calculateContributionService.calculateContribution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
 
         MaatCalculateContributionResponse maatCalculateContributionResponse = new MaatCalculateContributionResponse()
                 .withEffectiveDate(LocalDate.now().toString())

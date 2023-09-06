@@ -324,6 +324,25 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
+    public static ApiCalculateContributionRequest buildApiCalculateContributionRequest() {
+        return new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(new BigDecimal(1000))
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withMinimumMonthlyAmount(new BigDecimal(100))
+                .withContributionCap(new BigDecimal(50))
+                .withUpliftApplied(false)
+                .withUpfrontTotalMonths(12);
+    }
+
+    public static ApiCalculateContributionRequest buildInvalidApiCalculateContributionRequest() {
+        return new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(new BigDecimal(1000))
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withMinimumMonthlyAmount(new BigDecimal(100))
+                .withContributionCap(new BigDecimal(50))
+                .withUpliftApplied(false);
+    }
+
     public static AppealContributionResponse buildAppealContributionResponse() {
         return new AppealContributionResponse()
                 .withId(9)

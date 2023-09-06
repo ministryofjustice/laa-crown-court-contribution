@@ -16,7 +16,6 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -215,7 +214,7 @@ public class MaatCalculateContributionService {
                 calculateContributionDTO.getContributionCap());
 
         // Revisit the request to pass the offenceType object for Contribs Cap
-        return maatCalculateContributionResponseMapper.map(calculateContributionService.calcualteContibution(apiCalculateContributionRequest),
+        return maatCalculateContributionResponseMapper.map(calculateContributionService.calculateContribution(apiCalculateContributionRequest),
                 calculateContributionDTO.getContributionCap(),
                 getEffectiveDateByNewWorkReason(calculateContributionDTO,
                         calculateContributionDTO.getContributionCap(), assEffectiveDate), totalMonths);

@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 
@@ -22,7 +21,7 @@ public class CalculateContributionServiceTest {
                 .withUpliftApplied(true)
                 .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
                 .withUpliftedIncomePercent(new BigDecimal(10));
-        ApiCalculateContributionResponse response = calculateContributionService.calcualteContibution(request);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isGreaterThan(minUpliftedMonthlyAmount);
         assertEquals(response.getUpliftApplied(), "Y");
     }
@@ -37,7 +36,7 @@ public class CalculateContributionServiceTest {
                 .withUpliftApplied(true)
                 .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
                 .withUpliftedIncomePercent(new BigDecimal(10));
-        ApiCalculateContributionResponse response = calculateContributionService.calcualteContibution(request);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(minUpliftedMonthlyAmount);
         assertEquals(response.getUpliftApplied(), "Y");
     }
@@ -54,7 +53,7 @@ public class CalculateContributionServiceTest {
                 .withContributionCap(BigDecimal.ONE)
                 .withMinimumMonthlyAmount(minimumMonthlyAmount)
                 .withUpfrontTotalMonths(12);
-        ApiCalculateContributionResponse response = calculateContributionService.calcualteContibution(request);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
         assertEquals(response.getUpliftApplied(), "N");
@@ -74,7 +73,7 @@ public class CalculateContributionServiceTest {
                 .withContributionCap(contributionCap)
                 .withMinimumMonthlyAmount(minimumMonthlyAmount)
                 .withUpfrontTotalMonths(12);
-        ApiCalculateContributionResponse response = calculateContributionService.calcualteContibution(request);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(new BigDecimal(83));
         assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
         assertEquals(response.getUpliftApplied(), "N");
@@ -94,7 +93,7 @@ public class CalculateContributionServiceTest {
                 .withContributionCap(contributionCap)
                 .withMinimumMonthlyAmount(minimumMonthlyAmount)
                 .withUpfrontTotalMonths(12);
-        ApiCalculateContributionResponse response = calculateContributionService.calcualteContibution(request);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
         assertThat(response.getMonthlyContributions()).isEqualTo(contributionCap);
         assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
         assertEquals(response.getUpliftApplied(), "N");
