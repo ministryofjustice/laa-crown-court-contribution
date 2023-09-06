@@ -20,8 +20,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.AppealContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 

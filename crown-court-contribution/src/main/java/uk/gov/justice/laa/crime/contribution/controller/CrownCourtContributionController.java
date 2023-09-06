@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
-import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 

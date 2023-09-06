@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
 
 import java.math.BigDecimal;
 

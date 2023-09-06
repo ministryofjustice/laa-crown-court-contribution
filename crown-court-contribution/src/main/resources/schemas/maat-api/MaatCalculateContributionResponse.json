@@ -126,7 +126,7 @@
       "description": "List of Contributions Summary",
       "minItems": 1,
       "items": {
-        "$ref": "common/ContributionSummary.json"
+        "$ref": "../common/ContributionSummary.json"
       }
     }
   },
