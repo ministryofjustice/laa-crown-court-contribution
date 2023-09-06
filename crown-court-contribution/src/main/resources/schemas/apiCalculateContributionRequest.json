@@ -31,13 +31,13 @@
     },
     "upliftedIncomePercent": {
       "type": "number",
-      "description":  "Uplifted income percent"
+      "description": "Uplifted income percent"
     },
     "minUpliftedMonthlyAmount": {
       "type": "number",
-      "description":  "Minimum Uplifted Monthly Amount"
+      "description": "Minimum Uplifted Monthly Amount"
     }
   },
   "additionalProperties": false,
-  "required": ["annualDisposableIncome", "disposableIncomePercent", "minimumMonthlyAmount", "contributionCap", "upfrontTotalMonths" ]
+  "required": ["annualDisposableIncome", "disposableIncomePercent", "minimumMonthlyAmount", "contributionCap", "upfrontTotalMonths"]
 }
