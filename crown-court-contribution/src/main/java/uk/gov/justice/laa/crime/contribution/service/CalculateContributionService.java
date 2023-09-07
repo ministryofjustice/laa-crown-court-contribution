@@ -99,16 +99,19 @@ public class CalculateContributionService {
 
         Contribution currentContribution = getCurrentContribution(calculateContributionDTO, laaTransactionId);
 
-        verifyAndCreateContribs(calculateContributionDTO, laaTransactionId, isReassessment, repOrderDTO,
+        Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, laaTransactionId, isReassessment, repOrderDTO,
                 response, currentContribution);
 
-        verifyAndUpdateContribution(calculateContributionDTO, laaTransactionId, response, currentContribution);
+        requestEarlyTransfer(calculateContributionDTO, laaTransactionId, response, currentContribution);
 
-        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
+        if (contributionResponseDTO.getTemplate() != null && createdContribution != null) {
+            response.setProcessActivity(true);
+        }
+
         return response;
     }
 
-    private void verifyAndCreateContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId,
+    private Contribution verifyAndCreateContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId,
                                          boolean isReassessment, RepOrderDTO repOrderDTO,
                                          CalculateContributionResponse response,
                                          Contribution currentContribution) {
@@ -133,13 +136,14 @@ public class CalculateContributionService {
                 maatCourtDataService.updateContribution(updateContributionRequest, laaTransactionId);
             }
             //Revisit the createContribs logic - do we need to change the input?
-            createContribs(calculateContributionDTO, laaTransactionId);
+            return createContribs(calculateContributionDTO, laaTransactionId);
         } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
-            createContribs(calculateContributionDTO, laaTransactionId);
+            return createContribs(calculateContributionDTO, laaTransactionId);
         }
+        return null;
     }
 
-    private void verifyAndUpdateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, CalculateContributionResponse response, Contribution currentContribution) {
+    private void requestEarlyTransfer(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, CalculateContributionResponse response, Contribution currentContribution) {
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
