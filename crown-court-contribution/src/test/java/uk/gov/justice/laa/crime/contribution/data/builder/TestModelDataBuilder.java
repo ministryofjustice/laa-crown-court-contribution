@@ -509,4 +509,12 @@ public class TestModelDataBuilder {
                 .upliftedIncomePercent(BigDecimal.ONE)
                 .build();
     }
+
+    public static ApiCalculateContributionResponse getApiCalculateContributionResponse() {
+        return new ApiCalculateContributionResponse()
+                .withBasedOn(Constants.MEANS)
+                .withMonthlyContributions(BigDecimal.TEN)
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.Y);
+    }
 }

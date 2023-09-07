@@ -1,11 +1,15 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,12 +65,13 @@ class CalculateContributionServiceTest {
         assertEquals(Constants.MEANS, response.getBasedOn());
     }
 
-    @Test
-    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenMonthlyContributionsIsReturned() {
+    @ParameterizedTest
+    @MethodSource("contributionCap")
+    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenMonthlyContributionsIsReturned(BigDecimal contributionCap) {
         CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
-        BigDecimal contributionCap = new BigDecimal(100);
+        //BigDecimal contributionCap = new BigDecimal(100);
         ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
                 .withUpliftApplied(false)
                 .withAnnualDisposableIncome(annualDisposableIncome)
@@ -99,5 +104,8 @@ class CalculateContributionServiceTest {
         assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
         assertEquals(Constants.N, response.getUpliftApplied());
         assertEquals(Constants.OFFENCE_TYPE, response.getBasedOn());
+    }
+    private static Stream<Arguments> contributionCap() {
+        return Stream.of(Arguments.of(null, new BigDecimal(100)));
     }
 }
