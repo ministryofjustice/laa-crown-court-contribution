@@ -4,6 +4,10 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
@@ -309,8 +313,8 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
-    public static CalculateContributionRequest buildCalculateContributionRequest() {
-        return new CalculateContributionRequest()
+    public static MaatCalculateContributionRequest buildCalculateContributionRequest() {
+        return new MaatCalculateContributionRequest()
                 .withApplId(999)
                 .withRepId(999)
                 .withCaseType(CaseType.EITHER_WAY)
@@ -318,6 +322,25 @@ public class TestModelDataBuilder {
                 .withUserCreated("TEST")
                 .withLastOutcome(buildLastOutcome_1())
                 .withAssessments(List.of(buildAssessment()));
+    }
+
+    public static ApiCalculateContributionRequest buildApiCalculateContributionRequest() {
+        return new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(new BigDecimal(1000))
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withMinimumMonthlyAmount(new BigDecimal(100))
+                .withContributionCap(new BigDecimal(50))
+                .withUpliftApplied(false)
+                .withUpfrontTotalMonths(12);
+    }
+
+    public static ApiCalculateContributionRequest buildInvalidApiCalculateContributionRequest() {
+        return new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(new BigDecimal(1000))
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withMinimumMonthlyAmount(new BigDecimal(100))
+                .withContributionCap(new BigDecimal(50))
+                .withUpliftApplied(false);
     }
 
     public static AppealContributionResponse buildAppealContributionResponse() {
@@ -435,13 +458,20 @@ public class TestModelDataBuilder {
                 .withLaaTransactionId(LAA_TRANSACTION_ID);
     }
 
-    public static CalculateContributionResponse getCalculateContributionResponse() {
-        return new CalculateContributionResponse()
+    public static MaatCalculateContributionResponse getMaatCalculateContributionResponse() {
+        return new MaatCalculateContributionResponse()
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpliftApplied(Constants.N)
                 .withEffectiveDate(COMMITTAL_DATE.toString())
                 .withUpfrontContributions(BigDecimal.ZERO)
                 .withTotalMonths(0);
+    }
+
+    public static ApiCalculateContributionResponse getCalculateContributionResponse() {
+        return new ApiCalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.N)
+                .withUpfrontContributions(BigDecimal.ZERO);
     }
 
     public static CalculateContributionDTO getContributionDTOForCalcContribs() {
@@ -468,5 +498,23 @@ public class TestModelDataBuilder {
                 .dateSent(LocalDate.of(2023, 1, 1))
                 .dateReceived(LocalDate.of(2023, 2, 2))
                 .build();
+    }
+
+    public static ContributionCalcParametersDTO getContributionCalcParametersDTO() {
+        return ContributionCalcParametersDTO.builder()
+                .disposableIncomePercent(BigDecimal.TEN)
+                .minUpliftedMonthlyAmount(new BigDecimal(50))
+                .minimumMonthlyAmount(new BigDecimal(100))
+                .upfrontTotalMonths(12)
+                .upliftedIncomePercent(BigDecimal.ONE)
+                .build();
+    }
+
+    public static ApiCalculateContributionResponse getApiCalculateContributionResponse() {
+        return new ApiCalculateContributionResponse()
+                .withBasedOn(Constants.MEANS)
+                .withMonthlyContributions(BigDecimal.TEN)
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.Y);
     }
 }

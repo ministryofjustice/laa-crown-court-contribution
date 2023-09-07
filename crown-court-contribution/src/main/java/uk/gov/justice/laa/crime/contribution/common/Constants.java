@@ -18,4 +18,7 @@ public class Constants {
     public static final String HARDSHIP_APPLICATION = "HARDSHIP APPLICATION";
     public static final String Y = "Y";
     public static final String N = "N";
+
+    public static final String OFFENCE_TYPE = "Offence Type";
+    public static final String MEANS = "Means";
 }

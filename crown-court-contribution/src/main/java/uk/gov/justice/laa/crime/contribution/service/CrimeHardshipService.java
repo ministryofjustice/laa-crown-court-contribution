@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateHardshipByDetailRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateHardshipByDetailResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
 
 import java.util.Map;
 

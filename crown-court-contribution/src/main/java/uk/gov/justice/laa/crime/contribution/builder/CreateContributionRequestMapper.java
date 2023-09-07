@@ -3,8 +3,8 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.AppealContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 
 import java.math.BigDecimal;
 

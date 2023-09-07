@@ -4,16 +4,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContributionDTOBuilder {
 
-    public static CalculateContributionDTO build(final CalculateContributionRequest request) {
+    public static CalculateContributionDTO build(final MaatCalculateContributionRequest request) {
         CalculateContributionDTO.CalculateContributionDTOBuilder builder = CalculateContributionDTO.builder()
                 .id(request.getRepId())
                 .applId(request.getApplId())

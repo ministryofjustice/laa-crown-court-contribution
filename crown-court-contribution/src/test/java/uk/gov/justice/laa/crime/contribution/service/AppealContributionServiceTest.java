@@ -11,6 +11,8 @@ import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountReques
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 
@@ -66,7 +68,7 @@ class AppealContributionServiceTest {
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), anyString()))
                 .thenReturn(TestModelDataBuilder.buildContribution());
 
-        CalculateContributionResponse response = appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
+        MaatCalculateContributionResponse response = appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
 
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.valueOf(250));
         verify(maatCourtDataService, times(1)).createContribution(any(CreateContributionRequest.class), anyString());
@@ -85,7 +87,7 @@ class AppealContributionServiceTest {
                 .thenReturn(BigDecimal.valueOf(0));
         when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
-        CalculateContributionResponse response = appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
+        MaatCalculateContributionResponse response = appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
 
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
         verify(maatCourtDataService, times(0)).createContribution(any(CreateContributionRequest.class), anyString());

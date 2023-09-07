@@ -12,6 +12,9 @@ import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
