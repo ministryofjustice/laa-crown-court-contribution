@@ -111,17 +111,19 @@ public class CalculateContributionService {
         return response;
     }
 
-    private Contribution verifyAndCreateContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId,
-                                         boolean isReassessment, RepOrderDTO repOrderDTO,
-                                         CalculateContributionResponse response,
-                                         Contribution currentContribution) {
+    public Contribution verifyAndCreateContribs(final CalculateContributionDTO calculateContributionDTO,
+                                                final String laaTransactionId,
+                                                final boolean isReassessment,
+                                                final RepOrderDTO repOrderDTO,
+                                                final CalculateContributionResponse response,
+                                                final Contribution currentContribution) {
         TransferStatus currentTransferStatus = null;
         Integer currentContributionFileId = null;
 
         if (currentContribution != null) {
-             currentTransferStatus = currentContribution.getTransferStatus();
-             currentContributionFileId = currentContribution.getContributionFileId();
-        }   else {
+            currentTransferStatus = currentContribution.getTransferStatus();
+            currentContributionFileId = currentContribution.getContributionFileId();
+        } else {
             log.error("C3 Service: Current Contribution Is NULL.");
 
         }
@@ -143,7 +145,10 @@ public class CalculateContributionService {
         return null;
     }
 
-    private void requestEarlyTransfer(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, CalculateContributionResponse response, Contribution currentContribution) {
+    public void requestEarlyTransfer(final CalculateContributionDTO calculateContributionDTO,
+                                     final String laaTransactionId,
+                                     final CalculateContributionResponse response,
+                                     final Contribution currentContribution) {
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
@@ -153,7 +158,7 @@ public class CalculateContributionService {
         }
     }
 
-    public Contribution getCurrentContribution(CalculateContributionDTO calculateContributionDTO, final String laaTransactionId){
+    public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
         final Integer contributionId = calculateContributionDTO.getId();
         List<Contribution> contributionsList = new ArrayList<>();
         if (contributionId != null) {
@@ -163,9 +168,9 @@ public class CalculateContributionService {
     }
 
     public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
-                                                 final boolean isReassessment,
-                                                 final RepOrderDTO repOrderDTO,
-                                                 final TransferStatus currentTransferStatus) {
+                                                final boolean isReassessment,
+                                                final RepOrderDTO repOrderDTO,
+                                                final TransferStatus currentTransferStatus) {
         return ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
                 && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId(), calculateContributionDTO.getLaaTransactionId())
