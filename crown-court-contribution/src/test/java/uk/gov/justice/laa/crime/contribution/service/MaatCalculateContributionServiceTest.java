@@ -755,4 +755,37 @@ class MaatCalculateContributionServiceTest {
         assertThat(actualResponse)
                 .isEqualTo(expectedResponse);
     }
+
+    @Test
+    void givenARequestWithDoContribsAsNAndMonthlyContributionsZero_whenGetCalculateContributionResponseIsInvoked_thenResponseIsReturned() {
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
+                .id(1234)
+                .build();
+        when(contributionService.checkReassessment(repOrderDTO, TestModelDataBuilder.LAA_TRANSACTION_ID)).thenReturn(true);
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder().doContribs(Constants.Y).build();
+        when(contributionService.checkContribsCondition(any())).thenReturn(contributionResponseDTO);
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .assessments(List.of(new Assessment()
+                        .withAssessmentType(AssessmentType.INIT)
+                        .withResult(AssessmentResult.PASS)
+                        .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
+                .effectiveDate(LocalDate.now())
+                .monthlyContributions(BigDecimal.ZERO)
+                .build();
+        MaatCalculateContributionResponse expectedResponse = new MaatCalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withContributionCap(BigDecimal.ZERO);
+
+        when(maatCourtDataService.findLatestSentContribution(any(), any())).thenReturn(Contribution.builder()
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ONE)
+                .build());
+
+        MaatCalculateContributionResponse actualResponse = maatCalculateContributionService.getCalculateContributionResponse(calculateContributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID, repOrderDTO);
+        assertThat(actualResponse)
+                .isEqualTo(expectedResponse);
+    }
+
 }

@@ -15,9 +15,8 @@ public class CalculateContributionValidator {
 
     public Optional<Void> validate(MaatCalculateContributionRequest maatCalculateContributionRequest) {
         log.debug("Performing validation against calculate contributions request");
-        if (maatCalculateContributionRequest != null
-                    && maatCalculateContributionRequest.getLastOutcome() != null
-                    && maatCalculateContributionRequest.getLastOutcome().getDateSet() != null
+        //LastOutcome is a mandatory attribute. Removed the redundant null checks LastOutcome.
+        if (maatCalculateContributionRequest.getLastOutcome().getDateSet() != null
                     && maatCalculateContributionRequest.getLastOutcome().getDateSet().isAfter(LocalDateTime.now())) {
                 throw new ValidationException("The dateSet for lastOutcome is invalid");
             }
