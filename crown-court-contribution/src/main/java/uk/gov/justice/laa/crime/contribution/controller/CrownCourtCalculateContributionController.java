@@ -21,7 +21,7 @@ import uk.gov.justice.laa.crime.contribution.service.CalculateContributionServic
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/internal/v2/contribution/calculateContribution")
+@RequestMapping("api/internal/v2/contribution/calculate")
 public class CrownCourtCalculateContributionController {
 
     private final CalculateContributionService calculateContributionService;
