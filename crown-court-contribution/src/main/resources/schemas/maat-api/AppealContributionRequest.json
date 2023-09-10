@@ -48,7 +48,7 @@
       "description": "List of assessments performed",
       "minItems": 1,
       "items": {
-        "$ref": "common/Assessment.json"
+        "$ref": "../common/Assessment.json"
       }
     }
   },

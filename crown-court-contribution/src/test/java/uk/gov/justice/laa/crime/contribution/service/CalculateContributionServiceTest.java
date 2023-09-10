@@ -1,523 +1,111 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
-import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(MockitoExtension.class)
 class CalculateContributionServiceTest {
 
-    @Mock
-    private MaatCourtDataService maatCourtDataService;
-
-    @Mock
-    private AppealContributionService appealContributionService;
-
-    @InjectMocks
-    private CalculateContributionService calculateContributionService;
-
-    @Mock
-    private CompareContributionService compareContributionService;
-    @Mock
-    private CreateContributionRequestMapper createContributionRequestMapper;
-
-    @Mock
-    private CrimeHardshipService crimeHardshipService;
-
-    @Mock
-    private ContributionRulesService contributionRulesService;
-
     @Test
-    void givenAInvalidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
-        when(maatCourtDataService.getRepOrderByRepId(anyInt(), anyString())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
-        calculateContributionService.calculateContribution(ContributionDTO.builder().repId(120).build(), TestModelDataBuilder.LAA_TRANSACTION_ID);
-        verify(appealContributionService, times(0)).calculateAppealContribution(any(), anyString());
-    }
-
-    @Test
-    void givenAValidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
-        when(maatCourtDataService.getRepOrderByRepId(anyInt(), anyString())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
-        when(appealContributionService.calculateAppealContribution(any(ContributionDTO.class), anyString())).thenReturn(ContributionDTO.builder().build());
-        calculateContributionService.calculateContribution(ContributionDTO.builder().repId(120).caseType(CaseType.APPEAL_CC).build(),
-                TestModelDataBuilder.LAA_TRANSACTION_ID);
-        verify(appealContributionService, times(1)).calculateAppealContribution(any(), anyString());
-    }
-
-    @Test
-    void givenValidContributionAndCompareResultIsLessThanTwo_whenCreateContribsIsInvoked_thenContributionIsReturn() {
-        when(compareContributionService.compareContribution(any())).thenReturn(1);
-        when(maatCourtDataService.createContribution(any(), any())).thenReturn(TestModelDataBuilder.getContribution());
-        Contribution result = calculateContributionService.createContribs(new ContributionDTO(), TestModelDataBuilder.LAA_TRANSACTION_ID);
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    void givenValidContributionAndCompareResultIsGreaterThanTwo_whenCreateContribsIsInvoked_thenNullIsReturn() {
-        when(compareContributionService.compareContribution(any())).thenReturn(3);
-        Contribution result = calculateContributionService.createContribs(new ContributionDTO(), TestModelDataBuilder.LAA_TRANSACTION_ID);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void givenNoCommittalDateAndPassportAssessmentDate_whenGetEffectiveDateIsInvoked_thenPassportAssessmentDateIsReturned() {
-        LocalDateTime passportAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withAssessmentDate(passportAssessmentDate)))
-                .build();
-        LocalDate effectiveDate = CalculateContributionService.getEffectiveDate(contributionDTO);
-        assertThat(effectiveDate.getMonth()).isEqualTo(passportAssessmentDate.getMonth());
-        assertThat(effectiveDate.getYear()).isEqualTo(passportAssessmentDate.getYear());
-        assertThat(effectiveDate.getDayOfMonth()).isEqualTo(passportAssessmentDate.getDayOfMonth());
-    }
-
-    @Test
-    void givenNoCommittalDateAndFullMeansAssessmentDate_whenGetEffectiveDateIsInvoked_thenFullMeansAssessmentDateIsReturned() {
-        LocalDateTime fullMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.FULL)
-                        .withAssessmentDate(fullMeansAssessmentDate)))
-                .build();
-        LocalDate effectiveDate = CalculateContributionService.getEffectiveDate(contributionDTO);
-        assertThat(effectiveDate.getMonth()).isEqualTo(fullMeansAssessmentDate.getMonth());
-        assertThat(effectiveDate.getYear()).isEqualTo(fullMeansAssessmentDate.getYear());
-        assertThat(effectiveDate.getDayOfMonth()).isEqualTo(fullMeansAssessmentDate.getDayOfMonth());
-    }
-
-    @Test
-    void givenNoCommittalDateAndInitMeansAssessmentDate_whenGetEffectiveDateIsInvoked_thenInitMeansAssessmentDateIsReturned() {
-        LocalDateTime initMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.INIT)
-                        .withAssessmentDate(initMeansAssessmentDate)))
-                .build();
-        LocalDate effectiveDate = CalculateContributionService.getEffectiveDate(contributionDTO);
-        assertThat(effectiveDate.getMonth()).isEqualTo(initMeansAssessmentDate.getMonth());
-        assertThat(effectiveDate.getYear()).isEqualTo(initMeansAssessmentDate.getYear());
-        assertThat(effectiveDate.getDayOfMonth()).isEqualTo(initMeansAssessmentDate.getDayOfMonth());
-    }
-
-    @Test
-    void givenCommittalDateAfterAssessmentDate_whenGetEffectiveDateIsInvoked_thenCommittalDateIsReturned() {
-        LocalDateTime initMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
-        LocalDate committalDate = LocalDate.of(2023, 9, 28);
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.INIT)
-                        .withAssessmentDate(initMeansAssessmentDate)))
-                .committalDate(committalDate)
-                .build();
-        LocalDate effectiveDate = CalculateContributionService.getEffectiveDate(contributionDTO);
-        assertThat(effectiveDate).isEqualTo(committalDate);
-    }
-
-    @Test
-    void givenCommittalDateBeforeAssessmentDate_whenGetEffectiveDateIsInvoked_thenAssessmentDateIsReturned() {
-        LocalDateTime initMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
-        LocalDate committalDate = LocalDate.of(2023, 7, 28);
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.INIT)
-                        .withAssessmentDate(initMeansAssessmentDate)))
-                .committalDate(committalDate)
-                .build();
-        LocalDate effectiveDate = CalculateContributionService.getEffectiveDate(contributionDTO);
-        assertThat(effectiveDate.getMonth()).isEqualTo(initMeansAssessmentDate.getMonth());
-        assertThat(effectiveDate.getYear()).isEqualTo(initMeansAssessmentDate.getYear());
-        assertThat(effectiveDate.getDayOfMonth()).isEqualTo(initMeansAssessmentDate.getDayOfMonth());
-    }
-
-    @Test
-    void givenMonthlyContributionsGreater_whenCalculateUpliftedMonthlyAmountIsInvoked_thenMonthlyContributionsIsReturned() {
+    void giveValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMonthlyContributionWhenGreaterThanMinUpliftedMonthlyAmount() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(80);
-        BigDecimal monthlyContributions = BigDecimal.valueOf(83);
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .upliftedIncomePercent(BigDecimal.TEN)
-                .minUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
-                .build();
-        assertThat(CalculateContributionService.calculateUpliftedMonthlyAmount(annualDisposableIncome, contributionCalcParametersDTO))
-                .isEqualTo(monthlyContributions);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withUpliftApplied(true)
+                .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
+                .withUpliftedIncomePercent(new BigDecimal(10));
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+        assertThat(response.getMonthlyContributions()).isGreaterThan(minUpliftedMonthlyAmount);
+        assertEquals(Constants.Y, response.getUpliftApplied());
     }
 
     @Test
-    void givenMonthlyContributionsSmaller_whenCalculateUpliftedMonthlyAmountIsInvoked_thenMinUpliftMonthlyAmountIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
-        BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(100);
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .upliftedIncomePercent(BigDecimal.TEN)
-                .minUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
-                .build();
-        assertThat(CalculateContributionService.calculateUpliftedMonthlyAmount(annualDisposableIncome, contributionCalcParametersDTO))
-                .isEqualTo(minUpliftedMonthlyAmount);
+    void giveValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMinUpliftedMonthlyAmountWhenMonthlyContributionIsSmaller() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
+        BigDecimal annualDisposableIncome = BigDecimal.valueOf(500);
+        BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(80);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withUpliftApplied(true)
+                .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
+                .withUpliftedIncomePercent(new BigDecimal(10));
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+        assertThat(response.getMonthlyContributions()).isEqualTo(minUpliftedMonthlyAmount);
+        assertEquals(Constants.Y, response.getUpliftApplied());
     }
 
     @Test
-    void givenMonthlyContributionsSmaller_whenCalculateDisposableContributionIsInvoked_thenZeroIsReturned() {
+    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenReturnZeroWhenMonthlyContributionIsSmaller() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(100);
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .disposableIncomePercent(BigDecimal.TEN)
-                .minimumMonthlyAmount(minimumMonthlyAmount)
-                .build();
-        assertThat(CalculateContributionService.calculateDisposableContribution(annualDisposableIncome, contributionCalcParametersDTO))
-                .isEqualTo(BigDecimal.ZERO);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withUpliftApplied(false)
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withContributionCap(BigDecimal.ONE)
+                .withMinimumMonthlyAmount(minimumMonthlyAmount)
+                .withUpfrontTotalMonths(12);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+        assertThat(response.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
+        assertEquals(Constants.N, response.getUpliftApplied());
+        assertEquals(Constants.MEANS, response.getBasedOn());
     }
 
-    @Test
-    void givenMonthlyContributionsLessThanZero_whenCalculateDisposableContributionIsInvoked_thenZeroIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-        BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(100);
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .disposableIncomePercent(BigDecimal.TEN)
-                .minimumMonthlyAmount(minimumMonthlyAmount)
-                .build();
-        assertThat(CalculateContributionService.calculateDisposableContribution(annualDisposableIncome, contributionCalcParametersDTO))
-                .isEqualTo(BigDecimal.ZERO);
-    }
-
-    @Test
-    void givenMonthlyContributionsGreater_whenCalculateDisposableContributionIsInvoked_thenMonthlyContributionsIsReturned() {
+    @ParameterizedTest
+    @MethodSource("contributionCap")
+    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenMonthlyContributionsIsReturned(BigDecimal contributionCap) {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
-        BigDecimal monthlyContributions = BigDecimal.valueOf(83);
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .disposableIncomePercent(BigDecimal.TEN)
-                .minimumMonthlyAmount(minimumMonthlyAmount)
-                .build();
-        assertThat(CalculateContributionService.calculateDisposableContribution(annualDisposableIncome, contributionCalcParametersDTO))
-                .isEqualTo(monthlyContributions);
+        //BigDecimal contributionCap = new BigDecimal(100);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withUpliftApplied(false)
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withContributionCap(contributionCap)
+                .withMinimumMonthlyAmount(minimumMonthlyAmount)
+                .withUpfrontTotalMonths(12);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+        assertThat(response.getMonthlyContributions()).isEqualTo(new BigDecimal(83));
+        assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
+        assertEquals(Constants.N, response.getUpliftApplied());
+        assertEquals(Constants.MEANS, response.getBasedOn());
     }
 
     @Test
-    void givenUpfrontContributionGreater_whenCalculateUpfrontContributionsIsInvoked_thenContributionCapIsReturned() {
-        BigDecimal contributionCap = BigDecimal.valueOf(80);
-        BigDecimal monthlyContributions = BigDecimal.valueOf(83);
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .monthlyContributions(monthlyContributions)
-                .contributionCap(contributionCap)
-                .build();
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .upfrontTotalMonths(2)
-                .build();
-        assertThat(CalculateContributionService.calculateUpfrontContributions(contributionDTO, contributionCalcParametersDTO))
-                .isEqualTo(contributionCap);
+    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenContributionCapIsReturnedWhenMonthlyContributionIsGreater() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
+        BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
+        BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
+        BigDecimal contributionCap = new BigDecimal(53);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withUpliftApplied(false)
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withContributionCap(contributionCap)
+                .withMinimumMonthlyAmount(minimumMonthlyAmount)
+                .withUpfrontTotalMonths(12);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+        assertThat(response.getMonthlyContributions()).isEqualTo(contributionCap);
+        assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
+        assertEquals(Constants.N, response.getUpliftApplied());
+        assertEquals(Constants.OFFENCE_TYPE, response.getBasedOn());
     }
-
-    @Test
-    void givenUpfrontContributionSmaller_whenCalculateUpfrontContributionsIsInvoked_thenUpfrontContributionIsReturned() {
-        BigDecimal contributionCap = BigDecimal.valueOf(80);
-        BigDecimal monthlyContributions = BigDecimal.valueOf(75);
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .monthlyContributions(monthlyContributions)
-                .contributionCap(contributionCap)
-                .build();
-        ContributionCalcParametersDTO contributionCalcParametersDTO = ContributionCalcParametersDTO.builder()
-                .upfrontTotalMonths(1)
-                .build();
-        assertThat(CalculateContributionService.calculateUpfrontContributions(contributionDTO, contributionCalcParametersDTO))
-                .isEqualTo(monthlyContributions);
+    private static Stream<Arguments> contributionCap() {
+        return Stream.of(Arguments.of(null, new BigDecimal(100)));
     }
-
-    @Test
-    void givenPassportNewWorkReason_whenGetNewWorkReasonIsInvoked_thenPassportNewWorkReasonIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withNewWorkReason(NewWorkReason.INF)))
-                .build();
-        assertThat(CalculateContributionService.getNewWorkReason(contributionDTO)).isEqualTo(NewWorkReason.INF);
-    }
-
-    @Test
-    void givenInitialNewWorkReason_whenGetNewWorkReasonIsInvoked_thenInitialNewWorkReasonIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.INIT)
-                        .withNewWorkReason(NewWorkReason.NEW)))
-                .build();
-        assertThat(CalculateContributionService.getNewWorkReason(contributionDTO)).isEqualTo(NewWorkReason.NEW);
-    }
-
-    @Test
-    void givenFullNewWorkReason_whenGetNewWorkReasonIsInvoked_thenNullIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.FULL)
-                        .withNewWorkReason(NewWorkReason.NEW)))
-                .build();
-        assertThat(CalculateContributionService.getNewWorkReason(contributionDTO)).isNull();
-    }
-
-    @Test
-    void givenContributionDateNotNull_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenContributionDateIsReturned() {
-        LocalDate contributionDate = LocalDate.now();
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withNewWorkReason(NewWorkReason.INF)))
-                .effectiveDate(contributionDate)
-                .build();
-        String effectiveDate = CalculateContributionService.getEffectiveDateByNewWorkReason(contributionDTO, null, null);
-        assertThat(effectiveDate).isEqualTo(contributionDate.toString());
-    }
-
-    @Test
-    void givenNewWorkReasonAsINF_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentDateIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withNewWorkReason(NewWorkReason.INF)))
-                .build();
-        LocalDate assessmentDate = LocalDate.now();
-        String effectiveDate = CalculateContributionService.getEffectiveDateByNewWorkReason(contributionDTO, null, assessmentDate);
-        assertThat(effectiveDate).isEqualTo(assessmentDate.toString());
-    }
-
-    @Test
-    void givenNewWorkReasonAsFMA_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentDateIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withNewWorkReason(NewWorkReason.FMA)))
-                .build();
-        LocalDate assessmentDate = LocalDate.now();
-        String effectiveDate = CalculateContributionService.getEffectiveDateByNewWorkReason(contributionDTO, null, assessmentDate);
-        assertThat(effectiveDate).isEqualTo(assessmentDate.toString());
-    }
-
-    @Test
-    void givenNewWorkReasonAsPAIAndMonthlyContributionsAreSmaller_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenContributionEffectiveDateIsReturned() {
-        LocalDate effectiveDate = LocalDate.now();
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withNewWorkReason(NewWorkReason.PAI)))
-                .effectiveDate(effectiveDate)
-                .monthlyContributions(BigDecimal.TEN)
-                .build();
-        assertThat(CalculateContributionService.getEffectiveDateByNewWorkReason(contributionDTO, BigDecimal.valueOf(100), null))
-                .isEqualTo(effectiveDate.toString());
-    }
-
-    @Test
-    void givenNewWorkReasonAsPAIAndMonthlyContributionsAreEqual_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenContributionEffectiveDateIsReturned() {
-        LocalDate effectiveDate = LocalDate.now();
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withNewWorkReason(NewWorkReason.PAI)))
-                .effectiveDate(effectiveDate)
-                .monthlyContributions(BigDecimal.TEN)
-                .build();
-        assertThat(CalculateContributionService.getEffectiveDateByNewWorkReason(contributionDTO, BigDecimal.TEN, null))
-                .isEqualTo(effectiveDate.toString());
-    }
-
-    @Test
-    void givenNewWorkReasonAsPAIAndMonthlyContributionsAreGreater_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenContributionEffectiveDateIsReturned() {
-        LocalDate assessmentDate = LocalDate.now();
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
-                        .withNewWorkReason(NewWorkReason.PAI)))
-                .monthlyContributions(BigDecimal.valueOf(12))
-                .build();
-        assertThat(CalculateContributionService.getEffectiveDateByNewWorkReason(contributionDTO, BigDecimal.TEN, assessmentDate))
-                .isEqualTo(assessmentDate.toString());
-    }
-
-    @Test
-    void givenAValidAnnualIncome_whenGetAnnualDisposableIncomeIsInvoked_thenAnnualIncomeIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-        assertThat(CalculateContributionService.getAnnualDisposableIncome(null, annualDisposableIncome))
-                .isEqualTo(annualDisposableIncome);
-    }
-
-    @Test
-    void givenAValidAnnualIncomeAfterMagHardship_whenGetAnnualDisposableIncomeIsInvoked_thenAnnualIncomeAfterMagHardshipIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .disposableIncomeAfterMagHardship(annualDisposableIncome)
-                .build();
-        assertThat(CalculateContributionService.getAnnualDisposableIncome(contributionDTO, null))
-                .isEqualTo(annualDisposableIncome);
-    }
-
-    @Test
-    void givenAValidTotalAnnualIncome_whenGetAnnualDisposableIncomeIsInvoked_thenTotalAnnualIncomeIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .totalAnnualDisposableIncome(annualDisposableIncome)
-                .build();
-        assertThat(CalculateContributionService.getAnnualDisposableIncome(contributionDTO, null))
-                .isEqualTo(annualDisposableIncome);
-    }
-
-    @Test
-    void givenNoIncome_whenGetAnnualDisposableIncomeIsInvoked_thenZeroIsReturned() {
-        assertThat(CalculateContributionService.getAnnualDisposableIncome(ContributionDTO.builder().build(), null))
-                .isEqualTo(BigDecimal.ZERO);
-    }
-
-    @Test
-    void givenValidVariationAmount_whenCalculateVariationAmountIsInvoked_thenVariationAmountIsReturned() {
-        ApiCalculateHardshipByDetailResponse apiCalculateHardshipByDetailResponse = new ApiCalculateHardshipByDetailResponse()
-                .withHardshipSummary(BigDecimal.TEN);
-        when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
-                .thenReturn(apiCalculateHardshipByDetailResponse);
-        ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
-                .variationRule("+")
-                .build();
-        BigDecimal variationAmount = calculateContributionService.calculateVariationAmount(
-                TestModelDataBuilder.REP_ID, TestModelDataBuilder.LAA_TRANSACTION_ID, contributionVariationDTO);
-        assertThat(variationAmount).isEqualTo(BigDecimal.TEN);
-    }
-
-    @Test
-    void givenVariationRuleAsNull_whenCalculateVariationAmountIsInvoked_thenZeroIsReturned() {
-        ApiCalculateHardshipByDetailResponse apiCalculateHardshipByDetailResponse = new ApiCalculateHardshipByDetailResponse()
-                .withHardshipSummary(BigDecimal.TEN);
-        when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
-                .thenReturn(apiCalculateHardshipByDetailResponse);
-        ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
-                .build();
-        BigDecimal variationAmount = calculateContributionService.calculateVariationAmount(
-                TestModelDataBuilder.REP_ID, TestModelDataBuilder.LAA_TRANSACTION_ID, contributionVariationDTO);
-        assertThat(variationAmount).isEqualTo(BigDecimal.ZERO);
-    }
-
-    @Test
-    void givenCalcContribsAsN_whenCalcContribsIsInvoked_validResponseIsReturned() {
-        CalculateContributionResponse calculateContributionResponse = TestModelDataBuilder.getCalculateContributionResponse();
-        ContributionDTO contributionDTO = setupDataForCalcContribsTests();
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .calcContribs(Constants.N)
-                .build();
-        assertThat(calculateContributionService.calcContribs(contributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID))
-                .isEqualTo(calculateContributionResponse);
-    }
-
-    private ContributionDTO setupDataForCalcContribsTests() {
-        ContributionDTO contributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
-        when(maatCourtDataService.getContributionCalcParameters(anyString(), anyString())).thenReturn(new ContributionCalcParametersDTO());
-        when(contributionRulesService.getActiveCCOutcome(any())).thenReturn(CrownCourtOutcome.SUCCESSFUL);
-        when(contributionRulesService.isContributionRuleApplicable(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL))
-                .thenReturn(false);
-        return contributionDTO;
-    }
-
-    @Test
-    void givenUpliftCoteNotNullAndCalcContribsAsN_whenCalcContribsIsInvoked_validResponseIsReturned() {
-        CalculateContributionResponse calculateContributionResponse = TestModelDataBuilder.getCalculateContributionResponse();
-        ContributionDTO contributionDTO = setupDataForCalcContribsTests();
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .calcContribs(Constants.N)
-                .upliftCote(1)
-                .build();
-        assertThat(calculateContributionService.calcContribs(contributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID))
-                .isEqualTo(calculateContributionResponse);
-    }
-
-    @Test
-    void givenUpliftCoteNotNullAndUpliftAppliedIsPresent_whenCalcContribsIsInvoked_validResponseIsReturned() {
-        CalculateContributionResponse calculateContributionResponse = TestModelDataBuilder.getCalculateContributionResponse();
-        ContributionDTO contributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
-        when(contributionRulesService.getActiveCCOutcome(any())).thenReturn(CrownCourtOutcome.SUCCESSFUL);
-        when(contributionRulesService.isContributionRuleApplicable(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL))
-                .thenReturn(false);
-        when(maatCourtDataService.getContributionCalcParameters(anyString(), anyString()))
-                .thenReturn(ContributionCalcParametersDTO.builder()
-                        .upliftedIncomePercent(BigDecimal.TEN)
-                        .minUpliftedMonthlyAmount(BigDecimal.ONE)
-                        .build());
-        contributionDTO.setDateUpliftApplied(LocalDate.of(2023, 9, 9));
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .calcContribs(Constants.N)
-                .upliftCote(1)
-                .build();
-        calculateContributionResponse.setMonthlyContributions(BigDecimal.ONE);
-        calculateContributionResponse.setUpfrontContributions(null);
-        calculateContributionResponse.setUpliftApplied(Constants.Y);
-        calculateContributionResponse.setTotalMonths(null);
-        assertThat(calculateContributionService.calcContribs(contributionDTO, contributionResponseDTO, TestModelDataBuilder.LAA_TRANSACTION_ID))
-                .isEqualTo(calculateContributionResponse);
-    }
-
-    @Test
-    void givenDisposableIncomeAfterCrownHardship_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .disposableIncomeAfterCrownHardship(BigDecimal.TEN)
-                .build();
-        assertThat(calculateContributionService.calculateAnnualDisposableIncome(contributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID, CrownCourtOutcome.SUCCESSFUL, false))
-                .isEqualTo(BigDecimal.TEN);
-    }
-
-    @Test
-    void givenTotalAnnualDisposableIncome_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .totalAnnualDisposableIncome(BigDecimal.TEN)
-                .build();
-        assertThat(calculateContributionService.calculateAnnualDisposableIncome(contributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID, CrownCourtOutcome.SUCCESSFUL, false))
-                .isEqualTo(BigDecimal.TEN);
-    }
-
-    @Test
-    void givenNoIncome_whenCalculateAnnualDisposableIncomeIsInvoked_thenZeroIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .build();
-        assertThat(calculateContributionService.calculateAnnualDisposableIncome(contributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID, CrownCourtOutcome.SUCCESSFUL, false))
-                .isEqualTo(BigDecimal.ZERO);
-    }
-
-    @Test
-    void givenDisposableIncomeAfterCrownHardshipAndNoVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .disposableIncomeAfterCrownHardship(BigDecimal.TEN)
-                .magCourtOutcome(MagCourtOutcome.COMMITTED)
-                .caseType(CaseType.INDICTABLE)
-                .build();
-        when(contributionRulesService.getContributionVariation(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED,
-                CrownCourtOutcome.SUCCESSFUL)).thenReturn(Optional.empty());
-        assertThat(calculateContributionService.calculateAnnualDisposableIncome(contributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID, CrownCourtOutcome.SUCCESSFUL, true))
-                .isEqualTo(BigDecimal.TEN);
-    }
-
-    @Test
-    void givenDisposableIncomeAfterCrownHardshipAndValidVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
-        ContributionDTO contributionDTO = ContributionDTO.builder()
-                .disposableIncomeAfterCrownHardship(BigDecimal.TEN)
-                .magCourtOutcome(MagCourtOutcome.COMMITTED)
-                .caseType(CaseType.INDICTABLE)
-                .build();
-        when(contributionRulesService.getContributionVariation(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED,
-                CrownCourtOutcome.SUCCESSFUL)).thenReturn(Optional.of(ContributionVariationDTO.builder().build()));
-        assertThat(calculateContributionService.calculateAnnualDisposableIncome(contributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID, CrownCourtOutcome.SUCCESSFUL, true))
-                .isEqualTo(BigDecimal.TEN);
-    }
-
 }

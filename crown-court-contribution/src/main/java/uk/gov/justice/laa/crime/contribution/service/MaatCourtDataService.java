@@ -12,6 +12,9 @@ import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,6 +38,20 @@ public class MaatCourtDataService {
         List<Contribution> response = maatAPIClient.get(
                 new ParameterizedTypeReference<List<Contribution>>() {},
                 configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
+                Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
+                queryParams,
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
+        return response;
+    }
+
+
+    public Contribution findLatestSentContribution(Integer repId, String laaTransactionId) {
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        Contribution response = maatAPIClient.get(
+                new ParameterizedTypeReference<Contribution>() {},
+                configuration.getMaatApi().getContributionEndpoints().getFindLatestSentContributionUrl(),
                 Map.of(Constants.LAA_TRANSACTION_ID, laaTransactionId),
                 queryParams,
                 repId

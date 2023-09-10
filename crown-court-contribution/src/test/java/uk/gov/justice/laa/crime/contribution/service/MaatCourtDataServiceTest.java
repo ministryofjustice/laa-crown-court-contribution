@@ -1,17 +1,14 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.util.MultiValueMap;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.commons.common.Constants;
 import org.springframework.core.ParameterizedTypeReference;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
@@ -20,6 +17,9 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
@@ -56,6 +56,13 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.findContribution(TEST_REP_ID, LAA_TRANSACTION_ID, true);
         verify(maatCourtDataClient).get(any(), anyString(), anyMap(), any(), anyInt());
     }
+
+    @Test
+    void givenValidRepId_whenFindLatestSentContributionContributionIsInvoked_thenResponseIsReturned() {
+        maatCourtDataService.findLatestSentContribution(TEST_REP_ID, LAA_TRANSACTION_ID);
+        verify(maatCourtDataClient).get(any(), anyString(), anyMap(), any(), anyInt());
+    }
+
 
     @Test
     void givenValidParams_whenCreateContributionIsInvoked_thenResponseIsReturned() {

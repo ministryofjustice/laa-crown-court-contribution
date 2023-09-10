@@ -6,14 +6,12 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class GetContributionAmountRequestMapperTest {
@@ -24,11 +22,11 @@ class GetContributionAmountRequestMapperTest {
     @Test
     void givenAValidContributionDTOAndAssessmentResult_whenMapIsInvoked_thenReturnGetContributionAmountRequest() {
 
-        ContributionDTO contributionDTO = ContributionDTO.builder().caseType(CaseType.APPEAL_CC).appealType(AppealType.ACN)
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder().caseType(CaseType.APPEAL_CC).appealType(AppealType.ACN)
                         .lastOutcome(TestModelDataBuilder.buildLastOutcome_1()).build();
         GetContributionAmountRequestMapper mapper = new GetContributionAmountRequestMapper();
 
-        GetContributionAmountRequest request = mapper.map(contributionDTO, AssessmentResult.PASS);
+        GetContributionAmountRequest request = mapper.map(calculateContributionDTO, AssessmentResult.PASS);
 
         softly.assertThat(request.getCaseType()).isEqualTo(CaseType.APPEAL_CC);
         softly.assertThat(request.getAppealType()).isEqualTo(AppealType.ACN);

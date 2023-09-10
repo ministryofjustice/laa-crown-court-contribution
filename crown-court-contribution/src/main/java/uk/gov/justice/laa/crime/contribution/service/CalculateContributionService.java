@@ -3,237 +3,41 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.NewWorkReason;
-import uk.gov.justice.laa.crime.contribution.util.DateUtil;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.util.CalculateContributionUtil;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
+
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CalculateContributionService {
-
-    private final MaatCourtDataService maatCourtDataService;
-    private final CrimeHardshipService crimeHardshipService;
-
-    private final AppealContributionService appealContributionService;
-    private final CompareContributionService compareContributionService;
-    private final ContributionRulesService contributionRulesService;
-    private final CreateContributionRequestMapper createContributionRequestMapper;
-
-    public CalculateContributionResponse calculateContribution(ContributionDTO contributionDTO, String laaTransactionId) {
-        CalculateContributionResponse response = new CalculateContributionResponse();
-
-        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(contributionDTO.getRepId(), laaTransactionId);
-        contributionDTO.setRepOrderDTO(repOrderDTO);
-
-        if (CaseType.APPEAL_CC.equals(contributionDTO.getCaseType())) {
-            // TODO - refactor appealContribs to return response OR map the response from the appealContribs to response object
-            appealContributionService.calculateAppealContribution(contributionDTO, laaTransactionId);
-        }
-
-        return response;
-
-    }
-
-    public Contribution createContribs(ContributionDTO contributionDTO, String laaTransactionId) {
-        log.info("Inactivate existing Contribution and create a new Contribution");
-        CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(contributionDTO);
-        return compareContributionService.compareContribution(contributionDTO) < 2 ?
-                maatCourtDataService.createContribution(createContributionRequest, laaTransactionId) : null;
-    }
-
-    public CalculateContributionResponse calcContribs(ContributionDTO contributionDTO, ContributionResponseDTO contributionResponseDTO, String laaTransactionId) {
-        CalculateContributionResponse response = new CalculateContributionResponse();
-        LocalDate assEffectiveDate = getEffectiveDate(contributionDTO);
-        ContributionCalcParametersDTO contributionCalcParametersDTO = maatCourtDataService.getContributionCalcParameters(assEffectiveDate.toString(), laaTransactionId);
-        CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(contributionDTO.getCrownCourtSummary());
-        boolean isContributionRuleApplicable = contributionRulesService.isContributionRuleApplicable(contributionDTO.getCaseType(),
-                contributionDTO.getMagCourtOutcome(), crownCourtOutcome);
-
-        BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(contributionDTO, laaTransactionId, crownCourtOutcome, isContributionRuleApplicable);
-
-        if (contributionResponseDTO.getUpliftCote() != null &&
-                contributionDTO.getDateUpliftApplied() != null &&
-                contributionDTO.getDateUpliftRemoved() == null) {
-            BigDecimal monthlyContributions = calculateUpliftedMonthlyAmount(annualDisposableIncome, contributionCalcParametersDTO);
+    public ApiCalculateContributionResponse calculateContribution(ApiCalculateContributionRequest request) {
+        ApiCalculateContributionResponse response = new ApiCalculateContributionResponse();
+        if(Boolean.TRUE.equals(request.getUpliftApplied())) {
+            BigDecimal monthlyContributions = CalculateContributionUtil.calculateUpliftedMonthlyAmount(request.getAnnualDisposableIncome(),
+                    request.getUpliftedIncomePercent(), request.getMinUpliftedMonthlyAmount());
             response.setMonthlyContributions(monthlyContributions);
             response.setUpliftApplied(Constants.Y);
-        } else if (contributionResponseDTO.getCalcContribs().equals(Constants.N)) {
-            response.setMonthlyContributions(BigDecimal.ZERO);
-            response.setUpfrontContributions(BigDecimal.ZERO);
-            response.setUpliftApplied(Constants.N);
-            response.setBasedOn(null);
-            response.setTotalMonths(0);
         } else {
-            BigDecimal monthlyContributions = calculateDisposableContribution(annualDisposableIncome, contributionCalcParametersDTO);
+            BigDecimal monthlyContributions = CalculateContributionUtil.calculateMonthlyContribution(request.getAnnualDisposableIncome(),
+                    request.getDisposableIncomePercent(),
+                    request.getMinimumMonthlyAmount());
             response.setUpliftApplied(Constants.N);
-            if (monthlyContributions.compareTo(contributionDTO.getContributionCap()) > 0) {
-                response.setMonthlyContributions(contributionDTO.getContributionCap());
-                response.setBasedOn("Offence Type");
+            BigDecimal contributionCap = request.getContributionCap();
+            if (contributionCap != null && monthlyContributions.compareTo(contributionCap) > 0) {
+                response.setMonthlyContributions(contributionCap);
+                response.setBasedOn(Constants.OFFENCE_TYPE);
             } else {
                 response.setMonthlyContributions(monthlyContributions);
-                response.setBasedOn("Means");
+                response.setBasedOn(Constants.MEANS);
             }
-            response.setUpfrontContributions(calculateUpfrontContributions(contributionDTO, contributionCalcParametersDTO));
+            response.setUpfrontContributions(CalculateContributionUtil.calculateUpfrontContributions(monthlyContributions,
+                    request.getContributionCap(), request.getUpfrontTotalMonths()));
         }
-
-        response.setContributionCap(contributionDTO.getContributionCap()); // TODO refactor the request to pass the offenceType object for Contribs Cap
-        response.setEffectiveDate(getEffectiveDateByNewWorkReason(contributionDTO, response.getMonthlyContributions(), assEffectiveDate));
         return response;
-    }
-
-    public BigDecimal calculateAnnualDisposableIncome(ContributionDTO contributionDTO, String laaTransactionId, CrownCourtOutcome crownCourtOutcome, boolean isContributionRuleApplicable) {
-        BigDecimal annualDisposableIncome = contributionDTO.getDisposableIncomeAfterCrownHardship();
-        if (isContributionRuleApplicable) {
-            annualDisposableIncome = getAnnualDisposableIncome(contributionDTO, annualDisposableIncome);
-            Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(contributionDTO.getCaseType(), contributionDTO.getMagCourtOutcome(),
-                    crownCourtOutcome);
-
-            if (contributionVariation.isPresent()) {
-                annualDisposableIncome = annualDisposableIncome
-                        .add(calculateVariationAmount(contributionDTO.getRepId(), laaTransactionId, contributionVariation.get()));
-            }
-        } else {
-            if (annualDisposableIncome == null) {
-                if (contributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    annualDisposableIncome = contributionDTO.getTotalAnnualDisposableIncome();
-                } else annualDisposableIncome = BigDecimal.ZERO;
-            }
-        }
-        return annualDisposableIncome;
-    }
-
-    public BigDecimal calculateVariationAmount(final Integer repId,
-                                                final String laaTransactionId,
-                                                final ContributionVariationDTO contributionVariation) {
-        ApiCalculateHardshipByDetailResponse apiCalculateHardshipByDetailResponse =
-                crimeHardshipService.calculateHardshipForDetail(new ApiCalculateHardshipByDetailRequest()
-                        .withDetailType(contributionVariation.getVariation())
-                        .withRepId(repId)
-                        .withLaaTransactionId(laaTransactionId));
-        if ("+".equals(contributionVariation.getVariationRule())) {
-            return apiCalculateHardshipByDetailResponse.getHardshipSummary();
-        } else return BigDecimal.ZERO;
-    }
-
-    public static BigDecimal getAnnualDisposableIncome(final ContributionDTO contributionDTO, final BigDecimal annualDisposableIncome) {
-        if (annualDisposableIncome == null) {
-            if ((contributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
-                return contributionDTO.getDisposableIncomeAfterMagHardship();
-            } else {
-                if (contributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    return contributionDTO.getTotalAnnualDisposableIncome();
-                } else return BigDecimal.ZERO;
-            }
-        }
-        return annualDisposableIncome;
-    }
-
-    public static String getEffectiveDateByNewWorkReason(final ContributionDTO contributionDTO, final BigDecimal monthlyContributions, final LocalDate assEffectiveDate) {
-        NewWorkReason newWorkReason = getNewWorkReason(contributionDTO);
-        if (NewWorkReason.FMA == newWorkReason) {
-            return assEffectiveDate.toString();
-        } else if (NewWorkReason.PAI == newWorkReason) {
-            if (contributionDTO.getMonthlyContributions().compareTo(monthlyContributions) <= 0) {
-                return contributionDTO.getEffectiveDate().toString();
-            } else return assEffectiveDate.toString();
-        } else {
-            if (contributionDTO.getEffectiveDate() == null) {
-                return assEffectiveDate.toString();
-            } else return contributionDTO.getEffectiveDate().toString();
-        }
-    }
-
-    public static NewWorkReason getNewWorkReason(final ContributionDTO contributionDTO) {
-        return contributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst()
-                .map(Assessment::getNewWorkReason)
-                .orElse(contributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
-                        .map(Assessment::getNewWorkReason).orElse(null));
-    }
-
-    /**
-     * This method calculates the upfront contributions based on the below logic:
-     * //        p_application_object.crown_court_overview_object.contributions_object.upfront_contribs
-     * //                      := least(p_application_object.crown_court_overview_object.contributions_object.monthly_contribs * v_UPFRONT_TOTAL_MONTHS
-     * //                ,p_application_object.offence_type_object.contribs_cap);
-     */
-    public static BigDecimal calculateUpfrontContributions(final ContributionDTO contributionDTO, final ContributionCalcParametersDTO contributionCalcParametersDTO) {
-        BigDecimal upfrontContribution = contributionDTO.getMonthlyContributions().multiply(BigDecimal.valueOf(contributionCalcParametersDTO.getUpfrontTotalMonths()));
-        if (upfrontContribution.compareTo(contributionDTO.getContributionCap()) < 0) {
-            return upfrontContribution;
-        } else return contributionDTO.getContributionCap();
-    }
-
-    public static BigDecimal calculateDisposableContribution(final BigDecimal annualDisposableIncome, final ContributionCalcParametersDTO contributionCalcParametersDTO) {
-        BigDecimal monthlyContributionsCalc = annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
-                .multiply(contributionCalcParametersDTO.getDisposableIncomePercent())
-                .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR);
-        BigDecimal monthlyContributions = (monthlyContributionsCalc.compareTo(BigDecimal.ZERO) > 0) ? monthlyContributionsCalc : BigDecimal.ZERO;
-
-        if (monthlyContributions.compareTo(contributionCalcParametersDTO.getMinimumMonthlyAmount()) < 0) {
-            return BigDecimal.ZERO;
-        } else return monthlyContributions;
-    }
-
-    /**
-     * This method calculates the uplifted monthly amount based on the following logic:
-     * //        p_application_object.crown_court_overview_object.contributions_object.monthly_contribs
-     * //               := floor(greatest(
-     * //               (v_annual_disposable_income/12)  * (v_UPLIFTED_INCOME_PERCENT / 100), v_MIN_UPLIFTED_MONTHLY_AMOUNT)
-     * //               );
-     */
-    public static BigDecimal calculateUpliftedMonthlyAmount(final BigDecimal annualDisposableIncome, final ContributionCalcParametersDTO contributionCalcParametersDTO) {
-        BigDecimal monthlyContributionsCalc = annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
-                .multiply(contributionCalcParametersDTO.getUpliftedIncomePercent())
-                .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR);
-        if (monthlyContributionsCalc.compareTo(contributionCalcParametersDTO.getMinUpliftedMonthlyAmount()) > 0) {
-            return monthlyContributionsCalc;
-        } else {
-            return contributionCalcParametersDTO.getMinUpliftedMonthlyAmount();
-        }
-    }
-
-    /**
-     * This method returns the date based on the following logic:
-     * v_effective_date := greatest(nvl(p_application_object.committal_date,to_date('01/01/1900', 'dd/mm/yyyy' ))
-     * ,coalesce(p_application_object.passport_assessment_object.ass_date
-     * ,p_application_object.current_assessment_object.fin_assessment_object.full_assessment_object.assessment_date
-     * ,p_application_object.current_assessment_object.fin_assessment_object.initial_assessment_object.assessment_date)
-     * );
-     **/
-    public static LocalDate getEffectiveDate(final ContributionDTO contributionDTO) {
-        LocalDate committalDate = contributionDTO.getCommittalDate();
-        Optional<Assessment> passAssessment = contributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst();
-        LocalDateTime assessmentDate = passAssessment.map(Assessment::getAssessmentDate).orElse(null);
-        if (assessmentDate == null) {
-            Optional<Assessment> fullAssessment = contributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
-            assessmentDate = fullAssessment.map(Assessment::getAssessmentDate).orElse(null);
-            if (assessmentDate == null) {
-                Optional<Assessment> initAssessment = contributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
-                assessmentDate = initAssessment.map(Assessment::getAssessmentDate).orElse(null);
-            }
-        }
-        if (committalDate == null) {
-            return DateUtil.parseLocalDate(assessmentDate);
-        } else {
-            LocalDate assDate = DateUtil.parseLocalDate(assessmentDate);
-            if (committalDate.isAfter(assDate)) {
-                return committalDate;
-            } else {
-                return assDate;
-            }
-        }
     }
 }

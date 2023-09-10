@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.justice.laa.crime.contribution.model.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.contribution.model.Assessment;
-import uk.gov.justice.laa.crime.contribution.model.LastOutcome__1;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome__1;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
@@ -21,7 +21,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContributionDTO {
+public class CalculateContributionDTO {
 
     private String laaTransactionId;
     private Integer id;

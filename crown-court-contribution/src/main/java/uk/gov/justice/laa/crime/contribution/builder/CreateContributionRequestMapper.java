@@ -2,9 +2,9 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.AppealContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.AppealContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 
 import java.math.BigDecimal;
 
@@ -29,29 +29,29 @@ public class CreateContributionRequestMapper {
 
     }
 
-    public CreateContributionRequest map(ContributionDTO contributionDTO, BigDecimal appealContributionAmount) {
-        CreateContributionRequest createContributionRequest = map(contributionDTO);
+    public CreateContributionRequest map(CalculateContributionDTO calculateContributionDTO, BigDecimal appealContributionAmount) {
+        CreateContributionRequest createContributionRequest = map(calculateContributionDTO);
         return createContributionRequest.withUpfrontContributions(appealContributionAmount);
     }
 
-    public CreateContributionRequest map(ContributionDTO contributionDTO) {
+    public CreateContributionRequest map(CalculateContributionDTO calculateContributionDTO) {
         return new CreateContributionRequest()
-                .withRepId(contributionDTO.getRepId())
-                .withApplId(contributionDTO.getApplId())
-                .withContributionCap(contributionDTO.getContributionCap())
-                .withEffectiveDate(convertDateToDateTime(contributionDTO.getEffectiveDate()))
-                .withMonthlyContributions(contributionDTO.getMonthlyContributions())
-                .withUpliftApplied(contributionDTO.getUpliftApplied())
-                .withBasedOn(contributionDTO.getBasedOn())
-                .withUserCreated(contributionDTO.getUserCreated())
-                .withCorrespondenceId(contributionDTO.getCorrespondenceId())
-                .withCreateContributionOrder(contributionDTO.getCreateContributionOrder())
-                .withCalcDate(convertDateToDateTime(contributionDTO.getCalcDate()))
-                .withContributionFileId(contributionDTO.getContributionFileId())
-                .withDateUpliftApplied(convertDateToDateTime(contributionDTO.getDateUpliftApplied()))
-                .withDateUpliftRemoved(convertDateToDateTime(contributionDTO.getDateUpliftRemoved()))
-                .withTransferStatus(contributionDTO.getTransferStatus())
-                .withUserCreated(contributionDTO.getUserCreated())
-                .withUpfrontContributions(contributionDTO.getUpfrontContributions());
+                .withRepId(calculateContributionDTO.getRepId())
+                .withApplId(calculateContributionDTO.getApplId())
+                .withContributionCap(calculateContributionDTO.getContributionCap())
+                .withEffectiveDate(convertDateToDateTime(calculateContributionDTO.getEffectiveDate()))
+                .withMonthlyContributions(calculateContributionDTO.getMonthlyContributions())
+                .withUpliftApplied(calculateContributionDTO.getUpliftApplied())
+                .withBasedOn(calculateContributionDTO.getBasedOn())
+                .withUserCreated(calculateContributionDTO.getUserCreated())
+                .withCorrespondenceId(calculateContributionDTO.getCorrespondenceId())
+                .withCreateContributionOrder(calculateContributionDTO.getCreateContributionOrder())
+                .withCalcDate(convertDateToDateTime(calculateContributionDTO.getCalcDate()))
+                .withContributionFileId(calculateContributionDTO.getContributionFileId())
+                .withDateUpliftApplied(convertDateToDateTime(calculateContributionDTO.getDateUpliftApplied()))
+                .withDateUpliftRemoved(convertDateToDateTime(calculateContributionDTO.getDateUpliftRemoved()))
+                .withTransferStatus(calculateContributionDTO.getTransferStatus())
+                .withUserCreated(calculateContributionDTO.getUserCreated())
+                .withUpfrontContributions(calculateContributionDTO.getUpfrontContributions());
     }
 }

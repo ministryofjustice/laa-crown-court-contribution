@@ -120,6 +120,14 @@
     "seHistoryId": {
       "type": "integer",
       "description": "The se history ID"
+    },
+    "contributionsSummary": {
+      "type": "array",
+      "description": "List of Contributions Summary",
+      "minItems": 1,
+      "items": {
+        "$ref": "../common/ContributionSummary.json"
+      }
     }
   },
   "additionalProperties": false

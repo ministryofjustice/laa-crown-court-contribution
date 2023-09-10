@@ -3,17 +3,18 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContributionDTOBuilder {
 
-    public static ContributionDTO build(final CalculateContributionRequest request) {
-        ContributionDTO.ContributionDTOBuilder builder = ContributionDTO.builder()
+    public static CalculateContributionDTO build(final MaatCalculateContributionRequest request) {
+        CalculateContributionDTO.CalculateContributionDTOBuilder builder = CalculateContributionDTO.builder()
                 .id(request.getRepId())
                 .applId(request.getApplId())
                 .repId(request.getRepId())
@@ -55,8 +56,8 @@ public class ContributionDTOBuilder {
 
     }
 
-    public static ContributionDTO build(Contribution contribution) {
-        ContributionDTO.ContributionDTOBuilder builder = ContributionDTO.builder()
+    public static CalculateContributionDTO build(Contribution contribution) {
+        CalculateContributionDTO.CalculateContributionDTOBuilder builder = CalculateContributionDTO.builder()
                 .id(contribution.getId())
                 .applId(contribution.getApplId())
                 .repId(contribution.getRepId())
@@ -84,6 +85,29 @@ public class ContributionDTOBuilder {
                 .seHistoryId(contribution.getSeHistoryId());
 
         return builder.build();
-
     }
+
+
+    public static CalculateContributionDTO build(final CreateContributionRequest request) {
+        CalculateContributionDTO.CalculateContributionDTOBuilder builder = CalculateContributionDTO.builder()
+                .applId(request.getApplId())
+                .repId(request.getRepId())
+                .contributionFileId(request.getContributionFileId())
+                .effectiveDate(request.getEffectiveDate() != null ? request.getEffectiveDate().toLocalDate() : null)
+                .calcDate(request.getCalcDate() != null ? request.getCalcDate().toLocalDate() : null)
+                .contributionCap(request.getContributionCap())
+                .monthlyContributions(request.getMonthlyContributions())
+                .upfrontContributions(request.getUpfrontContributions())
+                .upliftApplied(request.getUpliftApplied())
+                .basedOn(request.getBasedOn())
+                .transferStatus(request.getTransferStatus() != null ? request.getTransferStatus() : null)
+                .dateUpliftApplied(request.getDateUpliftApplied() != null ? request.getDateUpliftApplied().toLocalDate() : null)
+                .dateUpliftRemoved(request.getDateUpliftRemoved() != null ? request.getDateUpliftRemoved().toLocalDate() : null)
+                .createContributionOrder(request.getCreateContributionOrder())
+                .userCreated(request.getUserCreated())
+                .correspondenceId(request.getCorrespondenceId());
+
+        return builder.build();
+    }
+
 }
