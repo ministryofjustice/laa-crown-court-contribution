@@ -27,7 +27,7 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @WebMvcTest(CrownCourtCalculateContributionController.class)
 class CrownCourtCalculateContributionControllerTest {
 
-    private static final String ENDPOINT_URL = "/api/internal/v2/contribution/calculateContribution";
+    private static final String ENDPOINT_URL = "/api/internal/v2/contribution/calculate";
 
     @Autowired
     private MockMvc mvc;
