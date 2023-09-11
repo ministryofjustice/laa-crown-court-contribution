@@ -191,8 +191,8 @@ public class ContributionService {
         List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId, laaTransactionId);
         if (null != repOrderCCOutcomeList && !repOrderCCOutcomeList.isEmpty()) {
             Optional<RepOrderCCOutcomeDTO> outcomeDTO = repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
-            return !(null == outcomeDTO.get().getOutcome()
-                    || CrownCourtOutcome.AQUITTED.getCode().equals(outcomeDTO.get().getOutcome()));
+            return outcomeDTO.isPresent() && outcomeDTO.get().getOutcome() != null
+                    && CrownCourtOutcome.AQUITTED.getCode().equals(outcomeDTO.get().getOutcome());
         }
         return false;
     }

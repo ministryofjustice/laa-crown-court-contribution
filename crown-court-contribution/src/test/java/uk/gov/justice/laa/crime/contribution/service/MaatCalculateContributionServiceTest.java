@@ -811,4 +811,33 @@ class MaatCalculateContributionServiceTest {
         );
         assertThat(response.getProcessActivity()).isTrue();
     }
-}
+
+    @Test
+    void givenATemplateAndContributionsAreNotCreated_whenDoContribsIsInvoked_thenProcessActivityFlagIsNull() {
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
+
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .template(1)
+                .build();
+        when(calculateContributionService.calculateContribution(any())).thenReturn(new ApiCalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.TEN));
+        MaatCalculateContributionResponse maatCalculateContributionResponse = TestModelDataBuilder.getMaatCalculateContributionResponse();
+        when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any())).thenReturn(maatCalculateContributionResponse);
+        when(maatCourtDataService.findLatestSentContribution(any(), any())).thenReturn(Contribution.builder()
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ONE)
+                .build());
+        when(maatCalculateContributionService.verifyAndCreateContribs(
+                calculateContributionDTO, "", true, null, maatCalculateContributionResponse, null
+        )).thenReturn(null);
+
+        MaatCalculateContributionResponse response = maatCalculateContributionService.doContribs(
+                calculateContributionDTO,
+                "",
+                contributionResponseDTO,
+                null,
+                true,
+                null
+        );
+        assertThat(response.getProcessActivity()).isNull();
+    }}
