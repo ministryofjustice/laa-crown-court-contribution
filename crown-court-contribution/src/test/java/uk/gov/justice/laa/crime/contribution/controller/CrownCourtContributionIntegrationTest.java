@@ -20,9 +20,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
 import java.math.BigDecimal;
@@ -45,7 +47,10 @@ class CrownCourtContributionIntegrationTest {
 
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);
-    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/appeal";
+    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/";
+
+    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/get-contribution-summaries";
+
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -58,6 +63,9 @@ class CrownCourtContributionIntegrationTest {
 
     @Value("${services.maat-api.contribution-endpoints.get-rep-order-url}")
     private String getRepOrderUrl;
+
+    @Value("${services.maat-api.contribution-endpoints.summary-url}")
+    private String summaryUrl;
 
     @Value("${services.maat-api.contribution-endpoints.get-appeal-amount-url}")
     private String getAppealAmountUrl;
@@ -238,4 +246,47 @@ class CrownCourtContributionIntegrationTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
+
+
+
+    @Test
+    void givenMaatApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
+        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        String requestData = objectMapper.writeValueAsString(maatCalculateContributionRequest);
+        var summariesUrl = UriComponentsBuilder.fromUriString(summaryUrl)
+                .build(maatCalculateContributionRequest.getRepId());
+        wiremock.stubFor(get(summariesUrl.getPath())
+                .willReturn(
+                        WireMock.aResponse()
+                                .withStatus(NOT_IMPLEMENTED.code())
+                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                )
+        );
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+
+    @Test
+    void givenMaatCalculateContributionRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
+        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        String requestData = objectMapper.writeValueAsString(maatCalculateContributionRequest);
+        List<ContributionsSummaryDTO> contributionsSummaryDTOList = List.of(TestModelDataBuilder.getContributionSummaryDTO());
+
+        var summariesUrl = UriComponentsBuilder.fromUriString(summaryUrl)
+                .build(maatCalculateContributionRequest.getRepId());
+        wiremock.stubFor(get(urlPathEqualTo(summariesUrl.getPath()))
+                .willReturn(
+                        WireMock.ok()
+                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                                .withBody(objectMapper.writeValueAsString(contributionsSummaryDTOList))
+                )
+        );
+
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
+                .andExpect(status().isOk());
+    }
+
+
 }
