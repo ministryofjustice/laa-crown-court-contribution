@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.contribution.builder.UpdateContributionRequestMa
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
@@ -132,7 +133,6 @@ public class MaatCalculateContributionService {
             currentContributionFileId = currentContribution.getContributionFileId();
         } else {
             log.error("C3 Service: Current Contribution Is NULL.");
-
         }
         if ((calculateContributionDTO.getMonthlyContributions() != null
                 && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
@@ -223,10 +223,9 @@ public class MaatCalculateContributionService {
                 calculateContributionDTO.getContributionCap());
 
         // Revisit the request to pass the offenceType object for Contribs Cap
-        return maatCalculateContributionResponseMapper.map(calculateContributionService.calculateContribution(apiCalculateContributionRequest),
-                calculateContributionDTO.getContributionCap(),
-                getEffectiveDateByNewWorkReason(calculateContributionDTO,
-                        calculateContributionDTO.getContributionCap(), assEffectiveDate), totalMonths);
+        ApiCalculateContributionResponse apiCalculateContributionResponse = calculateContributionService.calculateContribution(apiCalculateContributionRequest);
+        String effectiveDate = getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(), assEffectiveDate);
+        return maatCalculateContributionResponseMapper.map(apiCalculateContributionResponse, calculateContributionDTO.getContributionCap(), effectiveDate, totalMonths);
     }
 
     private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {

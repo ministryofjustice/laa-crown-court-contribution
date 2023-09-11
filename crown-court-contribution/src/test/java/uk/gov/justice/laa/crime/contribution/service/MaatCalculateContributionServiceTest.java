@@ -12,10 +12,12 @@ import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionRe
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
-import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
@@ -744,8 +746,8 @@ class MaatCalculateContributionServiceTest {
                 .upfrontTotalMonths(2)
                 .build());
         when(maatCourtDataService.findLatestSentContribution(any(), any())).thenReturn(Contribution.builder()
-                        .monthlyContributions(BigDecimal.TEN)
-                        .upfrontContributions(BigDecimal.ONE)
+                .monthlyContributions(BigDecimal.TEN)
+                .upfrontContributions(BigDecimal.ONE)
                 .build());
         when(calculateContributionRequestMapper.map(any(), any(), any(), any())).thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
         when(calculateContributionService.calculateContribution(any())).thenReturn(TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
@@ -764,15 +766,7 @@ class MaatCalculateContributionServiceTest {
         when(contributionService.checkReassessment(repOrderDTO, TestModelDataBuilder.LAA_TRANSACTION_ID)).thenReturn(true);
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder().doContribs(Constants.Y).build();
         when(contributionService.checkContribsCondition(any())).thenReturn(contributionResponseDTO);
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .assessments(List.of(new Assessment()
-                        .withAssessmentType(AssessmentType.INIT)
-                        .withResult(AssessmentResult.PASS)
-                        .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
-                .effectiveDate(LocalDate.now())
-                .monthlyContributions(BigDecimal.ZERO)
-                .build();
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
         MaatCalculateContributionResponse expectedResponse = new MaatCalculateContributionResponse()
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpfrontContributions(BigDecimal.ZERO)
@@ -788,4 +782,33 @@ class MaatCalculateContributionServiceTest {
                 .isEqualTo(expectedResponse);
     }
 
+    @Test
+    void givenATemplateAndContributionsAreCreated_whenDoContribsIsInvoked_thenProcessActivityFlagIsTrue() {
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
+
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .template(1)
+                .build();
+        when(calculateContributionService.calculateContribution(any())).thenReturn(new ApiCalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.TEN));
+        MaatCalculateContributionResponse maatCalculateContributionResponse = TestModelDataBuilder.getMaatCalculateContributionResponse();
+        when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any())).thenReturn(maatCalculateContributionResponse);
+        when(maatCourtDataService.findLatestSentContribution(any(), any())).thenReturn(Contribution.builder()
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ONE)
+                .build());
+        when(maatCalculateContributionService.verifyAndCreateContribs(
+                calculateContributionDTO, "", true, null, maatCalculateContributionResponse, null
+        )).thenReturn(new Contribution());
+
+        MaatCalculateContributionResponse response = maatCalculateContributionService.doContribs(
+                calculateContributionDTO,
+                "",
+                contributionResponseDTO,
+                null,
+                true,
+                null
+        );
+        assertThat(response.getProcessActivity()).isTrue();
+    }
 }

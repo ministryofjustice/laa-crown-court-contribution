@@ -517,4 +517,17 @@ public class TestModelDataBuilder {
                 .withUpfrontContributions(BigDecimal.ZERO)
                 .withUpliftApplied(Constants.Y);
     }
+
+    public static CalculateContributionDTO getCalculateContributionDTO() {
+        return CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .assessments(List.of(new Assessment()
+                        .withAssessmentType(AssessmentType.INIT)
+                        .withResult(AssessmentResult.PASS)
+                        .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
+                .effectiveDate(LocalDate.now())
+                .monthlyContributions(BigDecimal.ZERO)
+                .build();
+    }
+
 }
