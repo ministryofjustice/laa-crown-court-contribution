@@ -21,6 +21,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 
 @ExtendWith(MockitoExtension.class)
 class CalculateContributionServiceTest {
@@ -47,6 +48,8 @@ class CalculateContributionServiceTest {
 
     @Mock
     private ContributionService contributionService;
+
+    private static final String LAA_TRANSACTION_ID = "laaTransactionId";
 
     @Test
     void givenAValidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
@@ -772,4 +775,15 @@ class CalculateContributionServiceTest {
         assertThat(calculateContributionService.getCalculateContributionResponse(calculateContributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID, repOrderDTO))
                 .isEqualTo(calculateContributionResponse);
     }
+
+
+
+    @Test
+    void givenAValidCalculateContributionDTO_whenGetContributionSummariesIsInvoked_thenContributionSummaryListIsReturned() {
+        when(maatCourtDataService.getContributionsSummary(REP_ID, LAA_TRANSACTION_ID)).thenReturn(List.of(TestModelDataBuilder.getContributionSummaryDTO()));
+        List<ContributionSummary> contributionSummaries = calculateContributionService.getContributionSummaries(TestModelDataBuilder.getContributionDTOForCalcContribs(), LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getContributionsSummary(REP_ID, LAA_TRANSACTION_ID);
+        assertThat(contributionSummaries).isNotNull();
+    }
+
 }

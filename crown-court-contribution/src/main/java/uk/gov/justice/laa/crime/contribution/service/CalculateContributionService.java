@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.UpdateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
@@ -33,6 +34,7 @@ public class CalculateContributionService {
     private final CreateContributionRequestMapper createContributionRequestMapper;
     private final ContributionService contributionService;
     private final UpdateContributionRequestMapper updateContributionRequestMapper;
+    private final ContributionSummaryMapper contributionSummaryMapper;
     private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
             MagCourtOutcome.COMMITTED_FOR_TRIAL,
             MagCourtOutcome.APPEAL_TO_CC);
@@ -49,7 +51,16 @@ public class CalculateContributionService {
             response = getCalculateContributionResponse(calculateContributionDTO, laaTransactionId, repOrderDTO);
         }
 
+        List<ContributionSummary> contributionSummaryList = getContributionSummaries(calculateContributionDTO, laaTransactionId);
+        response.setContributionsSummary(contributionSummaryList);
+
         return response;
+    }
+
+
+    protected List<ContributionSummary> getContributionSummaries(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
+        List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(calculateContributionDTO.getRepId(), laaTransactionId);
+        return contribSummaryList.stream().map(contributionSummaryMapper::map).toList();
     }
 
     public CalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
