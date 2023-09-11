@@ -7,11 +7,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.model.common.ContributionSummary;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
@@ -65,6 +67,9 @@ class MaatCalculateContributionServiceTest {
 
     @Mock
     private MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
+
+    @Mock
+    private ContributionSummaryMapper contributionSummaryMapper;
 
     @Test
     void givenAValidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
@@ -783,7 +788,20 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenATemplateAndContributionsAreCreated_whenDoContribsIsInvoked_thenProcessActivityFlagIsTrue() {
+    void givenAValidCalculateContributionDTO_whenGetContributionSummariesIsInvoked_thenContributionSummaryListIsReturned() {
+        List<ContributionsSummaryDTO> contributionSummaryDTO = List.of(TestModelDataBuilder.getContributionSummaryDTO());
+        when(maatCourtDataService.getContributionsSummary(any(), any())).thenReturn(contributionSummaryDTO);
+        ContributionSummary contributionSummary =  new ContributionSummary();
+        when(contributionSummaryMapper.map(any())).thenReturn(contributionSummary);
+        MaatCalculateContributionResponse response = maatCalculateContributionService.getContributionSummaries(TestModelDataBuilder.getContributionDTOForCalcContribs(), TestModelDataBuilder.LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getContributionsSummary(any(), any());
+        assertThat(response.getContributionsSummary()).isEqualTo(List.of(contributionSummary));
+
+    }
+
+
+  @Test  
+  void givenATemplateAndContributionsAreCreated_whenDoContribsIsInvoked_thenProcessActivityFlagIsTrue() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
 
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()

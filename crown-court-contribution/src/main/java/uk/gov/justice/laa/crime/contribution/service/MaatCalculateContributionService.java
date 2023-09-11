@@ -3,16 +3,14 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
-import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
-import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
-import uk.gov.justice.laa.crime.contribution.builder.UpdateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.common.ContributionSummary;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
@@ -35,6 +33,7 @@ public class MaatCalculateContributionService {
     private final CompareContributionService compareContributionService;
     private final ContributionRulesService contributionRulesService;
     private final CalculateContributionService calculateContributionService;
+    private final ContributionSummaryMapper contributionSummaryMapper;
 
     private final CreateContributionRequestMapper createContributionRequestMapper;
     private final ContributionService contributionService;
@@ -45,6 +44,81 @@ public class MaatCalculateContributionService {
     private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
             MagCourtOutcome.COMMITTED_FOR_TRIAL,
             MagCourtOutcome.APPEAL_TO_CC);
+
+    private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {
+        return contributionResponseDTO.getUpliftCote() != null &&
+                calculateContributionDTO.getDateUpliftApplied() != null &&
+                calculateContributionDTO.getDateUpliftRemoved() == null;
+    }
+
+    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO, final BigDecimal annualDisposableIncome) {
+        if (annualDisposableIncome == null) {
+            if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
+                return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
+            } else {
+                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
+                    return calculateContributionDTO.getTotalAnnualDisposableIncome();
+                } else return BigDecimal.ZERO;
+            }
+        }
+        return annualDisposableIncome;
+    }
+
+    public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
+                                                         final BigDecimal monthlyContributions,
+                                                         final LocalDate assEffectiveDate) {
+        NewWorkReason newWorkReason = getNewWorkReason(calculateContributionDTO);
+        if (NewWorkReason.FMA == newWorkReason) {
+            return assEffectiveDate.toString();
+        } else if (NewWorkReason.PAI == newWorkReason) {
+            if (calculateContributionDTO.getMonthlyContributions().compareTo(monthlyContributions) <= 0) {
+                return calculateContributionDTO.getEffectiveDate().toString();
+            } else return assEffectiveDate.toString();
+        } else {
+            if (calculateContributionDTO.getEffectiveDate() == null) {
+                return assEffectiveDate.toString();
+            } else return calculateContributionDTO.getEffectiveDate().toString();
+        }
+    }
+
+    public static NewWorkReason getNewWorkReason(final CalculateContributionDTO calculateContributionDTO) {
+        return calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst()
+                .map(Assessment::getNewWorkReason)
+                .orElse(calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
+                        .map(Assessment::getNewWorkReason).orElse(null));
+    }
+
+    /**
+     * This method returns the date based on the following logic:
+     * v_effective_date := greatest(nvl(p_application_object.committal_date,to_date('01/01/1900', 'dd/mm/yyyy' ))
+     * ,coalesce(p_application_object.passport_assessment_object.ass_date
+     * ,p_application_object.current_assessment_object.fin_assessment_object.full_assessment_object.assessment_date
+     * ,p_application_object.current_assessment_object.fin_assessment_object.initial_assessment_object.assessment_date)
+     * );
+     **/
+    public static LocalDate getEffectiveDate(final CalculateContributionDTO calculateContributionDTO) {
+        LocalDate committalDate = calculateContributionDTO.getCommittalDate();
+        Optional<Assessment> passAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst();
+        LocalDateTime assessmentDate = passAssessment.map(Assessment::getAssessmentDate).orElse(null);
+        if (assessmentDate == null) {
+            Optional<Assessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
+            assessmentDate = fullAssessment.map(Assessment::getAssessmentDate).orElse(null);
+            if (assessmentDate == null) {
+                Optional<Assessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
+                assessmentDate = initAssessment.map(Assessment::getAssessmentDate).orElse(null);
+            }
+        }
+        if (committalDate == null) {
+            return DateUtil.parseLocalDate(assessmentDate);
+        } else {
+            LocalDate assDate = DateUtil.parseLocalDate(assessmentDate);
+            if (committalDate.isAfter(assDate)) {
+                return committalDate;
+            } else {
+                return assDate;
+            }
+        }
+    }
 
     public MaatCalculateContributionResponse calculateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
         MaatCalculateContributionResponse response;
@@ -59,6 +133,12 @@ public class MaatCalculateContributionService {
         }
 
         return response;
+    }
+
+    public MaatCalculateContributionResponse getContributionSummaries(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
+        List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(calculateContributionDTO.getRepId(), laaTransactionId);
+        List<ContributionSummary> contributionSummaries = contribSummaryList != null ? contribSummaryList.stream().map(contributionSummaryMapper::map).toList() : null;
+        return new MaatCalculateContributionResponse().withContributionsSummary(contributionSummaries);
     }
 
     public MaatCalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
@@ -228,12 +308,6 @@ public class MaatCalculateContributionService {
         return maatCalculateContributionResponseMapper.map(apiCalculateContributionResponse, calculateContributionDTO.getContributionCap(), effectiveDate, totalMonths);
     }
 
-    private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {
-        return contributionResponseDTO.getUpliftCote() != null &&
-                calculateContributionDTO.getDateUpliftApplied() != null &&
-                calculateContributionDTO.getDateUpliftRemoved() == null;
-    }
-
     public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,
                                                       final String laaTransactionId,
                                                       final CrownCourtOutcome crownCourtOutcome,
@@ -269,74 +343,5 @@ public class MaatCalculateContributionService {
         if ("+".equals(contributionVariation.getVariationRule())) {
             return apiCalculateHardshipByDetailResponse.getHardshipSummary();
         } else return BigDecimal.ZERO;
-    }
-
-    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO, final BigDecimal annualDisposableIncome) {
-        if (annualDisposableIncome == null) {
-            if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
-                return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
-            } else {
-                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    return calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else return BigDecimal.ZERO;
-            }
-        }
-        return annualDisposableIncome;
-    }
-
-    public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
-                                                         final BigDecimal monthlyContributions,
-                                                         final LocalDate assEffectiveDate) {
-        NewWorkReason newWorkReason = getNewWorkReason(calculateContributionDTO);
-        if (NewWorkReason.FMA == newWorkReason) {
-            return assEffectiveDate.toString();
-        } else if (NewWorkReason.PAI == newWorkReason) {
-            if (calculateContributionDTO.getMonthlyContributions().compareTo(monthlyContributions) <= 0) {
-                return calculateContributionDTO.getEffectiveDate().toString();
-            } else return assEffectiveDate.toString();
-        } else {
-            if (calculateContributionDTO.getEffectiveDate() == null) {
-                return assEffectiveDate.toString();
-            } else return calculateContributionDTO.getEffectiveDate().toString();
-        }
-    }
-
-    public static NewWorkReason getNewWorkReason(final CalculateContributionDTO calculateContributionDTO) {
-        return calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst()
-                .map(Assessment::getNewWorkReason)
-                .orElse(calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
-                        .map(Assessment::getNewWorkReason).orElse(null));
-    }
-
-    /**
-     * This method returns the date based on the following logic:
-     * v_effective_date := greatest(nvl(p_application_object.committal_date,to_date('01/01/1900', 'dd/mm/yyyy' ))
-     * ,coalesce(p_application_object.passport_assessment_object.ass_date
-     * ,p_application_object.current_assessment_object.fin_assessment_object.full_assessment_object.assessment_date
-     * ,p_application_object.current_assessment_object.fin_assessment_object.initial_assessment_object.assessment_date)
-     * );
-     **/
-    public static LocalDate getEffectiveDate(final CalculateContributionDTO calculateContributionDTO) {
-        LocalDate committalDate = calculateContributionDTO.getCommittalDate();
-        Optional<Assessment> passAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst();
-        LocalDateTime assessmentDate = passAssessment.map(Assessment::getAssessmentDate).orElse(null);
-        if (assessmentDate == null) {
-            Optional<Assessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
-            assessmentDate = fullAssessment.map(Assessment::getAssessmentDate).orElse(null);
-            if (assessmentDate == null) {
-                Optional<Assessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
-                assessmentDate = initAssessment.map(Assessment::getAssessmentDate).orElse(null);
-            }
-        }
-        if (committalDate == null) {
-            return DateUtil.parseLocalDate(assessmentDate);
-        } else {
-            LocalDate assDate = DateUtil.parseLocalDate(assessmentDate);
-            if (committalDate.isAfter(assDate)) {
-                return committalDate;
-            } else {
-                return assDate;
-            }
-        }
     }
 }
