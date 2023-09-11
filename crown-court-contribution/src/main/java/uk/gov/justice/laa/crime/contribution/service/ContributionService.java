@@ -192,7 +192,7 @@ public class ContributionService {
         if (null != repOrderCCOutcomeList && !repOrderCCOutcomeList.isEmpty()) {
             Optional<RepOrderCCOutcomeDTO> outcomeDTO = repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
             return outcomeDTO.isPresent() && outcomeDTO.get().getOutcome() != null
-                    && CrownCourtOutcome.AQUITTED.getCode().equals(outcomeDTO.get().getOutcome());
+                    && !CrownCourtOutcome.AQUITTED.getCode().equals(outcomeDTO.get().getOutcome());
         }
         return false;
     }
