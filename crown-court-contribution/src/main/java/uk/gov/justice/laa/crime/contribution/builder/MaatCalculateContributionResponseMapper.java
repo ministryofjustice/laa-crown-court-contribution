@@ -12,16 +12,15 @@ import java.math.BigDecimal;
 public class MaatCalculateContributionResponseMapper {
 
     public MaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
-                                                        BigDecimal contributionCap, String effectiveDate,
-                                                        Integer totalMonths) {
-        MaatCalculateContributionResponse maatCalculateContributionResponse = new MaatCalculateContributionResponse();
-        maatCalculateContributionResponse.withContributionCap(contributionCap);
-        maatCalculateContributionResponse.withEffectiveDate(effectiveDate);
-        maatCalculateContributionResponse.withTotalMonths(totalMonths);
-        maatCalculateContributionResponse.withMonthlyContributions(apiCalculateContributionResponse.getMonthlyContributions());
-        maatCalculateContributionResponse.withUpfrontContributions(apiCalculateContributionResponse.getUpfrontContributions());
-        maatCalculateContributionResponse.withUpliftApplied(apiCalculateContributionResponse.getUpliftApplied());
-        maatCalculateContributionResponse.withBasedOn(apiCalculateContributionResponse.getBasedOn());
-        return maatCalculateContributionResponse;
+                                                 BigDecimal contributionCap, String effectiveDate,
+                                                 Integer totalMonths) {
+        return new MaatCalculateContributionResponse()
+                .withContributionCap(contributionCap)
+                .withEffectiveDate(effectiveDate)
+                .withTotalMonths(totalMonths)
+                .withMonthlyContributions(apiCalculateContributionResponse.getMonthlyContributions())
+                .withUpfrontContributions(apiCalculateContributionResponse.getUpfrontContributions())
+                .withUpliftApplied(apiCalculateContributionResponse.getUpliftApplied())
+                .withBasedOn(apiCalculateContributionResponse.getBasedOn());
     }
 }

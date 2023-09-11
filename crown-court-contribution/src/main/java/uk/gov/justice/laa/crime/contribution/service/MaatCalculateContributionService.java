@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.contribution.builder.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.common.ContributionSummary;
@@ -187,19 +188,23 @@ public class MaatCalculateContributionService {
 
         Contribution currentContribution = getCurrentContribution(calculateContributionDTO, laaTransactionId);
 
-        verifyAndCreateContribs(calculateContributionDTO, laaTransactionId, isReassessment, repOrderDTO,
+        Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, laaTransactionId, isReassessment, repOrderDTO,
                 response, currentContribution);
 
-        verifyAndUpdateContribution(calculateContributionDTO, laaTransactionId, response, currentContribution);
+        requestEarlyTransfer(calculateContributionDTO, laaTransactionId, response, currentContribution);
 
-        //Call Matrix Activity and make sure corr_id is updated with the Correspondence ID
+        if (contributionResponseDTO.getTemplate() != null && createdContribution != null) {
+            response.setProcessActivity(true);
+        }
         return response;
     }
 
-    private void verifyAndCreateContribs(CalculateContributionDTO calculateContributionDTO, String laaTransactionId,
-                                         boolean isReassessment, RepOrderDTO repOrderDTO,
-                                         MaatCalculateContributionResponse response,
-                                         Contribution currentContribution) {
+    public Contribution verifyAndCreateContribs(final CalculateContributionDTO calculateContributionDTO,
+                                         final String laaTransactionId,
+                                         final boolean isReassessment,
+                                         final RepOrderDTO repOrderDTO,
+                                         final MaatCalculateContributionResponse response,
+                                         final Contribution currentContribution) {
         TransferStatus currentTransferStatus = null;
         Integer currentContributionFileId = null;
 
@@ -208,7 +213,6 @@ public class MaatCalculateContributionService {
             currentContributionFileId = currentContribution.getContributionFileId();
         } else {
             log.error("C3 Service: Current Contribution Is NULL.");
-
         }
         if ((calculateContributionDTO.getMonthlyContributions() != null
                 && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
@@ -221,13 +225,17 @@ public class MaatCalculateContributionService {
                 maatCourtDataService.updateContribution(updateContributionRequest, laaTransactionId);
             }
             //Revisit the createContribs logic - do we need to change the input?
-            createContribs(calculateContributionDTO, laaTransactionId);
+            return createContribs(calculateContributionDTO, laaTransactionId);
         } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
-            createContribs(calculateContributionDTO, laaTransactionId);
+            return createContribs(calculateContributionDTO, laaTransactionId);
         }
+        return null;
     }
 
-    private void verifyAndUpdateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId, MaatCalculateContributionResponse response, Contribution currentContribution) {
+    public void requestEarlyTransfer(final CalculateContributionDTO calculateContributionDTO,
+                                     final String laaTransactionId,
+                                     final MaatCalculateContributionResponse response,
+                                     final Contribution currentContribution) {
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
@@ -237,7 +245,7 @@ public class MaatCalculateContributionService {
         }
     }
 
-    public Contribution getCurrentContribution(CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
+    public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
         final Integer contributionId = calculateContributionDTO.getId();
         List<Contribution> contributionsList = new ArrayList<>();
         if (contributionId != null) {
@@ -295,10 +303,9 @@ public class MaatCalculateContributionService {
                 calculateContributionDTO.getContributionCap());
 
         // Revisit the request to pass the offenceType object for Contribs Cap
-        return maatCalculateContributionResponseMapper.map(calculateContributionService.calculateContribution(apiCalculateContributionRequest),
-                calculateContributionDTO.getContributionCap(),
-                getEffectiveDateByNewWorkReason(calculateContributionDTO,
-                        calculateContributionDTO.getContributionCap(), assEffectiveDate), totalMonths);
+        ApiCalculateContributionResponse apiCalculateContributionResponse = calculateContributionService.calculateContribution(apiCalculateContributionRequest);
+        String effectiveDate = getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(), assEffectiveDate);
+        return maatCalculateContributionResponseMapper.map(apiCalculateContributionResponse, calculateContributionDTO.getContributionCap(), effectiveDate, totalMonths);
     }
 
     public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,
