@@ -98,7 +98,7 @@ public class CrownCourtContributionController {
             MaatCalculateContributionRequest maatCalculateContributionRequest,
             @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
 
-        log.info("Received request to calculate contributions for ID {}", maatCalculateContributionRequest.getApplId());
+        log.info("Received request to get contribution summaries for ID {}", maatCalculateContributionRequest.getApplId());
         CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
         return ResponseEntity.ok(maatCalculateContributionService.getContributionSummaries(calculateContributionDTO, laaTransactionId));
     }
