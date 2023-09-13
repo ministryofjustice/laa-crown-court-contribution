@@ -23,13 +23,13 @@ import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionVal
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/internal/v1/contribution/")
+    @RequestMapping("api/internal/v1/contribution/")
 public class CrownCourtContributionController {
 
     private final MaatCalculateContributionService maatCalculateContributionService;
     private final CalculateContributionValidator calculateContributionValidator;
 
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/calculate-contribution", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Calculate Contribution")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
