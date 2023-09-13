@@ -16,18 +16,10 @@ env:
     value: {{ .Values.maatApi.baseUrl }}
   - name: MAAT_API_OAUTH_URL
     value: {{ .Values.maatApi.oauthUrl }}
-  - name: MAAT_API_OAUTH_CLIENT_ID
-    value: {{ .Values.maatApi.clientId }}
-  - name: MAAT_API_OAUTH_CLIENT_SECRET
-    value: {{ .Values.maatApi.clientSecret }}
   - name: HARDSHIP_API_BASE_URL
     value: {{ .Values.hardshipApi.baseUrl }}
   - name: HARDSHIP_API_OAUTH_URL
     value: {{ .Values.hardshipApi.oauthUrl }}
-  - name: HARDSHIP_API_OAUTH_CLIENT_ID
-    value: {{ .Values.hardshipApi.clientId }}
-  - name: HARDSHIP_API_OAUTH_CLIENT_SECRET
-    value: {{ .Values.hardshipApi.clientSecret }}
   - name: DATASOURCE_HOST_PORT
     valueFrom:
       secretKeyRef:
@@ -48,6 +40,26 @@ env:
       secretKeyRef:
         name: rds-postgresql-instance-output
         key: database_password
+  - name: MAAT_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: hardship-api-oauth-client-id
+            key: MAAT_API_OAUTH_CLIENT_ID
+  - name: MAAT_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: hardship-api-oauth-client-secret
+            key: MAAT_API_OAUTH_CLIENT_SECRET
+  - name: HARDSHIP_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: hardship-api-oauth-client-id
+            key: HARDSHIP_API_OAUTH_CLIENT_ID
+  - name: HARDSHIP_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: hardship-api-oauth-client-secret
+            key: HARDSHIP_API_OAUTH_CLIENT_SECRET
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
 {{- end -}}
