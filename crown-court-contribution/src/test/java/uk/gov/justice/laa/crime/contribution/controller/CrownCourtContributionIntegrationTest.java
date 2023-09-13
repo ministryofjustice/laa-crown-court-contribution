@@ -47,7 +47,7 @@ class CrownCourtContributionIntegrationTest {
 
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);
-    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/";
+    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
 
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/get-contribution-summaries";
 
@@ -159,13 +159,13 @@ class CrownCourtContributionIntegrationTest {
 
     @Test
     void givenAEmptyContent_whenCalculateContributionIsInvoked_thenFailsBadRequest() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, "{}", ENDPOINT_URL))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void givenAEmptyOAuthToken_whenCalculateContributionIsInvoked_thenFailsUnauthorizedAccess() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, "{}", ENDPOINT_URL, false))
                 .andExpect(status().isUnauthorized()).andReturn();
     }
 
@@ -180,7 +180,7 @@ class CrownCourtContributionIntegrationTest {
                         .build()
         );
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
                 .andExpect(status().isOk());
     }
 
@@ -208,7 +208,7 @@ class CrownCourtContributionIntegrationTest {
                 )
         );
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
                 .andExpect(status().isOk());
     }
 
@@ -220,7 +220,7 @@ class CrownCourtContributionIntegrationTest {
         appealContributionRequest.setAssessments(List.of(assessment));
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -242,7 +242,7 @@ class CrownCourtContributionIntegrationTest {
                 )
         );
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }

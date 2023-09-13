@@ -34,7 +34,7 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @WebMvcTest(CrownCourtContributionController.class)
 class CrownCourtContributionControllerTest {
 
-    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/";
+    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
 
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/get-contribution-summaries";
 
@@ -64,7 +64,7 @@ class CrownCourtContributionControllerTest {
         when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
                 .thenReturn(new MaatCalculateContributionResponse());
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -77,7 +77,7 @@ class CrownCourtContributionControllerTest {
         when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class)))
                 .thenThrow(new ValidationException("Test validation exception"));
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -92,7 +92,7 @@ class CrownCourtContributionControllerTest {
         when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
                 .thenThrow(new APIClientException("Test api client exception"));
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
