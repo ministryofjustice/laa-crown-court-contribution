@@ -50,7 +50,7 @@ env:
         secretKeyRef:
             name: hardship-api-oauth-client-secret
             key: MAAT_API_OAUTH_CLIENT_SECRET
- - name: HARDSHIP_API_OAUTH_CLIENT_ID
+  - name: HARDSHIP_API_OAUTH_CLIENT_ID
     valueFrom:
         secretKeyRef:
             name: hardship-api-oauth-client-id
