@@ -43,12 +43,12 @@ env:
   - name: MAAT_API_OAUTH_CLIENT_ID
     valueFrom:
         secretKeyRef:
-            name: hardship-api-oauth-client-id
+            name: maat-api-oauth-client-id
             key: MAAT_API_OAUTH_CLIENT_ID
   - name: MAAT_API_OAUTH_CLIENT_SECRET
     valueFrom:
         secretKeyRef:
-            name: hardship-api-oauth-client-secret
+            name: maat-api-oauth-client-secret
             key: MAAT_API_OAUTH_CLIENT_SECRET
   - name: HARDSHIP_API_OAUTH_CLIENT_ID
     valueFrom:
