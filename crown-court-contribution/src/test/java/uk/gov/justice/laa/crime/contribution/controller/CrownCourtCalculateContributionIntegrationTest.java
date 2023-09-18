@@ -47,7 +47,7 @@ class CrownCourtCalculateContributionIntegrationTest {
 
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);
-    private static final String ENDPOINT_URL = "/api/internal/v2/contribution/calculateContribution";
+    private static final String ENDPOINT_URL = "/api/internal/v2/contribution/calculate";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -108,7 +108,6 @@ class CrownCourtCalculateContributionIntegrationTest {
 
     @Test
     void givenValidRequestWithDisposableIncome_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
-        stubForOAuth();
         ApiCalculateContributionRequest apiCalculateContributionRequest = TestModelDataBuilder.buildApiCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
@@ -119,7 +118,6 @@ class CrownCourtCalculateContributionIntegrationTest {
 
     @Test
     void givenValidRequestWithUpliftApplied_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
-        stubForOAuth();
         ApiCalculateContributionRequest apiCalculateContributionRequest = TestModelDataBuilder
                 .buildApiCalculateContributionRequest().withUpliftApplied(true)
                 .withMinUpliftedMonthlyAmount(BigDecimal.valueOf(80))
