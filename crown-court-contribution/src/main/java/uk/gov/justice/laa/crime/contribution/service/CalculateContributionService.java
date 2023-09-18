@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class CalculateContributionService {
     public ApiCalculateContributionResponse calculateContribution(ApiCalculateContributionRequest request) {
         ApiCalculateContributionResponse response = new ApiCalculateContributionResponse();
-        if(Boolean.TRUE.equals(request.getUpliftApplied())) {
+        if (Boolean.TRUE.equals(request.getUpliftApplied())) {
             BigDecimal monthlyContributions = CalculateContributionUtil.calculateUpliftedMonthlyAmount(request.getAnnualDisposableIncome(),
                     request.getUpliftedIncomePercent(), request.getMinUpliftedMonthlyAmount());
             response.setMonthlyContributions(monthlyContributions);

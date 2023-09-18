@@ -23,13 +23,13 @@ import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionVal
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/internal/v1/contribution/appeal")
+    @RequestMapping("api/internal/v1/contribution/")
 public class CrownCourtContributionController {
 
     private final MaatCalculateContributionService maatCalculateContributionService;
     private final CalculateContributionValidator calculateContributionValidator;
 
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/calculate-contribution", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Calculate Contribution")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -66,6 +66,41 @@ public class CrownCourtContributionController {
 
     private CalculateContributionDTO preProcessRequest(MaatCalculateContributionRequest maatCalculateContributionRequest) {
         return ContributionDTOBuilder.build(maatCalculateContributionRequest);
+    }
+
+
+    @GetMapping(value = "/get-contribution-summaries", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "Get Contribution Summary")
+    @ApiResponse(responseCode = "200",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = MaatCalculateContributionResponse.class)
+            )
+    )
+    @ApiResponse(responseCode = "400",
+            description = "Bad request",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorDTO.class)
+            )
+    )
+    @ApiResponse(responseCode = "500",
+            description = "Internal server error",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorDTO.class)
+            )
+    )
+    public ResponseEntity<MaatCalculateContributionResponse> getContributionSummaries(
+            @Parameter(description = "Data required to get Contribution Summary",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = MaatCalculateContributionRequest.class)
+                    )
+            )
+            @Valid @RequestBody
+            MaatCalculateContributionRequest maatCalculateContributionRequest,
+            @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
+
+        log.info("Received request to get contribution summaries for ID {}", maatCalculateContributionRequest.getApplId());
+        CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
+        return ResponseEntity.ok(maatCalculateContributionService.getContributionSummaries(calculateContributionDTO, laaTransactionId));
     }
 
 }
