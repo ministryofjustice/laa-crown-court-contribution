@@ -108,7 +108,6 @@ class CrownCourtCalculateContributionIntegrationTest {
 
     @Test
     void givenValidRequestWithDisposableIncome_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
-        stubForOAuth();
         ApiCalculateContributionRequest apiCalculateContributionRequest = TestModelDataBuilder.buildApiCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
@@ -119,7 +118,6 @@ class CrownCourtCalculateContributionIntegrationTest {
 
     @Test
     void givenValidRequestWithUpliftApplied_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
-        stubForOAuth();
         ApiCalculateContributionRequest apiCalculateContributionRequest = TestModelDataBuilder
                 .buildApiCalculateContributionRequest().withUpliftApplied(true)
                 .withMinUpliftedMonthlyAmount(BigDecimal.valueOf(80))
