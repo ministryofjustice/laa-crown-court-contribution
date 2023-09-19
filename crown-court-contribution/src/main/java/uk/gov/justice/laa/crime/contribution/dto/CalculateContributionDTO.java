@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome__1;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
@@ -52,7 +52,7 @@ public class CalculateContributionDTO {
     private CaseType caseType;
     private List<Assessment> assessments;
     private AppealType appealType;
-    private LastOutcome__1 lastOutcome;
+    private LastOutcome lastOutcome;
     private MagCourtOutcome magCourtOutcome;
     private RepOrderDTO repOrderDTO;
     private String removeContribs;

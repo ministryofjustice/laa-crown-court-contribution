@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome__1;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
@@ -16,7 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class AppealContributionValidatorTest {
 
-    private static CalculateContributionValidator calculateContributionValidator = new CalculateContributionValidator();
+    private static final CalculateContributionValidator calculateContributionValidator = new CalculateContributionValidator();
 
     @Test
     void givenValidRequest_whenValidateIsInvoked_thenNoExceptionIsRaised() {
@@ -36,7 +36,7 @@ class AppealContributionValidatorTest {
     @Test
     void givenIncorrectOutcomeDateSet_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
         MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
-        LastOutcome__1 lastOutcome = TestModelDataBuilder.buildLastOutcome_1();
+        LastOutcome lastOutcome = TestModelDataBuilder.buildLastOutcome();
         lastOutcome.setDateSet(LocalDateTime.now().plusDays(1));
         maatCalculateContributionRequest.setLastOutcome(lastOutcome);
 

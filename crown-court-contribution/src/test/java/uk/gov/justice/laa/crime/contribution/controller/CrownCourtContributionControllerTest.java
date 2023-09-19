@@ -14,7 +14,6 @@ import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.AppealContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
@@ -56,7 +55,7 @@ class CrownCourtContributionControllerTest {
 
     @Test
     void givenValidRequest_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        MaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class))).thenReturn(Optional.empty());
@@ -71,7 +70,7 @@ class CrownCourtContributionControllerTest {
 
     @Test
     void givenInvalidRequest_whenCalculateAppealContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        MaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class)))
@@ -84,7 +83,7 @@ class CrownCourtContributionControllerTest {
 
     @Test
     void givenClientApiException_whenCalculateAppealContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        MaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class)))
