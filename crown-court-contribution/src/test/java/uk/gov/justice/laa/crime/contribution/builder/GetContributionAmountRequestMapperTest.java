@@ -23,7 +23,7 @@ class GetContributionAmountRequestMapperTest {
     void givenAValidContributionDTOAndAssessmentResult_whenMapIsInvoked_thenReturnGetContributionAmountRequest() {
 
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder().caseType(CaseType.APPEAL_CC).appealType(AppealType.ACN)
-                        .lastOutcome(TestModelDataBuilder.buildLastOutcome_1()).build();
+                        .lastOutcome(TestModelDataBuilder.buildLastOutcome()).build();
         GetContributionAmountRequestMapper mapper = new GetContributionAmountRequestMapper();
 
         GetContributionAmountRequest request = mapper.map(calculateContributionDTO, AssessmentResult.PASS);

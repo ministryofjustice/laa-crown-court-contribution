@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.builder.AppealContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
@@ -36,9 +35,6 @@ class AppealContributionServiceTest {
     @Mock
     private CreateContributionRequestMapper createContributionRequestMapper;
 
-    @Mock
-    private AppealContributionResponseMapper appealContributionResponseMapper;
-
     @InjectMocks
     private AppealContributionService appealContributionService;
 
@@ -53,9 +49,6 @@ class AppealContributionServiceTest {
 
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(250));
-
-        AppealContributionResponse appealContributionResponse = TestModelDataBuilder.buildAppealContributionResponse();
-        appealContributionResponse.setUpfrontContributions(BigDecimal.valueOf(500));
 
         when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
                 .thenReturn(new GetContributionAmountRequest());
