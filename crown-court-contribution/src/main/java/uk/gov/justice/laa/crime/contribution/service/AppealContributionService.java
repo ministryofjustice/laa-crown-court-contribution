@@ -11,7 +11,7 @@ import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
@@ -38,7 +38,7 @@ public class AppealContributionService {
         return AssessmentResult.FAIL;
     }
 
-    public MaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+    public ApiMaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);

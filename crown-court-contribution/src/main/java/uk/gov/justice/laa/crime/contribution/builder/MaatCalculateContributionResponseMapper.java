@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 
 import java.math.BigDecimal;
 
@@ -11,10 +11,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class MaatCalculateContributionResponseMapper {
 
-    public MaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
+    public ApiMaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
                                                  BigDecimal contributionCap, String effectiveDate,
                                                  Integer totalMonths) {
-        return new MaatCalculateContributionResponse()
+        return new ApiMaatCalculateContributionResponse()
                 .withContributionCap(contributionCap)
                 .withEffectiveDate(effectiveDate)
                 .withTotalMonths(totalMonths)

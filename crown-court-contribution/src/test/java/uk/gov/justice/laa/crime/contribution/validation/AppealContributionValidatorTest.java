@@ -5,7 +5,7 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
 import java.time.LocalDateTime;
@@ -20,14 +20,14 @@ class AppealContributionValidatorTest {
 
     @Test
     void givenValidRequest_whenValidateIsInvoked_thenNoExceptionIsRaised() {
-        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
 
         assertThat(calculateContributionValidator.validate(maatCalculateContributionRequest)).isEmpty();
     }
 
     @Test
     void givenEmptyOutDateSet_whenValidateIsInvoked_thenNoExceptionIsRaised() {
-        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         maatCalculateContributionRequest.getLastOutcome().setDateSet(null);
 
         assertThat(calculateContributionValidator.validate(maatCalculateContributionRequest)).isEmpty();
@@ -35,7 +35,7 @@ class AppealContributionValidatorTest {
 
     @Test
     void givenIncorrectOutcomeDateSet_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
-        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         LastOutcome lastOutcome = TestModelDataBuilder.buildLastOutcome();
         lastOutcome.setDateSet(LocalDateTime.now().plusDays(1));
         maatCalculateContributionRequest.setLastOutcome(lastOutcome);
@@ -47,7 +47,7 @@ class AppealContributionValidatorTest {
 
     @Test
     void givenNoCompleteAssessment_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
-        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         Assessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.withStatus(AssessmentStatus.IN_PROGRESS);
         maatCalculateContributionRequest.setAssessments(List.of(assessment));

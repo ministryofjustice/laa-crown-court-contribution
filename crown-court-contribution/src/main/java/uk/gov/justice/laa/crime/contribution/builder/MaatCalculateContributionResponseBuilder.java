@@ -3,8 +3,8 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.getLocalDateString;
@@ -13,35 +13,32 @@ import static uk.gov.justice.laa.crime.contribution.util.DateUtil.getLocalDateSt
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MaatCalculateContributionResponseBuilder {
 
-    public static MaatCalculateContributionResponse build(Contribution contribution) {
-        MaatCalculateContributionResponse maatCalculateContributionResponse = new MaatCalculateContributionResponse();
-        maatCalculateContributionResponse.withId(contribution.getId());
-        maatCalculateContributionResponse.withApplId(contribution.getApplId());
-        maatCalculateContributionResponse.withRepId(contribution.getRepId());
-        maatCalculateContributionResponse.withContributionFileId(contribution.getContributionFileId());
-        maatCalculateContributionResponse.withEffectiveDate(getLocalDateString(contribution.getEffectiveDate()));
-        maatCalculateContributionResponse.withCalcDate(convertDateToDateTime(contribution.getCalcDate()));
-        maatCalculateContributionResponse.withContributionCap(contribution.getContributionCap());
-        maatCalculateContributionResponse.withMonthlyContributions(contribution.getMonthlyContributions());
-        maatCalculateContributionResponse.withUpfrontContributions(contribution.getUpfrontContributions());
-        maatCalculateContributionResponse.withUpliftApplied(contribution.getUpliftApplied());
-        maatCalculateContributionResponse.withBasedOn(contribution.getBasedOn());
-        maatCalculateContributionResponse.withTransferStatus(contribution.getTransferStatus());
-        maatCalculateContributionResponse.withDateUpliftApplied(convertDateToDateTime(contribution.getDateUpliftApplied()));
-        maatCalculateContributionResponse.withDateUpliftRemoved(convertDateToDateTime(contribution.getDateUpliftRemoved()));
-        maatCalculateContributionResponse.withDateCreated(contribution.getDateCreated());
-        maatCalculateContributionResponse.withUserCreated(contribution.getUserCreated());
-        maatCalculateContributionResponse.withDateModified(contribution.getDateModified());
-        maatCalculateContributionResponse.withUserModified(contribution.getUserModified());
-        maatCalculateContributionResponse.withCreateContributionOrder(contribution.getCreateContributionOrder());
-        maatCalculateContributionResponse.withCorrespondenceId(contribution.getCorrespondenceId());
-        maatCalculateContributionResponse.withActive(contribution.getActive());
-        maatCalculateContributionResponse.withReplacedDate(convertDateToDateTime(contribution.getReplacedDate()));
-        maatCalculateContributionResponse.withLatest(contribution.getLatest());
-        maatCalculateContributionResponse.withCcOutcomeCount(contribution.getCcOutcomeCount());
-        maatCalculateContributionResponse.withSeHistoryId(contribution.getSeHistoryId());
-
-        return maatCalculateContributionResponse;
+    public static ApiMaatCalculateContributionResponse build(Contribution contribution) {
+        return new ApiMaatCalculateContributionResponse()
+                .withId(contribution.getId())
+                .withApplId(contribution.getApplId())
+                .withRepId(contribution.getRepId())
+                .withContributionFileId(contribution.getContributionFileId())
+                .withEffectiveDate(getLocalDateString(contribution.getEffectiveDate()))
+                .withCalcDate(convertDateToDateTime(contribution.getCalcDate()))
+                .withContributionCap(contribution.getContributionCap())
+                .withMonthlyContributions(contribution.getMonthlyContributions())
+                .withUpfrontContributions(contribution.getUpfrontContributions())
+                .withUpliftApplied(contribution.getUpliftApplied())
+                .withBasedOn(contribution.getBasedOn())
+                .withTransferStatus(contribution.getTransferStatus())
+                .withDateUpliftApplied(convertDateToDateTime(contribution.getDateUpliftApplied()))
+                .withDateUpliftRemoved(convertDateToDateTime(contribution.getDateUpliftRemoved()))
+                .withDateCreated(contribution.getDateCreated())
+                .withUserCreated(contribution.getUserCreated())
+                .withDateModified(contribution.getDateModified())
+                .withUserModified(contribution.getUserModified())
+                .withCreateContributionOrder(contribution.getCreateContributionOrder())
+                .withCorrespondenceId(contribution.getCorrespondenceId())
+                .withActive(contribution.getActive())
+                .withReplacedDate(convertDateToDateTime(contribution.getReplacedDate()))
+                .withLatest(contribution.getLatest())
+                .withCcOutcomeCount(contribution.getCcOutcomeCount())
+                .withSeHistoryId(contribution.getSeHistoryId());
     }
-
 }

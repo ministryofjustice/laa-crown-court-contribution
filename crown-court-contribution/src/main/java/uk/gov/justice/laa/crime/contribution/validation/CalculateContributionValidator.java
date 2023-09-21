@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.validation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ import java.util.Optional;
 @Component
 public class CalculateContributionValidator {
 
-    public Optional<Void> validate(MaatCalculateContributionRequest maatCalculateContributionRequest) {
+    public Optional<Void> validate(ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
         log.debug("Performing validation against calculate contributions request");
         //LastOutcome is a mandatory attribute. Removed the redundant null checks LastOutcome.
         if (maatCalculateContributionRequest.getLastOutcome().getDateSet() != null

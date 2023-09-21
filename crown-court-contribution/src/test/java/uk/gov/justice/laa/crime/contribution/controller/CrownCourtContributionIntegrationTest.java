@@ -23,7 +23,7 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
 
 import java.math.BigDecimal;
@@ -109,7 +109,7 @@ class CrownCourtContributionIntegrationTest {
                 .addFilter(springSecurityFilterChain).build();
     }
 
-    private void setupAppealStubbing(MaatCalculateContributionRequest appealContributionRequest,
+    private void setupAppealStubbing(ApiMaatCalculateContributionRequest appealContributionRequest,
                                      Contribution contribution) throws JsonProcessingException {
 
         var repOrderUrl = UriComponentsBuilder.fromUriString(getRepOrderUrl)
@@ -167,7 +167,7 @@ class CrownCourtContributionIntegrationTest {
 
     @Test
     void givenAppealCaseWithSameContributions_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
-        MaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         setupAppealStubbing(appealContributionRequest,
@@ -184,7 +184,7 @@ class CrownCourtContributionIntegrationTest {
     void givenAppealCaseWithDiffContributions_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
         Contribution newContribution = TestModelDataBuilder.buildContribution();
         newContribution.setUpfrontContributions(BigDecimal.valueOf(500));
-        MaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         setupAppealStubbing(appealContributionRequest,
@@ -209,7 +209,7 @@ class CrownCourtContributionIntegrationTest {
 
     @Test
     void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        MaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         Assessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.withStatus(AssessmentStatus.IN_PROGRESS);
         appealContributionRequest.setAssessments(List.of(assessment));
@@ -222,7 +222,7 @@ class CrownCourtContributionIntegrationTest {
 
     @Test
     void givenMaatApiException_whenCalculateContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        MaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         var repOrderUrl = UriComponentsBuilder.fromUriString(getRepOrderUrl)
@@ -244,7 +244,7 @@ class CrownCourtContributionIntegrationTest {
 
     @Test
     void givenMaatApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(maatCalculateContributionRequest);
         var summariesUrl = UriComponentsBuilder.fromUriString(summaryUrl)
                 .build(maatCalculateContributionRequest.getRepId());
@@ -261,8 +261,8 @@ class CrownCourtContributionIntegrationTest {
     }
 
     @Test
-    void givenMaatCalculateContributionRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
-        MaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+    void givenApiMaatCalculateContributionRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
+        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(maatCalculateContributionRequest);
         List<ContributionsSummaryDTO> contributionsSummaryDTOList = List.of(TestModelDataBuilder.getContributionSummaryDTO());
 

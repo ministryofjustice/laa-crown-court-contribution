@@ -120,8 +120,8 @@ public class MaatCalculateContributionService {
         }
     }
 
-    public MaatCalculateContributionResponse calculateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
-        MaatCalculateContributionResponse response;
+    public ApiMaatCalculateContributionResponse calculateContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+        ApiMaatCalculateContributionResponse response;
 
         RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(calculateContributionDTO.getRepId(), laaTransactionId);
         calculateContributionDTO.setRepOrderDTO(repOrderDTO);
@@ -135,16 +135,16 @@ public class MaatCalculateContributionService {
         return response;
     }
 
-    public MaatCalculateContributionResponse getContributionSummaries(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
+    public ApiMaatCalculateContributionResponse getContributionSummaries(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
         List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(calculateContributionDTO.getRepId(), laaTransactionId);
         List<ContributionSummary> contributionSummaries = contribSummaryList != null ? contribSummaryList.stream().map(contributionSummaryMapper::map).toList() : null;
-        return new MaatCalculateContributionResponse().withContributionsSummary(contributionSummaries);
+        return new ApiMaatCalculateContributionResponse().withContributionsSummary(contributionSummaries);
     }
 
-    public MaatCalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
+    public ApiMaatCalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
                                                                               final String laaTransactionId,
                                                                               final RepOrderDTO repOrderDTO) {
-        MaatCalculateContributionResponse response = new MaatCalculateContributionResponse();
+        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
         boolean isReassessment = contributionService.checkReassessment(repOrderDTO, laaTransactionId);
 
         Optional<Assessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
@@ -166,13 +166,13 @@ public class MaatCalculateContributionService {
         return response;
     }
 
-    public MaatCalculateContributionResponse doContribs(final CalculateContributionDTO calculateContributionDTO,
+    public ApiMaatCalculateContributionResponse doContribs(final CalculateContributionDTO calculateContributionDTO,
                                                         final String laaTransactionId,
                                                         final ContributionResponseDTO contributionResponseDTO,
                                                         final String fullResult,
                                                         final boolean isReassessment,
                                                         final RepOrderDTO repOrderDTO) {
-        MaatCalculateContributionResponse response = new MaatCalculateContributionResponse();
+        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
 
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
         if (Constants.Y.equals(contributionResponseDTO.getCalcContribution()) ||
@@ -203,7 +203,7 @@ public class MaatCalculateContributionService {
                                          final String laaTransactionId,
                                          final boolean isReassessment,
                                          final RepOrderDTO repOrderDTO,
-                                         final MaatCalculateContributionResponse response,
+                                         final ApiMaatCalculateContributionResponse response,
                                          final Contribution currentContribution) {
         TransferStatus currentTransferStatus = null;
         Integer currentContributionFileId = null;
@@ -234,7 +234,7 @@ public class MaatCalculateContributionService {
 
     public void requestEarlyTransfer(final CalculateContributionDTO calculateContributionDTO,
                                      final String laaTransactionId,
-                                     final MaatCalculateContributionResponse response,
+                                     final ApiMaatCalculateContributionResponse response,
                                      final Contribution currentContribution) {
         Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId(), laaTransactionId);
         if (isEarlyTransferRequired(calculateContributionDTO, laaTransactionId, response, latestSentContribution) && currentContribution != null) {
@@ -267,7 +267,7 @@ public class MaatCalculateContributionService {
 
     public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,
                                            final String laaTransactionId,
-                                           final MaatCalculateContributionResponse response,
+                                           final ApiMaatCalculateContributionResponse response,
                                            final Contribution latestSentContribution) {
         return ((response.getMonthlyContributions().compareTo(latestSentContribution.getMonthlyContributions()) != 0
                 || response.getUpfrontContributions().compareTo(latestSentContribution.getUpfrontContributions()) != 0
@@ -286,7 +286,7 @@ public class MaatCalculateContributionService {
         } else return null;
     }
 
-    public MaatCalculateContributionResponse calcContribs(final CalculateContributionDTO calculateContributionDTO,
+    public ApiMaatCalculateContributionResponse calcContribs(final CalculateContributionDTO calculateContributionDTO,
                                                           final ContributionResponseDTO contributionResponseDTO,
                                                           final String laaTransactionId) {
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
@@ -296,7 +296,7 @@ public class MaatCalculateContributionService {
                 calculateContributionDTO.getMagCourtOutcome(), crownCourtOutcome);
 
         BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, laaTransactionId, crownCourtOutcome, isContributionRuleApplicable);
-        Integer totalMonths = Constants.N.equals(contributionResponseDTO.getCalcContribs()) ? 0 : null;
+        Integer totalMonths = Constants.N.equals(contributionResponseDTO.getCalcContribs()) ? 0 : contributionCalcParametersDTO.getTotalMonths();
 
         ApiCalculateContributionRequest apiCalculateContributionRequest = calculateContributionRequestMapper.map(contributionCalcParametersDTO,
                 annualDisposableIncome, isUpliftApplied(calculateContributionDTO, contributionResponseDTO),

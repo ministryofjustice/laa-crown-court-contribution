@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
@@ -33,7 +33,7 @@ public class CrownCourtContributionController {
     @Operation(description = "Calculate Contribution")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = MaatCalculateContributionResponse.class)
+                    schema = @Schema(implementation = ApiMaatCalculateContributionResponse.class)
             )
     )
     @ApiResponse(responseCode = "400",
@@ -48,14 +48,14 @@ public class CrownCourtContributionController {
                     schema = @Schema(implementation = ErrorDTO.class)
             )
     )
-    public ResponseEntity<MaatCalculateContributionResponse> calculateContribution(
+    public ResponseEntity<ApiMaatCalculateContributionResponse> calculateContribution(
             @Parameter(description = "Data required to calculate contributions",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = MaatCalculateContributionRequest.class)
+                            schema = @Schema(implementation = ApiMaatCalculateContributionRequest.class)
                     )
             )
             @Valid @RequestBody
-            MaatCalculateContributionRequest maatCalculateContributionRequest,
+            ApiMaatCalculateContributionRequest maatCalculateContributionRequest,
             @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
 
         log.info("Received request to calculate contributions for ID {}", maatCalculateContributionRequest.getApplId());
@@ -64,7 +64,7 @@ public class CrownCourtContributionController {
         return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO, laaTransactionId));
     }
 
-    private CalculateContributionDTO preProcessRequest(MaatCalculateContributionRequest maatCalculateContributionRequest) {
+    private CalculateContributionDTO preProcessRequest(ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
         return ContributionDTOBuilder.build(maatCalculateContributionRequest);
     }
 
@@ -73,7 +73,7 @@ public class CrownCourtContributionController {
     @Operation(description = "Get Contribution Summary")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = MaatCalculateContributionResponse.class)
+                    schema = @Schema(implementation = ApiMaatCalculateContributionResponse.class)
             )
     )
     @ApiResponse(responseCode = "400",
@@ -88,14 +88,14 @@ public class CrownCourtContributionController {
                     schema = @Schema(implementation = ErrorDTO.class)
             )
     )
-    public ResponseEntity<MaatCalculateContributionResponse> getContributionSummaries(
+    public ResponseEntity<ApiMaatCalculateContributionResponse> getContributionSummaries(
             @Parameter(description = "Data required to get Contribution Summary",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = MaatCalculateContributionRequest.class)
+                            schema = @Schema(implementation = ApiMaatCalculateContributionRequest.class)
                     )
             )
             @Valid @RequestBody
-            MaatCalculateContributionRequest maatCalculateContributionRequest,
+            ApiMaatCalculateContributionRequest maatCalculateContributionRequest,
             @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
 
         log.info("Received request to get contribution summaries for ID {}", maatCalculateContributionRequest.getApplId());
