@@ -38,7 +38,6 @@ public class MaatCalculateContributionResponseBuilder {
                 .withActive(contribution.getActive())
                 .withReplacedDate(convertDateToDateTime(contribution.getReplacedDate()))
                 .withLatest(contribution.getLatest())
-                .withCcOutcomeCount(contribution.getCcOutcomeCount())
-                .withSeHistoryId(contribution.getSeHistoryId());
+                .withCcOutcomeCount(contribution.getCcOutcomeCount());
     }
 }
