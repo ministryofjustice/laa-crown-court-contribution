@@ -49,7 +49,7 @@ public class TestModelDataBuilder {
                 .passportResult(PASS).build();
     }
 
-    public static CreateContributionRequest getCreateContributionRequest(TransferStatus tranferStatus, LocalDateTime dateTime){
+    public static CreateContributionRequest getCreateContributionRequest(TransferStatus transferStatus, LocalDateTime dateTime){
         return new CreateContributionRequest()
                 .withRepId(REP_ID)
                 .withApplId(123)
@@ -62,7 +62,7 @@ public class TestModelDataBuilder {
                 .withUpfrontContributions(BigDecimal.valueOf(250))
                 .withUpliftApplied("N")
                 .withBasedOn("N")
-                .withTransferStatus(tranferStatus)
+                .withTransferStatus(transferStatus)
                 .withDateUpliftApplied(dateTime)
                 .withDateUpliftRemoved(dateTime)
                 .withCreateContributionOrder("N")
@@ -289,8 +289,8 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static MaatCalculateContributionRequest buildAppealContributionRequest() {
-        return new MaatCalculateContributionRequest()
+    public static ApiMaatCalculateContributionRequest buildAppealContributionRequest() {
+        return new ApiMaatCalculateContributionRequest()
                 .withApplId(999)
                 .withRepId(999)
                 .withCaseType(CaseType.APPEAL_CC)
@@ -300,8 +300,8 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
-    public static MaatCalculateContributionRequest buildCalculateContributionRequest() {
-        return new MaatCalculateContributionRequest()
+    public static ApiMaatCalculateContributionRequest buildCalculateContributionRequest() {
+        return new ApiMaatCalculateContributionRequest()
                 .withApplId(999)
                 .withRepId(999)
                 .withCaseType(CaseType.EITHER_WAY)
@@ -409,8 +409,8 @@ public class TestModelDataBuilder {
                 .withLaaTransactionId(LAA_TRANSACTION_ID);
     }
 
-    public static MaatCalculateContributionResponse getMaatCalculateContributionResponse() {
-        return new MaatCalculateContributionResponse()
+    public static ApiMaatCalculateContributionResponse getApiMaatCalculateContributionResponse() {
+        return new ApiMaatCalculateContributionResponse()
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpliftApplied(Constants.N)
                 .withEffectiveDate(COMMITTAL_DATE.toString())

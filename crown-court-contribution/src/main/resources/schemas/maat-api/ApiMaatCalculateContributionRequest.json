@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "CalculateContributionRequest.json",
+  "id": "ApiMaatCalculateContributionRequest.json",
   "type": "object",
-  "title": "Calculate Contribution Request",
+  "title": "Calculate Contribution Request from MAAT application",
   "description": "Request data for calculating contributions following an appeal",
   "properties": {
     "id": {
