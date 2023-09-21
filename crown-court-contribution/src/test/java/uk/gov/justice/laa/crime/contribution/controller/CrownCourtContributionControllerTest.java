@@ -17,7 +17,6 @@ import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
-import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
 import java.util.Optional;
@@ -35,7 +34,7 @@ class CrownCourtContributionControllerTest {
 
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
 
-    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/get-contribution-summaries";
+    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/summaries";
 
     @Autowired
     private MockMvc mvc;
@@ -48,10 +47,6 @@ class CrownCourtContributionControllerTest {
 
     @MockBean
     private MaatCalculateContributionService maatCalculateContributionService;
-
-    @MockBean
-    private CompareContributionService compareContributionService;
-
 
     @Test
     void givenValidRequest_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {

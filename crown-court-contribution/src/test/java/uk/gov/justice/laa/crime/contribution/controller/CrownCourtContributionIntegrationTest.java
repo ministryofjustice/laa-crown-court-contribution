@@ -47,7 +47,7 @@ class CrownCourtContributionIntegrationTest {
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
-    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/get-contribution-summaries";
+    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/summaries";
 
     @Autowired
     private ObjectMapper objectMapper;

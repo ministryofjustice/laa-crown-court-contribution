@@ -69,7 +69,7 @@ public class CrownCourtContributionController {
     }
 
 
-    @GetMapping(value = "/get-contribution-summaries", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/summaries", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get Contribution Summary")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
