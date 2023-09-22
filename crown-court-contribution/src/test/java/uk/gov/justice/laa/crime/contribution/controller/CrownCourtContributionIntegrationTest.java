@@ -21,7 +21,7 @@ import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
@@ -47,7 +47,8 @@ class CrownCourtContributionIntegrationTest {
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
-    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/summaries";
+    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/" + TestModelDataBuilder.REP_ID
+            + "/summaries";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -210,7 +211,7 @@ class CrownCourtContributionIntegrationTest {
     @Test
     void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
         ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
-        Assessment assessment = TestModelDataBuilder.buildAssessment();
+        ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.withStatus(AssessmentStatus.IN_PROGRESS);
         appealContributionRequest.setAssessments(List.of(assessment));
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
@@ -244,10 +245,8 @@ class CrownCourtContributionIntegrationTest {
 
     @Test
     void givenMaatApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
-        String requestData = objectMapper.writeValueAsString(maatCalculateContributionRequest);
         var summariesUrl = UriComponentsBuilder.fromUriString(summaryUrl)
-                .build(maatCalculateContributionRequest.getRepId());
+                .build(TestModelDataBuilder.REP_ID);
         wiremock.stubFor(get(summariesUrl.getPath())
                 .willReturn(
                         WireMock.aResponse()
@@ -255,19 +254,16 @@ class CrownCourtContributionIntegrationTest {
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                 )
         );
-        mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenApiMaatCalculateContributionRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
-        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
-        String requestData = objectMapper.writeValueAsString(maatCalculateContributionRequest);
         List<ContributionsSummaryDTO> contributionsSummaryDTOList = List.of(TestModelDataBuilder.getContributionSummaryDTO());
-
         var summariesUrl = UriComponentsBuilder.fromUriString(summaryUrl)
-                .build(maatCalculateContributionRequest.getRepId());
+                .build(TestModelDataBuilder.REP_ID);
         wiremock.stubFor(get(urlPathEqualTo(summariesUrl.getPath()))
                 .willReturn(
                         WireMock.ok()
@@ -275,9 +271,8 @@ class CrownCourtContributionIntegrationTest {
                                 .withBody(objectMapper.writeValueAsString(contributionsSummaryDTOList))
                 )
         );
-
-        mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
-                .andExpect(status().isOk());
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
+                        .andExpect(status().isOk());
     }
 
 }

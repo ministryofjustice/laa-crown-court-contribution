@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.model.common.ContributionSummary;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
 
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
 
@@ -23,7 +23,7 @@ class ContributionSummaryMapperTest {
         ContributionsSummaryDTO contributionsSummaryDTO = TestModelDataBuilder.getContributionSummaryDTO();
         ContributionSummaryMapper mapper = new ContributionSummaryMapper();
 
-        ContributionSummary contributionSummary = mapper.map(contributionsSummaryDTO);
+        ApiContributionSummary contributionSummary = mapper.map(contributionsSummaryDTO);
 
         softly.assertThat(contributionSummary.getId()).isEqualTo(contributionsSummaryDTO.getId());
         softly.assertThat(contributionSummary.getMonthlyContributions()).isEqualTo(contributionsSummaryDTO.getMonthlyContributions());

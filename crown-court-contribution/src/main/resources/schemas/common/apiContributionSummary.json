@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "ContributionSummary.json",
+  "id": "apiContributionSummary.json",
   "type": "object",
   "title": "Contribution Summary",
   "description": "Contribution Summary Object",

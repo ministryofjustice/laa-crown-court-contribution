@@ -15,8 +15,7 @@ public class MaatCalculateContributionResponseBuilder {
 
     public static ApiMaatCalculateContributionResponse build(Contribution contribution) {
         return new ApiMaatCalculateContributionResponse()
-                .withId(contribution.getId())
-                .withApplId(contribution.getApplId())
+                .withContributionId(contribution.getId())
                 .withRepId(contribution.getRepId())
                 .withContributionFileId(contribution.getContributionFileId())
                 .withEffectiveDate(getLocalDateString(contribution.getEffectiveDate()))
@@ -29,10 +28,6 @@ public class MaatCalculateContributionResponseBuilder {
                 .withTransferStatus(contribution.getTransferStatus())
                 .withDateUpliftApplied(convertDateToDateTime(contribution.getDateUpliftApplied()))
                 .withDateUpliftRemoved(convertDateToDateTime(contribution.getDateUpliftRemoved()))
-                .withDateCreated(contribution.getDateCreated())
-                .withUserCreated(contribution.getUserCreated())
-                .withDateModified(contribution.getDateModified())
-                .withUserModified(contribution.getUserModified())
                 .withCreateContributionOrder(contribution.getCreateContributionOrder())
                 .withCorrespondenceId(contribution.getCorrespondenceId())
                 .withActive(contribution.getActive())
