@@ -43,7 +43,6 @@ public class CreateContributionRequestMapper {
                 .withMonthlyContributions(calculateContributionDTO.getMonthlyContributions())
                 .withUpliftApplied(calculateContributionDTO.getUpliftApplied())
                 .withBasedOn(calculateContributionDTO.getBasedOn())
-                .withUserCreated(calculateContributionDTO.getUserCreated())
                 .withCorrespondenceId(calculateContributionDTO.getCorrespondenceId())
                 .withCreateContributionOrder(calculateContributionDTO.getCreateContributionOrder())
                 .withCalcDate(convertDateToDateTime(calculateContributionDTO.getCalcDate()))

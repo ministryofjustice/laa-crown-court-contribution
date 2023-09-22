@@ -9,8 +9,8 @@ import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ContributionSummary;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
@@ -83,9 +83,9 @@ public class MaatCalculateContributionService {
 
     public static NewWorkReason getNewWorkReason(final CalculateContributionDTO calculateContributionDTO) {
         return calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst()
-                .map(Assessment::getNewWorkReason)
+                .map(ApiAssessment::getNewWorkReason)
                 .orElse(calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
-                        .map(Assessment::getNewWorkReason).orElse(null));
+                        .map(ApiAssessment::getNewWorkReason).orElse(null));
     }
 
     /**
@@ -98,14 +98,14 @@ public class MaatCalculateContributionService {
      **/
     public static LocalDate getEffectiveDate(final CalculateContributionDTO calculateContributionDTO) {
         LocalDate committalDate = calculateContributionDTO.getCommittalDate();
-        Optional<Assessment> passAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst();
-        LocalDateTime assessmentDate = passAssessment.map(Assessment::getAssessmentDate).orElse(null);
+        Optional<ApiAssessment> passAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst();
+        LocalDateTime assessmentDate = passAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
         if (assessmentDate == null) {
-            Optional<Assessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
-            assessmentDate = fullAssessment.map(Assessment::getAssessmentDate).orElse(null);
+            Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
+            assessmentDate = fullAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
             if (assessmentDate == null) {
-                Optional<Assessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
-                assessmentDate = initAssessment.map(Assessment::getAssessmentDate).orElse(null);
+                Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
+                assessmentDate = initAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
             }
         }
         if (committalDate == null) {
@@ -135,10 +135,9 @@ public class MaatCalculateContributionService {
         return response;
     }
 
-    public ApiMaatCalculateContributionResponse getContributionSummaries(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
-        List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(calculateContributionDTO.getRepId(), laaTransactionId);
-        List<ContributionSummary> contributionSummaries = contribSummaryList != null ? contribSummaryList.stream().map(contributionSummaryMapper::map).toList() : null;
-        return new ApiMaatCalculateContributionResponse().withContributionsSummary(contributionSummaries);
+    public List<ApiContributionSummary> getContributionSummaries(final int repId, final String laaTransactionId) {
+        List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(repId, laaTransactionId);
+        return contribSummaryList != null ? contribSummaryList.stream().map(contributionSummaryMapper::map).toList() : List.of();
     }
 
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
@@ -147,8 +146,8 @@ public class MaatCalculateContributionService {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
         boolean isReassessment = contributionService.checkReassessment(repOrderDTO, laaTransactionId);
 
-        Optional<Assessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
-        Optional<Assessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
+        Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
+        Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
         String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
 
         ContributionResponseDTO contributionResponseDTO = contributionService.checkContribsCondition(ContributionRequestDTO.builder()
@@ -241,12 +240,12 @@ public class MaatCalculateContributionService {
             maatCourtDataService.updateContribution(new UpdateContributionRequest()
                     .withId(currentContribution.getId())
                     .withTransferStatus(TransferStatus.REQUESTED)
-                    .withUserModified(calculateContributionDTO.getUserModified()), laaTransactionId);
+                    .withUserModified(calculateContributionDTO.getUserCreated()), laaTransactionId);
         }
     }
 
     public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO, final String laaTransactionId) {
-        final Integer contributionId = calculateContributionDTO.getId();
+        final Integer contributionId = calculateContributionDTO.getContributionId();
         List<Contribution> contributionsList = new ArrayList<>();
         if (contributionId != null) {
             contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), laaTransactionId, false);

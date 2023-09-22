@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.contribution.model.common.Assessment;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
@@ -336,8 +336,8 @@ public class TestModelDataBuilder {
                 .withDateSet(TEST_DATE);
     }
 
-    public static Assessment buildAssessment() {
-        return new Assessment()
+    public static ApiAssessment buildAssessment() {
+        return new ApiAssessment()
                 .withAssessmentType(AssessmentType.INIT)
                 .withStatus(AssessmentStatus.COMPLETE)
                 .withResult(AssessmentResult.PASS);
@@ -428,7 +428,7 @@ public class TestModelDataBuilder {
     public static CalculateContributionDTO getContributionDTOForCalcContribs() {
         return CalculateContributionDTO.builder()
                 .committalDate(COMMITTAL_DATE)
-                .assessments(List.of(new Assessment()
+                .assessments(List.of(new ApiAssessment()
                         .withAssessmentType(AssessmentType.PASSPORT)
                         .withAssessmentDate(TEST_DATE)))
                 .caseType(CaseType.INDICTABLE)
@@ -472,7 +472,7 @@ public class TestModelDataBuilder {
     public static CalculateContributionDTO getCalculateContributionDTO() {
         return CalculateContributionDTO.builder()
                 .repId(TestModelDataBuilder.REP_ID)
-                .assessments(List.of(new Assessment()
+                .assessments(List.of(new ApiAssessment()
                         .withAssessmentType(AssessmentType.INIT)
                         .withResult(AssessmentResult.PASS)
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
