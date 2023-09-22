@@ -168,9 +168,11 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenNoAssessments_whenGetEffectiveDateIsInvoked_thenNullIsReturned() {
+    void givenNoValidAssessments_whenGetEffectiveDateIsInvoked_thenNullIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .assessments(List.of())
+                .assessments(List.of(new ApiAssessment()
+                        .withAssessmentType(AssessmentType.HARDSHIP)
+                        .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
         assertThat(effectiveDate).isNull();
