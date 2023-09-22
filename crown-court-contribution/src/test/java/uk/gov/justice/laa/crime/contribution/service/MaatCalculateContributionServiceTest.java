@@ -622,6 +622,60 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
+    void givenDifferentEffectiveDatesAndMonthlyContributions_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
+                .build();
+        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
+                .withEffectiveDate(LocalDate.now().toString())
+                .withMonthlyContributions(BigDecimal.TEN)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
+                .monthlyContributions(BigDecimal.TEN)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        assertThat(maatCalculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isTrue();
+    }
+
+    @Test
+    void givenDifferentEffectiveDatesAndZeroMonthlyContributions_whenIsEarlyTransferRequiredIsInvoked_FalseIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
+                .build();
+        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
+                .withEffectiveDate(LocalDate.now().toString())
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
+                .monthlyContributions(BigDecimal.ZERO)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        assertThat(maatCalculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isFalse();
+    }
+
+    @Test
+    void givenSameEffectiveDates_whenIsEarlyTransferRequiredIsInvoked_FalseIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
+                .build();
+        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
+                .withEffectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate().toString())
+                .withMonthlyContributions(BigDecimal.TEN)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
+                .monthlyContributions(BigDecimal.TEN)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        assertThat(maatCalculateContributionService.isEarlyTransferRequired(calculateContributionDTO, "", response, latestSentContribution)).isFalse();
+    }
+
+    @Test
     void givenTransferRequestedAndAppealCC_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .caseType(CaseType.APPEAL_CC)
@@ -868,4 +922,38 @@ class MaatCalculateContributionServiceTest {
         );
         assertThat(response.getProcessActivity()).isNull();
     }
+
+    @Test
+    void givenValidContributionId_whenGetCurrentContributionIsInvoked_validResponseIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .contributionId(TestModelDataBuilder.CONTRIBUTION_ID)
+                .build();
+        when(maatCourtDataService.findContribution(any(), any(), any())).thenReturn(List.of(Contribution.builder()
+                .id(TestModelDataBuilder.CONTRIBUTION_ID).build()));
+        Contribution contribution = maatCalculateContributionService.getCurrentContribution(
+                calculateContributionDTO, TestModelDataBuilder.LAA_TRANSACTION_ID);
+        assertThat(contribution.getId()).isEqualTo(TestModelDataBuilder.CONTRIBUTION_ID);
+    }
+
+    @Test
+    void givenEarlyTransferRequired_whenRequestEarlyTransferIsInvoked_thenUpdateContributionIsCalled() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
+                .build();
+        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
+                .withEffectiveDate(LocalDate.now().toString())
+                .withMonthlyContributions(BigDecimal.TEN)
+                .withUpfrontContributions(BigDecimal.ZERO);
+        Contribution latestSentContribution = Contribution.builder()
+                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
+                .monthlyContributions(BigDecimal.TEN)
+                .upfrontContributions(BigDecimal.ZERO)
+                .build();
+        when(maatCourtDataService.findLatestSentContribution(any(), any())).thenReturn(latestSentContribution);
+        maatCalculateContributionService.requestEarlyTransfer(calculateContributionDTO, "", response, new Contribution());
+        verify(maatCourtDataService, times(1)).updateContribution(any(), anyString());
+    }
 }
+
+

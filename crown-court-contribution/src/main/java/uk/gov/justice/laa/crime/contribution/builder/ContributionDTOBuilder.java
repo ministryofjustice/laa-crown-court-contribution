@@ -5,8 +5,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
 @Component
@@ -14,7 +12,7 @@ import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 public class ContributionDTOBuilder {
 
     public static CalculateContributionDTO build(final ApiMaatCalculateContributionRequest request) {
-        CalculateContributionDTO.CalculateContributionDTOBuilder builder = CalculateContributionDTO.builder()
+        return CalculateContributionDTO.builder()
                 .contributionId(request.getContributionId())
                 .applId(request.getApplId())
                 .repId(request.getRepId())
@@ -45,9 +43,7 @@ public class ContributionDTOBuilder {
                 .crownCourtSummary(request.getCrownCourtSummary())
                 .disposableIncomeAfterCrownHardship(request.getDisposableIncomeAfterCrownHardship())
                 .disposableIncomeAfterMagHardship(request.getDisposableIncomeAfterMagHardship())
-                .totalAnnualDisposableIncome(request.getTotalAnnualDisposableIncome());
-
-        return builder.build();
-
+                .totalAnnualDisposableIncome(request.getTotalAnnualDisposableIncome())
+                .build();
     }
 }
