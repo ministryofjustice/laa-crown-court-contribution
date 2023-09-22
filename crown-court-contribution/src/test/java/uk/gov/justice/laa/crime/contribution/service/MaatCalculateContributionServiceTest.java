@@ -168,6 +168,15 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
+    void givenNoAssessments_whenGetEffectiveDateIsInvoked_thenNullIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .assessments(List.of())
+                .build();
+        LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
+        assertThat(effectiveDate).isNull();
+    }
+
+    @Test
     void givenPassportNewWorkReason_whenGetNewWorkReasonIsInvoked_thenPassportNewWorkReasonIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
@@ -854,6 +863,15 @@ class MaatCalculateContributionServiceTest {
         List<ApiContributionSummary> response = maatCalculateContributionService.getContributionSummaries(TestModelDataBuilder.REP_ID, TestModelDataBuilder.LAA_TRANSACTION_ID);
         verify(maatCourtDataService).getContributionsSummary(any(), any());
         assertThat(response).isEqualTo(List.of(contributionSummary));
+
+    }
+
+    @Test
+    void givenNoContributionSummaries_whenGetContributionSummariesIsInvoked_thenEmptyListIsReturned() {
+        when(maatCourtDataService.getContributionsSummary(any(), any())).thenReturn(null);
+        List<ApiContributionSummary> response = maatCalculateContributionService.getContributionSummaries(TestModelDataBuilder.REP_ID, TestModelDataBuilder.LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).getContributionsSummary(any(), any());
+        assertThat(response).isEqualTo(List.of());
 
     }
 

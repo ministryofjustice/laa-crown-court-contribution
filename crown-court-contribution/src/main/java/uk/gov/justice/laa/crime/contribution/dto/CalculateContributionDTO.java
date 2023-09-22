@@ -37,10 +37,7 @@ public class CalculateContributionDTO {
     private TransferStatus transferStatus;
     private LocalDate dateUpliftApplied;
     private LocalDate dateUpliftRemoved;
-//    private LocalDateTime dateCreated;
     private String userCreated;
-//    private LocalDateTime dateModified;
-//    private String userModified;
     private String createContributionOrder;
     private Integer correspondenceId;
     private String active;
