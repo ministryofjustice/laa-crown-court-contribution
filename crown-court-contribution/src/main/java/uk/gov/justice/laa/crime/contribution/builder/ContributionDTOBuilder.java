@@ -40,7 +40,7 @@ public class ContributionDTOBuilder {
                 .removeContribs(request.getRemoveContributions())
                 .committalDate(DateUtil.parseLocalDate(request.getCommittalDate()))
                 .magCourtOutcome(request.getMagCourtOutcome())
-                .crownCourtSummary(request.getCrownCourtSummary())
+                .crownCourtOutcomeList(request.getCrownCourtOutcome())
                 .disposableIncomeAfterCrownHardship(request.getDisposableIncomeAfterCrownHardship())
                 .disposableIncomeAfterMagHardship(request.getDisposableIncomeAfterMagHardship())
                 .totalAnnualDisposableIncome(request.getTotalAnnualDisposableIncome())

@@ -290,7 +290,7 @@ public class MaatCalculateContributionService {
                                                           final String laaTransactionId) {
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO = maatCourtDataService.getContributionCalcParameters(assEffectiveDate.toString(), laaTransactionId);
-        CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtSummary());
+        CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
         boolean isContributionRuleApplicable = contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
                 calculateContributionDTO.getMagCourtOutcome(), crownCourtOutcome);
 
