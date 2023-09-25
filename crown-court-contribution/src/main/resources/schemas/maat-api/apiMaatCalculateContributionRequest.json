@@ -142,10 +142,12 @@
       "description": "Committal date",
       "format": "date-time"
     },
-    "crownCourtSummary": {
-      "type": "object",
-      "description": "Crown Court Summary",
-      "$ref": "apiCrownCourtSummary.json"
+    "crownCourtOutcome": {
+      "type": "array",
+      "description": "list of crown court outcome",
+      "items": {
+        "$ref": "../common/apiCrownCourtOutcome.json"
+      }
     },
     "disposableIncomeAfterCrownHardship": {
       "type": "number",

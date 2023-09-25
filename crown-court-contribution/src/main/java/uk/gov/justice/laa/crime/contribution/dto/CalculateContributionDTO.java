@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
@@ -53,7 +53,7 @@ public class CalculateContributionDTO {
     private String removeContribs;
     private LocalDate committalDate;
     private String applicationStatus;
-    private ApiCrownCourtSummary crownCourtSummary;
+    private List<ApiCrownCourtOutcome> crownCourtOutcomeList;
     private BigDecimal disposableIncomeAfterCrownHardship;
     private BigDecimal disposableIncomeAfterMagHardship;
     private BigDecimal totalAnnualDisposableIncome;

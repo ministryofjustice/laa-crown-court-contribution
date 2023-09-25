@@ -5,8 +5,7 @@ import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
@@ -15,7 +14,6 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -156,13 +154,10 @@ public class TestModelDataBuilder {
                 .withOutcome(crownCourtOutcome);
     }
 
-    public static ApiCrownCourtSummary getApiCrownCourtSummary() {
-        List<ApiCrownCourtOutcome> apiCrownCourtOutcomeList = new ArrayList<>();
-        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED));
-        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED));
-        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));
-        return new ApiCrownCourtSummary()
-                .withCrownCourtOutcome(apiCrownCourtOutcomeList);
+    public static List<ApiCrownCourtOutcome> getApiCrownCourtSummary() {
+        return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED),
+                getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED),
+                getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));
     }
 
     public static RepOrderDTO getRepOrderDTO() {
@@ -480,5 +475,4 @@ public class TestModelDataBuilder {
                 .monthlyContributions(BigDecimal.ZERO)
                 .build();
     }
-
 }
