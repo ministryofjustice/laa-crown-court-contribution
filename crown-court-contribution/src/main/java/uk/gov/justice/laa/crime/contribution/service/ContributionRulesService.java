@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.repository.ContributionRulesRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -42,8 +42,8 @@ public class ContributionRulesService {
      * Returns active crown-court outcome from object passed in.
      * The active one is the first in the collection (already ordered in get_crown_court_outcomes)
      */
-    public CrownCourtOutcome getActiveCCOutcome(ApiCrownCourtSummary crownCourtSummary) {
-        return crownCourtSummary.getCrownCourtOutcome().stream().findFirst()
+    public CrownCourtOutcome getActiveCCOutcome(List<ApiCrownCourtOutcome> crownCourtOutcomeList) {
+        return crownCourtOutcomeList.stream().findFirst()
                 .map(ApiCrownCourtOutcome::getOutcome).orElse(null);
     }
 
