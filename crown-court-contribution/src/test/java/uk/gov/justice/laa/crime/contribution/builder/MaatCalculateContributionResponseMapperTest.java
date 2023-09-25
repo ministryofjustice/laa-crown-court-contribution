@@ -6,23 +6,21 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 
 import java.math.BigDecimal;
 
 @ExtendWith(SoftAssertionsExtension.class)
-class MaatCalculateContributionResponseMapperTest {
+class ApiMaatCalculateContributionResponseMapperTest {
     @InjectSoftAssertions
     private SoftAssertions softly;
 
     @Test
-    void givenAValidApiCalculateContributionResponse_whenMapIsInvoked_thenReturnMaatCalculateContributionResponse() {
+    void givenAValidApiCalculateContributionResponse_whenMapIsInvoked_thenReturnApiMaatCalculateContributionResponse() {
         ApiCalculateContributionResponse apiCalculateContributionResponse = TestModelDataBuilder.getApiCalculateContributionResponse();
         MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper = new MaatCalculateContributionResponseMapper();
-        MaatCalculateContributionResponse maatCalculateContributionResponse = maatCalculateContributionResponseMapper.map(apiCalculateContributionResponse, BigDecimal.ONE, null, 0);
+        ApiMaatCalculateContributionResponse maatCalculateContributionResponse = maatCalculateContributionResponseMapper.map(apiCalculateContributionResponse, BigDecimal.ONE, null, 0);
         softly.assertThat(maatCalculateContributionResponse.getMonthlyContributions()).isEqualTo(apiCalculateContributionResponse.getMonthlyContributions());
         softly.assertThat(maatCalculateContributionResponse.getUpfrontContributions()).isEqualTo(apiCalculateContributionResponse.getUpfrontContributions());
         softly.assertThat(maatCalculateContributionResponse.getBasedOn()).isEqualTo(apiCalculateContributionResponse.getBasedOn());

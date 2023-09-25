@@ -14,15 +14,16 @@ import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.AppealContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
-import uk.gov.justice.laa.crime.contribution.service.CompareContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,7 +35,10 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @WebMvcTest(CrownCourtContributionController.class)
 class CrownCourtContributionControllerTest {
 
-    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/appeal";
+    private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
+
+    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/" + TestModelDataBuilder.REP_ID
+            + "/summaries";
 
     @Autowired
     private MockMvc mvc;
@@ -48,50 +52,67 @@ class CrownCourtContributionControllerTest {
     @MockBean
     private MaatCalculateContributionService maatCalculateContributionService;
 
-    @MockBean
-    private CompareContributionService compareContributionService;
-
-
     @Test
     void givenValidRequest_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class))).thenReturn(Optional.empty());
+        when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class))).thenReturn(Optional.empty());
 
         when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
-                .thenReturn(new MaatCalculateContributionResponse());
+                .thenReturn(new ApiMaatCalculateContributionResponse());
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenInvalidRequest_whenCalculateAppealContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class)))
+        when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class)))
                 .thenThrow(new ValidationException("Test validation exception"));
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenClientApiException_whenCalculateAppealContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        AppealContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
+        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        when(calculateContributionValidator.validate(any(MaatCalculateContributionRequest.class)))
+        when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class)))
                 .thenReturn(Optional.empty());
         when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
                 .thenThrow(new APIClientException("Test api client exception"));
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestData, ENDPOINT_URL, false))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
+
+    @Test
+    void givenValidRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
+        when(maatCalculateContributionService.getContributionSummaries(anyInt(), any()))
+                .thenReturn(List.of(new ApiContributionSummary()));
+
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL, false))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void givenClientApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
+        when(maatCalculateContributionService.getContributionSummaries(anyInt(), any()))
+                .thenThrow(new APIClientException("Test api client exception"));
+
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL, false))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
 }

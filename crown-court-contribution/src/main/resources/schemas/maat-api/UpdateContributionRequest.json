@@ -7,7 +7,7 @@
   "properties": {
     "id": {
       "type": "integer",
-      "description": "The ID of the correspondence record"
+      "description": "The ID of the contribution record"
     },
     "userModified": {
       "type": "string",

@@ -78,7 +78,7 @@ public class ContributionService {
 
     @Transactional
     public ContributionResponseDTO checkContribsCondition(ContributionRequestDTO request) {
-        ContributionResponseDTO contributionResponseDTO = null;
+        ContributionResponseDTO contributionResponseDTO;
         AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
 
         ContributionResponseDTO contributionResponse = new ContributionResponseDTO();
@@ -188,16 +188,13 @@ public class ContributionService {
     }
 
     public boolean hasCCOutcomeChanged(final int repId, final String laaTransactionId) {
-        boolean isOutcomeChanged = false;
         List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId, laaTransactionId);
         if (null != repOrderCCOutcomeList && !repOrderCCOutcomeList.isEmpty()) {
             Optional<RepOrderCCOutcomeDTO> outcomeDTO = repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
-            if (outcomeDTO.isPresent() && !(null == outcomeDTO.get().getOutcome()
-                    || CrownCourtOutcome.AQUITTED.getCode().equals(outcomeDTO.get().getOutcome()))) {
-                isOutcomeChanged = true;
-            }
+            return outcomeDTO.isPresent() && outcomeDTO.get().getOutcome() != null
+                    && !CrownCourtOutcome.AQUITTED.getCode().equals(outcomeDTO.get().getOutcome());
         }
-        return isOutcomeChanged;
+        return false;
     }
 
     public boolean hasApplicationStatusChanged(RepOrderDTO repOrderDTO, CaseType caseType, String status) {

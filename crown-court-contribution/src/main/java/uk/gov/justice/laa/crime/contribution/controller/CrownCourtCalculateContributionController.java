@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.CalculateContributionService;
-
 
 @Slf4j
 @RestController
@@ -30,7 +28,7 @@ public class CrownCourtCalculateContributionController {
     @Operation(description = "Calculate Contribution")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = MaatCalculateContributionResponse.class)
+                    schema = @Schema(implementation = ApiCalculateContributionResponse.class)
             )
     )
     @ApiResponse(responseCode = "400",

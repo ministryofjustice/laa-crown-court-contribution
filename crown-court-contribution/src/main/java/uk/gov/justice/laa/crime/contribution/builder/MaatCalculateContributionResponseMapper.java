@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.MaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 
 import java.math.BigDecimal;
 
@@ -11,17 +11,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class MaatCalculateContributionResponseMapper {
 
-    public MaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
-                                                        BigDecimal contributionCap, String effectiveDate,
-                                                        Integer totalMonths) {
-        MaatCalculateContributionResponse maatCalculateContributionResponse = new MaatCalculateContributionResponse();
-        maatCalculateContributionResponse.withContributionCap(contributionCap);
-        maatCalculateContributionResponse.withEffectiveDate(effectiveDate);
-        maatCalculateContributionResponse.withTotalMonths(totalMonths);
-        maatCalculateContributionResponse.withMonthlyContributions(apiCalculateContributionResponse.getMonthlyContributions());
-        maatCalculateContributionResponse.withUpfrontContributions(apiCalculateContributionResponse.getUpfrontContributions());
-        maatCalculateContributionResponse.withUpliftApplied(apiCalculateContributionResponse.getUpliftApplied());
-        maatCalculateContributionResponse.withBasedOn(apiCalculateContributionResponse.getBasedOn());
-        return maatCalculateContributionResponse;
+    public ApiMaatCalculateContributionResponse map(ApiCalculateContributionResponse apiCalculateContributionResponse,
+                                                 BigDecimal contributionCap, String effectiveDate,
+                                                 Integer totalMonths) {
+        return new ApiMaatCalculateContributionResponse()
+                .withContributionCap(contributionCap)
+                .withEffectiveDate(effectiveDate)
+                .withTotalMonths(totalMonths)
+                .withMonthlyContributions(apiCalculateContributionResponse.getMonthlyContributions())
+                .withUpfrontContributions(apiCalculateContributionResponse.getUpfrontContributions())
+                .withUpliftApplied(apiCalculateContributionResponse.getUpliftApplied())
+                .withBasedOn(apiCalculateContributionResponse.getBasedOn());
     }
 }

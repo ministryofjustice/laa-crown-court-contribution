@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "CalculateContributionRequest.json",
+  "id": "apiMaatCalculateContributionRequest.json",
   "type": "object",
-  "title": "Calculate Contribution Request",
+  "title": "Calculate Contribution Request from MAAT application",
   "description": "Request data for calculating contributions following an appeal",
   "properties": {
-    "id": {
+    "contributionId": {
       "type": "integer",
       "description": "ID"
     },
@@ -66,23 +66,9 @@
       "description": "Date Uplift Removed",
       "format": "date-time"
     },
-    "dateCreated": {
-      "type": "string",
-      "description": "Date Contribution Created",
-      "format": "date-time"
-    },
     "userCreated": {
       "type": "string",
       "description": "The user creating the record"
-    },
-    "dateModified": {
-      "type": "string",
-      "description": "Date Modified",
-      "format": "date-time"
-    },
-    "userModified": {
-      "type": "string",
-      "description": "User Modified"
     },
     "createContributionOrder": {
       "type": "string",
@@ -107,10 +93,6 @@
     "ccOutcomeCount": {
       "type": "integer",
       "description": "Crown Court Outcome Count"
-    },
-    "seHistoryId": {
-      "type": "integer",
-      "description": "History Id"
     },
     "magCourtOutcome": {
       "type": "object",
@@ -148,7 +130,7 @@
       "description": "List of assessments performed",
       "minItems": 1,
       "items": {
-        "$ref": "../common/Assessment.json"
+        "$ref": "../common/apiAssessment.json"
       }
     },
     "removeContributions": {

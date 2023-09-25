@@ -1,17 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "CalculateContributionResponse.json",
+  "id": "apiMAATCalculateContributionResponse.json",
   "type": "object",
-  "title": "Calculate Contribution Response",
+  "title": "Calculate Contribution Response to MAAT",
   "description": "Response data following calculation of appeal contributions",
   "properties": {
-    "id": {
+    "contributionId": {
       "type": "integer",
       "description": "The ID of the contribution entry"
-    },
-    "applId": {
-      "type": "integer",
-      "description": "The application ID"
     },
     "repId": {
       "type": "integer",
@@ -66,24 +62,6 @@
       "format": "date-time",
       "description": "The date that an income uplift was removed"
     },
-    "dateCreated": {
-      "type": "string",
-      "format": "date-time",
-      "description": "The creation date"
-    },
-    "userCreated": {
-      "type": "string",
-      "description": "The user that created the record"
-    },
-    "dateModified": {
-      "type": "string",
-      "format": "date-time",
-      "description": "The date the contribution entry was modified"
-    },
-    "userModified": {
-      "type": "string",
-      "description": "The user modifying the record"
-    },
     "createContributionOrder": {
       "type": "string",
       "description": "Indicates whether a contribution order should be created"
@@ -109,25 +87,13 @@
       "type": "integer",
       "description": "The count of crown court outcomes"
     },
-    "seHistoryId": {
-      "type": "integer",
-      "description": "The se history ID"
-    },
     "totalMonths": {
       "type": "integer",
       "description": "Total months"
     },
-    "seHistoryId": {
-      "type": "integer",
-      "description": "The se history ID"
-    },
-    "contributionsSummary": {
-      "type": "array",
-      "description": "List of Contributions Summary",
-      "minItems": 1,
-      "items": {
-        "$ref": "../common/ContributionSummary.json"
-      }
+    "processActivity": {
+      "type": "boolean",
+      "description": "Indicator to call MATRIX process activity"
     }
   },
   "additionalProperties": false
