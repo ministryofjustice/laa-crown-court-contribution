@@ -44,7 +44,6 @@ public class CreateContributionRequestMapper {
                 .withUpliftApplied(calculateContributionDTO.getUpliftApplied())
                 .withBasedOn(calculateContributionDTO.getBasedOn())
                 .withUserCreated(calculateContributionDTO.getUserCreated())
-                .withCorrespondenceId(calculateContributionDTO.getCorrespondenceId())
                 .withCreateContributionOrder(calculateContributionDTO.getCreateContributionOrder())
                 .withCalcDate(convertDateToDateTime(calculateContributionDTO.getCalcDate()))
                 .withContributionFileId(calculateContributionDTO.getContributionFileId())

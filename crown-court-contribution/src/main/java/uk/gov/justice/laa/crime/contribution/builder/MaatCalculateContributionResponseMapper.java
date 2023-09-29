@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
 import java.math.BigDecimal;
 
@@ -16,7 +17,7 @@ public class MaatCalculateContributionResponseMapper {
                                                  Integer totalMonths) {
         return new ApiMaatCalculateContributionResponse()
                 .withContributionCap(contributionCap)
-                .withEffectiveDate(effectiveDate)
+                .withEffectiveDate(DateUtil.convertDateToDateTime(DateUtil.parse(effectiveDate)))
                 .withTotalMonths(totalMonths)
                 .withMonthlyContributions(apiCalculateContributionResponse.getMonthlyContributions())
                 .withUpfrontContributions(apiCalculateContributionResponse.getUpfrontContributions())

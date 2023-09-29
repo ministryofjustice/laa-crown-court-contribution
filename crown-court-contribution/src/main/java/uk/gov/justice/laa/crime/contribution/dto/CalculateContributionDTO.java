@@ -39,11 +39,6 @@ public class CalculateContributionDTO {
     private LocalDate dateUpliftRemoved;
     private String userCreated;
     private String createContributionOrder;
-    private Integer correspondenceId;
-    private String active;
-    private LocalDate replacedDate;
-    private Boolean latest;
-    private Integer ccOutcomeCount;
     private CaseType caseType;
     private List<ApiAssessment> assessments;
     private AppealType appealType;

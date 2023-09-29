@@ -25,7 +25,7 @@ class ApiMaatCalculateContributionResponseMapperTest {
         softly.assertThat(maatCalculateContributionResponse.getUpfrontContributions()).isEqualTo(apiCalculateContributionResponse.getUpfrontContributions());
         softly.assertThat(maatCalculateContributionResponse.getBasedOn()).isEqualTo(apiCalculateContributionResponse.getBasedOn());
         softly.assertThat(maatCalculateContributionResponse.getUpliftApplied()).isEqualTo(apiCalculateContributionResponse.getUpliftApplied());
-        softly.assertThat(maatCalculateContributionResponse.getEffectiveDate()).isEqualTo(null);
+        softly.assertThat(maatCalculateContributionResponse.getEffectiveDate()).isNull();
         softly.assertThat(maatCalculateContributionResponse.getTotalMonths()).isEqualTo(0);
         softly.assertThat(maatCalculateContributionResponse.getContributionCap()).isEqualTo(BigDecimal.ONE);
         softly.assertAll();

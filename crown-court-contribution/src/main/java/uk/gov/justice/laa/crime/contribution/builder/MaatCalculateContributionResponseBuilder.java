@@ -17,22 +17,15 @@ public class MaatCalculateContributionResponseBuilder {
         return new ApiMaatCalculateContributionResponse()
                 .withContributionId(contribution.getId())
                 .withRepId(contribution.getRepId())
-                .withContributionFileId(contribution.getContributionFileId())
-                .withEffectiveDate(getLocalDateString(contribution.getEffectiveDate()))
+                .withEffectiveDate(convertDateToDateTime(contribution.getEffectiveDate()))
                 .withCalcDate(convertDateToDateTime(contribution.getCalcDate()))
                 .withContributionCap(contribution.getContributionCap())
                 .withMonthlyContributions(contribution.getMonthlyContributions())
                 .withUpfrontContributions(contribution.getUpfrontContributions())
                 .withUpliftApplied(contribution.getUpliftApplied())
                 .withBasedOn(contribution.getBasedOn())
-                .withTransferStatus(contribution.getTransferStatus())
-                .withDateUpliftApplied(convertDateToDateTime(contribution.getDateUpliftApplied()))
-                .withDateUpliftRemoved(convertDateToDateTime(contribution.getDateUpliftRemoved()))
                 .withCreateContributionOrder(contribution.getCreateContributionOrder())
-                .withCorrespondenceId(contribution.getCorrespondenceId())
-                .withActive(contribution.getActive())
                 .withReplacedDate(convertDateToDateTime(contribution.getReplacedDate()))
-                .withLatest(contribution.getLatest())
                 .withCcOutcomeCount(contribution.getCcOutcomeCount());
     }
 }

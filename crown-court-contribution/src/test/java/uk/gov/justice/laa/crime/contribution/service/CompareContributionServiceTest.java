@@ -35,7 +35,7 @@ class CompareContributionServiceTest {
         when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean())).thenReturn(List.of());
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.APPEAL_CC.getCaseTypeString(),
-                null, null, null, null, null, null);
+                null, null, null, null, null);
 
         int result = compareContributionService.compareContribution(calculateContributionDTO);
         assertThat(result).isZero();
@@ -48,7 +48,7 @@ class CompareContributionServiceTest {
         when(contributionService.isCds15WorkAround(any())).thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                null, null, null, null, "N", null);
+                null, null, null, null, null);
 
         int result = compareContributionService.compareContribution(calculateContributionDTO);
         assertThat(result).isZero();
@@ -61,7 +61,7 @@ class CompareContributionServiceTest {
         when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                null, null, null, null, "N", null);
+                null, null, null, null, null);
 
         int result = compareContributionService.compareContribution(calculateContributionDTO);
         assertThat(result).isZero();
@@ -75,7 +75,7 @@ class CompareContributionServiceTest {
         when(contributionService.hasMessageOutcomeChanged(anyString(), any())).thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
         int result = compareContributionService.compareContribution(calculateContributionDTO);
 
         assertThat(result).isOne();
@@ -89,7 +89,7 @@ class CompareContributionServiceTest {
         when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(1), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(1), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
         int result = compareContributionService.compareContribution(calculateContributionDTO);
 
         assertThat(result).isOne();
@@ -104,7 +104,7 @@ class CompareContributionServiceTest {
                 thenReturn(CorrespondenceState.builder().status(CorrespondenceStatus.APPEAL_CC.getStatus()).build());
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.APPEAL_CC.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
         int result = compareContributionService.compareContribution(calculateContributionDTO);
 
         assertThat(result).isOne();
@@ -119,7 +119,7 @@ class CompareContributionServiceTest {
                 thenReturn(CorrespondenceState.builder().status(CorrespondenceStatus.APPEAL_CC.getStatus()).build());
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
         int result = compareContributionService.compareContribution(calculateContributionDTO);
 
         assertThat(result).isEqualTo(2);
@@ -135,7 +135,7 @@ class CompareContributionServiceTest {
                 thenReturn(CorrespondenceState.builder().status(CorrespondenceStatus.CDS15.getStatus()).build());
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
         int result = compareContributionService.compareContribution(calculateContributionDTO);
 
         assertThat(result).isEqualTo(2);
@@ -151,7 +151,7 @@ class CompareContributionServiceTest {
                 thenReturn(CorrespondenceState.builder().status(CorrespondenceStatus.REASS.getStatus()).build());
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
 
         int result = compareContributionService.compareContribution(calculateContributionDTO);
         assertThat(result).isOne();
@@ -167,7 +167,7 @@ class CompareContributionServiceTest {
         when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
         int result = compareContributionService.compareContribution(calculateContributionDTO);
 
         assertThat(result).isEqualTo(2);
@@ -183,7 +183,7 @@ class CompareContributionServiceTest {
         when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
-                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(),"Y", MagCourtOutcome.APPEAL_TO_CC);
+                BigDecimal.valueOf(250), BigDecimal.valueOf(250), BigDecimal.valueOf(250), LocalDate.now(), MagCourtOutcome.APPEAL_TO_CC);
         int result = compareContributionService.compareContribution(calculateContributionDTO);
 
         assertThat(result).isOne();

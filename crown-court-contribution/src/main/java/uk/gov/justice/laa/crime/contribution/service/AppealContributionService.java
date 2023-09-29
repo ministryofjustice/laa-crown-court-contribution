@@ -13,7 +13,7 @@ import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRe
 import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,10 +27,9 @@ public class AppealContributionService {
     private final GetContributionAmountRequestMapper getContributionAmountRequestMapper;
     private final CreateContributionRequestMapper createContributionRequestMapper;
 
-
     private AssessmentResult determineAssessmentResult(List<ApiAssessment> assessments) {
         for (ApiAssessment assessment : assessments) {
-            if (assessment.getStatus() == AssessmentStatus.COMPLETE && assessment.getResult() == AssessmentResult.PASS) {
+            if (assessment.getStatus() == CurrentStatus.COMPLETE && assessment.getResult() == AssessmentResult.PASS) {
                 return AssessmentResult.PASS;
             }
         }

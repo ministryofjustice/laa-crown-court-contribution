@@ -215,7 +215,7 @@ public class MaatCalculateContributionService {
         }
         if ((calculateContributionDTO.getMonthlyContributions() != null
                 && response.getMonthlyContributions().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
-                || (response.getEffectiveDate() != null && !response.getEffectiveDate().equals(calculateContributionDTO.getEffectiveDate().toString()))
+                || (response.getEffectiveDate() != null && !response.getEffectiveDate().toLocalDate().equals(calculateContributionDTO.getEffectiveDate()))
         ) {
             if (TransferStatus.REQUESTED.equals(currentTransferStatus)) {
                 TransferStatus transferStatus = (currentContributionFileId == null) ? null : TransferStatus.SENT;
@@ -270,7 +270,7 @@ public class MaatCalculateContributionService {
                                            final Contribution latestSentContribution) {
         return ((response.getMonthlyContributions().compareTo(latestSentContribution.getMonthlyContributions()) != 0
                 || response.getUpfrontContributions().compareTo(latestSentContribution.getUpfrontContributions()) != 0
-                || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().equals(latestSentContribution.getEffectiveDate().toString())
+                || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().toLocalDate().equals(latestSentContribution.getEffectiveDate())
                 && BigDecimal.ZERO.compareTo(response.getMonthlyContributions()) < 0)
                 || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId(), laaTransactionId))
                 && (calculateContributionDTO.getMagCourtOutcome() != null && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome())))
