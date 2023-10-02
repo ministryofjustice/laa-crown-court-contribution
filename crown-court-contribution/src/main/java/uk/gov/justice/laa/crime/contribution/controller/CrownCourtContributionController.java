@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
+import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
@@ -29,6 +30,8 @@ import java.util.List;
 @RequestMapping("api/internal/v1/contribution")
 public class CrownCourtContributionController {
 
+    private final ContributionService contributionService;
+    private final CalculateContributionValidator calculateContributionValidator;
     private final MaatCalculateContributionService maatCalculateContributionService;
 
 
@@ -96,6 +99,30 @@ public class CrownCourtContributionController {
             @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
         log.info("Received request to get contribution summaries for repId {}", repId);
         return ResponseEntity.ok(maatCalculateContributionService.getContributionSummaries(repId, laaTransactionId));
+    }
+
+
+    @PostMapping(value = "/request-transfer", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "Request Contributions Transfer")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400",
+            description = "Bad request",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorDTO.class)
+            )
+    )
+    @ApiResponse(responseCode = "500",
+            description = "Internal server error",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorDTO.class)
+            )
+    )
+    public ResponseEntity<Void> requestTransfer(@Valid @RequestBody ApiContributionTransferRequest request,
+                                          @RequestHeader(value = "Laa-Transaction-Id", required = false)
+                                          String laaTransactionId) {
+        log.info("Received request to transfer contribution for ID: {}", request.getContributionId());
+        contributionService.requestTransfer(request, laaTransactionId);
+        return ResponseEntity.ok().build();
     }
 
 }

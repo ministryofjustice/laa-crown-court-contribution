@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
@@ -215,4 +216,11 @@ public class ContributionService {
         return !contributionList.isEmpty();
     }
 
+    public void requestTransfer(final ApiContributionTransferRequest transferRequest, final String laaTransactionId) {
+        UpdateContributionRequest updateRequest = new UpdateContributionRequest()
+                .withId(transferRequest.getContributionId())
+                .withTransferStatus(TransferStatus.REQUESTED)
+                .withUserModified(transferRequest.getUserModified());
+        maatCourtDataService.updateContribution(updateRequest, laaTransactionId);
+    }
 }
