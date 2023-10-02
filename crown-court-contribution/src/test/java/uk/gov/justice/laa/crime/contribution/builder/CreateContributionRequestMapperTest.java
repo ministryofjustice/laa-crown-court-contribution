@@ -46,7 +46,7 @@ class CreateContributionRequestMapperTest {
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),
                 new BigDecimal(500), null, null,
-                TestModelDataBuilder.TEST_DATE.toLocalDate(), "N", null);
+                TestModelDataBuilder.TEST_DATE.toLocalDate(), null);
 
         BigDecimal appealContributionAmount = BigDecimal.valueOf(500);
         CreateContributionRequest request = mapper.map(calculateContributionDTO, appealContributionAmount);

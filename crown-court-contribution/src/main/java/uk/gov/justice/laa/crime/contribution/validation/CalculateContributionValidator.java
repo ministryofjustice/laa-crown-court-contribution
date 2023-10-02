@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public class CalculateContributionValidator {
 
         boolean isNoCompletedAssessment = maatCalculateContributionRequest.getAssessments()
                 .stream()
-                .filter(assessment -> assessment.getStatus() == AssessmentStatus.COMPLETE)
+                .filter(assessment -> assessment.getStatus() == CurrentStatus.COMPLETE)
                 .toList()
                 .isEmpty();
         if (isNoCompletedAssessment) {

@@ -334,7 +334,7 @@ public class TestModelDataBuilder {
     public static ApiAssessment buildAssessment() {
         return new ApiAssessment()
                 .withAssessmentType(AssessmentType.INIT)
-                .withStatus(AssessmentStatus.COMPLETE)
+                .withStatus(CurrentStatus.COMPLETE)
                 .withResult(AssessmentResult.PASS);
     }
 
@@ -351,7 +351,6 @@ public class TestModelDataBuilder {
                                                                                            BigDecimal upfrontContributions,
                                                                                            BigDecimal monthlyContributions,
                                                                                            LocalDate effectiveDate,
-                                                                                           String isActive,
                                                                                            MagCourtOutcome magCourtOutcome) {
         return CalculateContributionDTO.builder()
                 .repId(123)
@@ -360,9 +359,8 @@ public class TestModelDataBuilder {
                 .contributionCap(contributionCap)
                 .upfrontContributions(upfrontContributions)
                 .monthlyContributions(monthlyContributions)
-                .replacedDate(null)
                 .effectiveDate(effectiveDate)
-                .active(isActive).magCourtOutcome(magCourtOutcome)
+                .magCourtOutcome(magCourtOutcome)
                 .assessments(List.of(buildAssessment()))
                 .lastOutcome(buildLastOutcome())
                 .userCreated("TEST")
@@ -408,7 +406,7 @@ public class TestModelDataBuilder {
         return new ApiMaatCalculateContributionResponse()
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpliftApplied(Constants.N)
-                .withEffectiveDate(COMMITTAL_DATE.toString())
+                .withEffectiveDate(TEST_DATE)
                 .withUpfrontContributions(BigDecimal.ZERO)
                 .withTotalMonths(0);
     }

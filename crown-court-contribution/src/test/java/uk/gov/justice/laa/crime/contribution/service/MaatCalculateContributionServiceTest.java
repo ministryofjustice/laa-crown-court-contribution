@@ -639,7 +639,7 @@ class MaatCalculateContributionServiceTest {
                 .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
                 .build();
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(LocalDate.now().toString())
+                .withEffectiveDate(LocalDateTime.now())
                 .withMonthlyContributions(BigDecimal.TEN)
                 .withUpfrontContributions(BigDecimal.ZERO);
         Contribution latestSentContribution = Contribution.builder()
@@ -657,7 +657,7 @@ class MaatCalculateContributionServiceTest {
                 .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
                 .build();
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(LocalDate.now().toString())
+                .withEffectiveDate(LocalDateTime.now())
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpfrontContributions(BigDecimal.ZERO);
         Contribution latestSentContribution = Contribution.builder()
@@ -675,7 +675,7 @@ class MaatCalculateContributionServiceTest {
                 .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
                 .build();
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate().toString())
+                .withEffectiveDate(TestModelDataBuilder.TEST_DATE)
                 .withMonthlyContributions(BigDecimal.TEN)
                 .withUpfrontContributions(BigDecimal.ZERO);
         Contribution latestSentContribution = Contribution.builder()
@@ -808,7 +808,7 @@ class MaatCalculateContributionServiceTest {
                 .monthlyContributions(BigDecimal.TEN)
                 .build();
         ApiMaatCalculateContributionResponse expectedResponse = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(LocalDate.now().toString())
+                .withEffectiveDate(LocalDateTime.now())
                 .withMonthlyContributions(BigDecimal.ZERO)
                 .withUpfrontContributions(BigDecimal.ZERO)
                 .withUpliftApplied(Constants.N)
@@ -962,7 +962,7 @@ class MaatCalculateContributionServiceTest {
                 .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
                 .build();
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(LocalDate.now().toString())
+                .withEffectiveDate(LocalDateTime.now())
                 .withMonthlyContributions(BigDecimal.TEN)
                 .withUpfrontContributions(BigDecimal.ZERO);
         Contribution latestSentContribution = Contribution.builder()
