@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CalculateContributionServiceTest {
 
     @Test
-    void giveValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMonthlyContributionWhenGreaterThanMinUpliftedMonthlyAmount() {
+    void givenValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMonthlyContributionWhenGreaterThanMinUpliftedMonthlyAmount() {
         CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(80);
@@ -32,7 +32,7 @@ class CalculateContributionServiceTest {
     }
 
     @Test
-    void giveValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMinUpliftedMonthlyAmountWhenMonthlyContributionIsSmaller() {
+    void givenValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMinUpliftedMonthlyAmountWhenMonthlyContributionIsSmaller() {
         CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(500);
         BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(80);
@@ -47,7 +47,7 @@ class CalculateContributionServiceTest {
     }
 
     @Test
-    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenReturnZeroWhenMonthlyContributionIsSmaller() {
+    void givenValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenReturnZeroWhenMonthlyContributionIsSmaller() {
         CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(100);
@@ -67,7 +67,7 @@ class CalculateContributionServiceTest {
 
     @ParameterizedTest
     @MethodSource("contributionCap")
-    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenMonthlyContributionsIsReturned(BigDecimal contributionCap) {
+    void givenValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenMonthlyContributionsIsReturned(BigDecimal contributionCap) {
         CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
@@ -87,7 +87,7 @@ class CalculateContributionServiceTest {
     }
 
     @Test
-    void giveValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenContributionCapIsReturnedWhenMonthlyContributionIsGreater() {
+    void givenValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenContributionCapIsReturnedWhenMonthlyContributionIsGreater() {
         CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
