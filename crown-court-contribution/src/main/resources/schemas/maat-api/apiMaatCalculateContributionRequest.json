@@ -17,18 +17,9 @@
       "type": "integer",
       "description": "The representation order ID"
     },
-    "contributionFileId": {
-      "type": "integer",
-      "description": "The Contribution File Id"
-    },
     "effectiveDate": {
       "type": "string",
       "description": "Effective Date",
-      "format": "date-time"
-    },
-    "calcDate": {
-      "type": "string",
-      "description": "Calculate Contribution Date",
       "format": "date-time"
     },
     "contributionCap": {
@@ -43,19 +34,6 @@
       "type": "number",
       "description": "Upfront Contributions"
     },
-    "upliftApplied": {
-      "type": "string",
-      "description": "Uplift Applied"
-    },
-    "basedOn": {
-      "type": "string",
-      "description": "Based On"
-    },
-    "transferStatus": {
-      "type": "object",
-      "description": "Transfer status",
-      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus"
-    },
     "dateUpliftApplied": {
       "type": "string",
       "description": "Date Uplift Applied",
@@ -69,26 +47,6 @@
     "userCreated": {
       "type": "string",
       "description": "The user creating the record"
-    },
-    "createContributionOrder": {
-      "type": "string",
-      "description": "Create Contribution Order"
-    },
-    "correspondenceId": {
-      "type": "integer",
-      "description": "Correspondence Id"
-    },
-    "active": {
-      "type": "string",
-      "description": "Active Record Indicator"
-    },
-    "replacedDate": {
-      "type": "string",
-      "description": "Replaced Date"
-    },
-    "latest": {
-      "type": "boolean",
-      "description": "Latest Record Indicator"
     },
     "ccOutcomeCount": {
       "type": "integer",

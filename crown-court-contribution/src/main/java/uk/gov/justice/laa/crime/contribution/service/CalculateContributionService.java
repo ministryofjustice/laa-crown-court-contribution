@@ -10,7 +10,6 @@ import uk.gov.justice.laa.crime.contribution.util.CalculateContributionUtil;
 
 import java.math.BigDecimal;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor

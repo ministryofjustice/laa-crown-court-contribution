@@ -24,7 +24,7 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -212,7 +212,7 @@ class CrownCourtContributionIntegrationTest {
     void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
         ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
-        assessment.withStatus(AssessmentStatus.IN_PROGRESS);
+        assessment.withStatus(CurrentStatus.IN_PROGRESS);
         appealContributionRequest.setAssessments(List.of(assessment));
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 

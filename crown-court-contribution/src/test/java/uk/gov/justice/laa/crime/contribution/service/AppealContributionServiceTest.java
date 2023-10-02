@@ -43,7 +43,7 @@ class AppealContributionServiceTest {
     @Test
     void givenAssessmentFailed_whenCalculateContributionIsInvoked_thenContributionDataIsUpdated() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.APPEAL_CC.getCaseTypeString(),
-                null, null, null, null, null, null);
+                null, null, null, null, null);
 
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.setResult(AssessmentResult.FAIL);
@@ -73,7 +73,7 @@ class AppealContributionServiceTest {
     void givenAssessmentPassed_whenCalculateContributionIsInvoked_thenAppealContributionDataIsNotUpdated() {
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.APPEAL_CC.getCaseTypeString(),
-                null, null, null, null, null, null);
+                null, null, null, null, null);
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
         when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))

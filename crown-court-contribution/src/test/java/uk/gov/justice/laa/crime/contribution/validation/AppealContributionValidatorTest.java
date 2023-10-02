@@ -6,7 +6,7 @@ import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.LastOutcome;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentStatus;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,7 +49,7 @@ class AppealContributionValidatorTest {
     void givenNoCompleteAssessment_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
         ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
-        assessment.withStatus(AssessmentStatus.IN_PROGRESS);
+        assessment.withStatus(CurrentStatus.IN_PROGRESS);
         maatCalculateContributionRequest.setAssessments(List.of(assessment));
 
         assertThatThrownBy(() -> calculateContributionValidator.validate(maatCalculateContributionRequest))
