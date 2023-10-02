@@ -14,9 +14,10 @@ import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
@@ -45,6 +46,9 @@ class CrownCourtContributionControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private ContributionService contributionService;
 
     @MockBean
     private CalculateContributionValidator calculateContributionValidator;

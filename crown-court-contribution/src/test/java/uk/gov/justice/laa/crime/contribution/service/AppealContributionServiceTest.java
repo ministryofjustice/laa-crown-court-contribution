@@ -9,9 +9,9 @@ import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMa
 import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;

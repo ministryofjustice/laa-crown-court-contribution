@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
@@ -25,11 +26,11 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-    @RequestMapping("api/internal/v1/contribution")
+@RequestMapping("api/internal/v1/contribution")
 public class CrownCourtContributionController {
 
     private final MaatCalculateContributionService maatCalculateContributionService;
-    private final CalculateContributionValidator calculateContributionValidator;
+
 
     @PostMapping(value = "/calculate-contribution", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Calculate Contribution")
@@ -69,6 +70,7 @@ public class CrownCourtContributionController {
     private CalculateContributionDTO preProcessRequest(ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
         return ContributionDTOBuilder.build(maatCalculateContributionRequest);
     }
+
 
     @GetMapping(value = "/{repId}/summaries", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get Contribution Summary")
