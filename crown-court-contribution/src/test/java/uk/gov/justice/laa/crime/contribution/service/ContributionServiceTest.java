@@ -1,5 +1,8 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,6 +37,7 @@ import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBu
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(SoftAssertionsExtension.class)
 class ContributionServiceTest {
     private static final String CONTRIBUTION_NO = "N";
     private static final String CONTRIBUTION_YES = "Y";
@@ -41,6 +45,9 @@ class ContributionServiceTest {
     private static final String RORS_STATUS_CURR = "CURR";
     private static final String LAA_TRANSACTION_ID = "laaTransactionId";
     private static final LocalDateTime dateCreated = LocalDateTime.parse("2023-07-10T15:01:25");
+
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @InjectMocks
     private ContributionService contributionService;
@@ -520,17 +527,17 @@ class ContributionServiceTest {
 
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
 
-        assertThat(response.getId())
+        softly.assertThat(response.getId())
                 .isEqualTo(1);
-        assertThat(response.getCorrespondenceType())
+        softly.assertThat(response.getCorrespondenceType())
                 .isEqualTo("CONTRIBUTION_NOTICE");
-        assertThat(response.getCorrespondenceTypeDesc())
+        softly.assertThat(response.getCorrespondenceTypeDesc())
                 .isEqualTo("Contribution Notice");
-        assertThat(response.getUpliftCote())
+        softly.assertThat(response.getUpliftCote())
                 .isEqualTo(1);
-        assertThat(response.getReassessmentCoteId())
+        softly.assertThat(response.getReassessmentCoteId())
                 .isEqualTo(1);
-        assertThat(response.getTemplateDesc())
+        softly.assertThat(response.getTemplateDesc())
                 .isEqualTo("No contributions required");
     }
 
@@ -544,19 +551,19 @@ class ContributionServiceTest {
 
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
 
-        assertThat(response.getDoContribs())
+        softly.assertThat(response.getDoContribs())
                 .isEqualTo("Y");
-        assertThat(response.getId())
+        softly.assertThat(response.getId())
                 .isEqualTo(1);
-        assertThat(response.getCorrespondenceType())
+        softly.assertThat(response.getCorrespondenceType())
                 .isEqualTo("CONTRIBUTION_NOTICE");
-        assertThat(response.getCorrespondenceTypeDesc())
+        softly.assertThat(response.getCorrespondenceTypeDesc())
                 .isEqualTo("Contribution Notice");
-        assertThat(response.getUpliftCote())
+        softly.assertThat(response.getUpliftCote())
                 .isEqualTo(1);
-        assertThat(response.getReassessmentCoteId())
+        softly.assertThat(response.getReassessmentCoteId())
                 .isEqualTo(1);
-        assertThat(response.getTemplateDesc())
+        softly.assertThat(response.getTemplateDesc())
                 .isEqualTo("No contributions required");
     }
 
@@ -570,11 +577,11 @@ class ContributionServiceTest {
 
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
 
-        assertThat(response.getDoContribs())
+        softly.assertThat(response.getDoContribs())
                 .isEqualTo("Y");
-        assertThat(response.getId())
+        softly.assertThat(response.getId())
                 .isEqualTo(1);
-        assertThat(response.getCorrespondenceType())
+        softly.assertThat(response.getCorrespondenceType())
                 .isEmpty();
     }
 

@@ -1,6 +1,10 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,10 +15,11 @@ import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRespo
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+@ExtendWith(SoftAssertionsExtension.class)
 class CalculateContributionServiceTest {
+
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @Test
     void givenValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMonthlyContributionWhenGreaterThanMinUpliftedMonthlyAmount() {
@@ -27,8 +32,11 @@ class CalculateContributionServiceTest {
                 .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
                 .withUpliftedIncomePercent(new BigDecimal(10));
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
-        assertThat(response.getMonthlyContributions()).isGreaterThan(minUpliftedMonthlyAmount);
-        assertEquals(Constants.Y, response.getUpliftApplied());
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isGreaterThan(minUpliftedMonthlyAmount);
+        softly.assertThat(Constants.Y)
+                .isEqualTo(response.getUpliftApplied());
     }
 
     @Test
@@ -42,8 +50,11 @@ class CalculateContributionServiceTest {
                 .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
                 .withUpliftedIncomePercent(new BigDecimal(10));
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
-        assertThat(response.getMonthlyContributions()).isEqualTo(minUpliftedMonthlyAmount);
-        assertEquals(Constants.Y, response.getUpliftApplied());
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(minUpliftedMonthlyAmount);
+        softly.assertThat(Constants.Y)
+                .isEqualTo(response.getUpliftApplied());
     }
 
     @Test
@@ -59,10 +70,15 @@ class CalculateContributionServiceTest {
                 .withMinimumMonthlyAmount(minimumMonthlyAmount)
                 .withUpfrontTotalMonths(12);
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
-        assertThat(response.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
-        assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
-        assertEquals(Constants.N, response.getUpliftApplied());
-        assertEquals(Constants.MEANS, response.getBasedOn());
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(BigDecimal.ZERO);
+        softly.assertThat(response.getUpfrontContributions())
+                .isEqualTo(BigDecimal.ZERO);
+        softly.assertThat(Constants.N)
+                .isEqualTo(response.getUpliftApplied());
+        softly.assertThat(Constants.MEANS)
+                .isEqualTo(response.getBasedOn());
     }
 
     @ParameterizedTest
@@ -71,7 +87,6 @@ class CalculateContributionServiceTest {
         CalculateContributionService calculateContributionService = new CalculateContributionService();
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
-        //BigDecimal contributionCap = new BigDecimal(100);
         ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
                 .withUpliftApplied(false)
                 .withAnnualDisposableIncome(annualDisposableIncome)
@@ -80,10 +95,15 @@ class CalculateContributionServiceTest {
                 .withMinimumMonthlyAmount(minimumMonthlyAmount)
                 .withUpfrontTotalMonths(12);
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
-        assertThat(response.getMonthlyContributions()).isEqualTo(new BigDecimal(83));
-        assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
-        assertEquals(Constants.N, response.getUpliftApplied());
-        assertEquals(Constants.MEANS, response.getBasedOn());
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(new BigDecimal(83));
+        softly.assertThat(response.getUpfrontContributions())
+                .isEqualTo(contributionCap);
+        softly.assertThat(Constants.N)
+                .isEqualTo(response.getUpliftApplied());
+        softly.assertThat(Constants.MEANS)
+                .isEqualTo(response.getBasedOn());
     }
 
     @Test
@@ -100,10 +120,15 @@ class CalculateContributionServiceTest {
                 .withMinimumMonthlyAmount(minimumMonthlyAmount)
                 .withUpfrontTotalMonths(12);
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
-        assertThat(response.getMonthlyContributions()).isEqualTo(contributionCap);
-        assertThat(response.getUpfrontContributions()).isEqualTo(contributionCap);
-        assertEquals(Constants.N, response.getUpliftApplied());
-        assertEquals(Constants.OFFENCE_TYPE, response.getBasedOn());
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(contributionCap);
+        softly.assertThat(response.getUpfrontContributions())
+                .isEqualTo(contributionCap);
+        softly.assertThat(Constants.N)
+                .isEqualTo(response.getUpliftApplied());
+        softly.assertThat(Constants.OFFENCE_TYPE)
+                .isEqualTo(response.getBasedOn());
     }
     private static Stream<Arguments> contributionCap() {
         return Stream.of(Arguments.of(null, new BigDecimal(100)));
