@@ -34,8 +34,8 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 
 @DirtiesContext
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(CrownCourtContributionController.class)
-class CrownCourtContributionControllerTest {
+@WebMvcTest(ContributionController.class)
+class ContributionControllerTest {
 
     private static final String BASE_URL = "/api/internal/v1/contribution";
     private static final String ENDPOINT_URL = BASE_URL + "/calculate-contribution";

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
@@ -29,7 +28,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/internal/v1/contribution")
-public class CrownCourtContributionController {
+public class ContributionController {
 
     private final ContributionService contributionService;
     private final CalculateContributionValidator calculateContributionValidator;
