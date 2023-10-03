@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 
@@ -960,7 +962,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAInvalidTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
+    void givenAnInvalidTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
         Contribution contribution = TestModelDataBuilder.buildContribution();
         contribution.setTransferStatus(TransferStatus.MANUAL);
         contribution.setMonthlyContributions(BigDecimal.ONE);
@@ -973,7 +975,7 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAIValidContribution_whenHasContributionBeenSentIsInvoked_thenTrueIsReturn() {
+    void givenAnInvalidContribution_whenHasContributionBeenSentIsInvoked_thenTrueIsReturn() {
         Contribution contribution = TestModelDataBuilder.buildContribution();
         contribution.setTransferStatus(TransferStatus.SENT);
         contribution.setMonthlyContributions(BigDecimal.ONE);
@@ -983,6 +985,16 @@ class ContributionServiceTest {
 
         assertThat(hasContributionBeenSent)
                 .isTrue();
+    }
+
+    @Test
+    void givenContributionTransferRequest_whenTransferRequestIsInvoked_thenCourtDataAPIIsCalled() {
+        ApiContributionTransferRequest data = new ApiContributionTransferRequest()
+                .withUserModified("mock-u")
+                .withContributionId(1000);
+
+        contributionService.requestTransfer(data, LAA_TRANSACTION_ID);
+        verify(maatCourtDataService).updateContribution(any(UpdateContributionRequest.class), anyString());
     }
 }
 
