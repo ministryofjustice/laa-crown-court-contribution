@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.justice.laa.crime.contribution.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
@@ -31,18 +32,7 @@ public class CrownCourtCalculateContributionController {
                     schema = @Schema(implementation = ApiCalculateContributionResponse.class)
             )
     )
-    @ApiResponse(responseCode = "400",
-            description = "Bad request",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
-    @ApiResponse(responseCode = "500",
-            description = "Internal server error",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
+    @DefaultHTTPErrorResponse
     public ResponseEntity<ApiCalculateContributionResponse> calculateContribution(
             @Parameter(description = "Data required to calculate contributions",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,

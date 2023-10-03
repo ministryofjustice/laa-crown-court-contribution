@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.justice.laa.crime.contribution.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
@@ -42,18 +43,7 @@ public class CrownCourtContributionController {
                     schema = @Schema(implementation = ApiMaatCalculateContributionResponse.class)
             )
     )
-    @ApiResponse(responseCode = "400",
-            description = "Bad request",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
-    @ApiResponse(responseCode = "500",
-            description = "Internal server error",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
+    @DefaultHTTPErrorResponse
     public ResponseEntity<ApiMaatCalculateContributionResponse> calculateContribution(
             @Parameter(description = "Data required to calculate contributions",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -82,18 +72,7 @@ public class CrownCourtContributionController {
                     schema = @Schema(implementation = ApiMaatCalculateContributionResponse.class)
             )
     )
-    @ApiResponse(responseCode = "400",
-            description = "Bad request",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
-    @ApiResponse(responseCode = "500",
-            description = "Internal server error",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
+    @DefaultHTTPErrorResponse
     public ResponseEntity<List<ApiContributionSummary>> getContributionSummaries(
             @PathVariable int repId,
             @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
@@ -105,18 +84,7 @@ public class CrownCourtContributionController {
     @PostMapping(value = "/request-transfer", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Request Contributions Transfer")
     @ApiResponse(responseCode = "200")
-    @ApiResponse(responseCode = "400",
-            description = "Bad request",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
-    @ApiResponse(responseCode = "500",
-            description = "Internal server error",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-            )
-    )
+    @DefaultHTTPErrorResponse
     public ResponseEntity<Void> requestTransfer(@Valid @RequestBody ApiContributionTransferRequest request,
                                           @RequestHeader(value = "Laa-Transaction-Id", required = false)
                                           String laaTransactionId) {
