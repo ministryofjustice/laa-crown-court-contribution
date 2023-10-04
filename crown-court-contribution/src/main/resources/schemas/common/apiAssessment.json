@@ -30,5 +30,6 @@
     }
   },
   "additionalProperties": false,
-  "required": ["assessmentType", "status", "result"]
+  "required": ["assessmentType", "status", "result"],
+  "javaType": "uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment"
 }

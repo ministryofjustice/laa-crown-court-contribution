@@ -23,5 +23,6 @@
     }
   },
   "additionalProperties": false,
-  "required": ["outcome"]
+  "required": ["outcome"],
+  "javaType": "uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome"
 }

@@ -38,7 +38,9 @@ class CrimeHardshipServiceTest {
     @Test
     void givenAValidCalcHardshipForDetailRequest_whenCalculateHardshipForDetailIsInvokedAndTheApiCallFails_thenFailureIsHandled() {
 
-        when(hardshipAPIClient.post(any(), any(), any(), any())).thenThrow(new APIClientException());
+        when(hardshipAPIClient.post(any(), any(), any(), any()))
+                .thenThrow(new APIClientException());
+
         assertThatThrownBy(() -> crimeHardshipService.calculateHardshipForDetail(
                 TestModelDataBuilder.getApiCalculateHardshipByDetailRequest())
         ).isInstanceOf(APIClientException.class);

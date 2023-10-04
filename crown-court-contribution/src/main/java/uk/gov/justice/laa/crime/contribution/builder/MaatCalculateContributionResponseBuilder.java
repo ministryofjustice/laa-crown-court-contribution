@@ -3,11 +3,10 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionResponse;
 
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
-import static uk.gov.justice.laa.crime.contribution.util.DateUtil.getLocalDateString;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

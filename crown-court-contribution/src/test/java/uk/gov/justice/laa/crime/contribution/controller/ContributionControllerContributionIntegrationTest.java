@@ -21,9 +21,9 @@ import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.math.BigDecimal;
@@ -42,7 +42,7 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
-class CrownCourtContributionIntegrationTest {
+class ContributionControllerContributionIntegrationTest {
 
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);

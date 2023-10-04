@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.validation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.time.LocalDateTime;

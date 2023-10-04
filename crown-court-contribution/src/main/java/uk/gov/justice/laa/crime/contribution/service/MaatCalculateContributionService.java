@@ -8,10 +8,14 @@ import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
