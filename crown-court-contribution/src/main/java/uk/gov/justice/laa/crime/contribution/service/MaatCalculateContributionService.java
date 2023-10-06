@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.contribution.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.builder.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
@@ -293,7 +294,7 @@ public class MaatCalculateContributionService {
                                                           final ContributionResponseDTO contributionResponseDTO,
                                                           final String laaTransactionId) {
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
-        ContributionCalcParametersDTO contributionCalcParametersDTO = maatCourtDataService.getContributionCalcParameters(assEffectiveDate.toString(), laaTransactionId);
+        ContributionCalcParametersDTO contributionCalcParametersDTO = maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assEffectiveDate), laaTransactionId);
         CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
         boolean isContributionRuleApplicable = contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
                 calculateContributionDTO.getMagCourtOutcome(), crownCourtOutcome);

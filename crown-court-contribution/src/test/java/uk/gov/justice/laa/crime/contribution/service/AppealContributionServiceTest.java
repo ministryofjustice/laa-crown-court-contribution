@@ -108,4 +108,30 @@ class AppealContributionServiceTest {
         verify(maatCourtDataService, times(0))
                 .createContribution(any(CreateContributionRequest.class), anyString());
     }
+
+    @Test
+    void givenNoPriorContributions_whenCalculateAppealContributionIsInvoked_thenNullIsReturned() {
+
+        CalculateContributionDTO calculateContributionDTO =
+                TestModelDataBuilder.getContributionDTOForCompareContributionService(
+                        CaseType.APPEAL_CC.getCaseTypeString(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        Contribution currContribution = Contribution.builder().build();
+        currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
+
+        when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
+                .thenReturn(new GetContributionAmountRequest());
+        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
+                .thenReturn(BigDecimal.valueOf(0));
+        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+                .thenReturn(null);
+        ApiMaatCalculateContributionResponse response =
+                appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
+        assertThat(response).isNull();
+    }
 }

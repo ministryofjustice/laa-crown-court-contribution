@@ -26,6 +26,13 @@ class AppealContributionValidatorTest {
     }
 
     @Test
+    void givenLastOutcomeIsNotAvailable_whenValidateIsInvoked_thenNoExceptionIsRaised() {
+        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
+        maatCalculateContributionRequest.setLastOutcome(null);
+        assertThat(calculateContributionValidator.validate(maatCalculateContributionRequest)).isEmpty();
+    }
+
+    @Test
     void givenEmptyOutDateSet_whenValidateIsInvoked_thenNoExceptionIsRaised() {
         ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         maatCalculateContributionRequest.getLastOutcome().setDateSet(null);

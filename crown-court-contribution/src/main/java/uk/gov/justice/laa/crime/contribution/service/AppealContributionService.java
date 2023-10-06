@@ -44,15 +44,18 @@ public class AppealContributionService {
 
         Integer repId = calculateContributionDTO.getRepId();
         List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, laaTransactionId, true);
-        Contribution currContribution = currContributionList.get(0);
-        if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
-            CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
-            Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);
-            log.info("Contribution data has been updated");
-            return MaatCalculateContributionResponseBuilder.build(newContribution);
+        if (currContributionList != null) {
+            Contribution currContribution = currContributionList.get(0);
+            if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
+                CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
+                Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);
+                log.info("Contribution data has been updated");
+                return MaatCalculateContributionResponseBuilder.build(newContribution);
+            }
+            log.info("Contribution data is already up to date");
+            return MaatCalculateContributionResponseBuilder.build(currContribution);
         }
-        log.info("Contribution data is already up to date");
-        return MaatCalculateContributionResponseBuilder.build(currContribution);
+        return null;
     }
 
 }
