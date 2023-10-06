@@ -27,5 +27,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["caseType", "appealType", "outcome", "assessmentResult"]
+  "required": ["caseType", "appealType", "assessmentResult"]
 }

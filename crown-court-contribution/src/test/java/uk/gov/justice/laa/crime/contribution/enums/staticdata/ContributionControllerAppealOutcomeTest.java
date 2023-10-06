@@ -7,7 +7,7 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOu
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-class CrownCourtAppealOutcomeTest {
+class ContributionControllerAppealOutcomeTest {
 
     @Test
     void givenABlankString_whenGetFromIsInvoked_thenNullIsReturned() {

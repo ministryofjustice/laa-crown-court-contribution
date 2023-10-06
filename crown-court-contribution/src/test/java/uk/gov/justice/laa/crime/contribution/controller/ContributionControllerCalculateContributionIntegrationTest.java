@@ -35,7 +35,7 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
-class CrownCourtCalculateContributionIntegrationTest {
+class ContributionControllerCalculateContributionIntegrationTest {
 
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);

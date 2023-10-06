@@ -36,4 +36,20 @@ class GetContributionAmountRequestMapperTest {
 
     }
 
+    @Test
+    void givenContributionDTOWithNoLastOutcomeAndAssessmentResult_whenMapIsInvoked_thenReturnGetContributionAmountRequest() {
+
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder().caseType(CaseType.APPEAL_CC).appealType(AppealType.ACN)
+                .build();
+        GetContributionAmountRequestMapper mapper = new GetContributionAmountRequestMapper();
+
+        GetContributionAmountRequest request = mapper.map(calculateContributionDTO, AssessmentResult.PASS);
+
+        softly.assertThat(request.getCaseType()).isEqualTo(CaseType.APPEAL_CC);
+        softly.assertThat(request.getAppealType()).isEqualTo(AppealType.ACN);
+        softly.assertThat(request.getOutcome()).isNull();
+        softly.assertThat(request.getAssessmentResult()).isEqualTo(AssessmentResult.PASS);
+        softly.assertAll();
+
+    }
 }

@@ -3,7 +3,8 @@ package uk.gov.justice.laa.crime.contribution.validation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.time.LocalDateTime;
@@ -15,9 +16,9 @@ public class CalculateContributionValidator {
 
     public Optional<Void> validate(ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
         log.debug("Performing validation against calculate contributions request");
-        //LastOutcome is a mandatory attribute. Removed the redundant null checks LastOutcome.
-        if (maatCalculateContributionRequest.getLastOutcome().getDateSet() != null
-                    && maatCalculateContributionRequest.getLastOutcome().getDateSet().isAfter(LocalDateTime.now())) {
+        LastOutcome lastOutcome = maatCalculateContributionRequest.getLastOutcome();
+        if (lastOutcome != null && lastOutcome.getDateSet() != null
+                    && lastOutcome.getDateSet().isAfter(LocalDateTime.now())) {
                 throw new ValidationException("The dateSet for lastOutcome is invalid");
             }
 

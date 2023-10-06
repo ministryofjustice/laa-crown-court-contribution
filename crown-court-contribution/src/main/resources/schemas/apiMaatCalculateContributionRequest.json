@@ -88,7 +88,7 @@
       "description": "List of assessments performed",
       "minItems": 1,
       "items": {
-        "$ref": "../common/apiAssessment.json"
+        "$ref": "common/apiAssessment.json"
       }
     },
     "removeContributions": {
@@ -104,7 +104,7 @@
       "type": "array",
       "description": "list of crown court outcome",
       "items": {
-        "$ref": "../common/apiCrownCourtOutcome.json"
+        "$ref": "common/apiCrownCourtOutcome.json"
       }
     },
     "disposableIncomeAfterCrownHardship": {
@@ -121,5 +121,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["applId", "repId", "caseType", "appealType", "lastOutcome", "assessments"]
+  "required": ["applId", "repId", "caseType", "assessments"]
 }

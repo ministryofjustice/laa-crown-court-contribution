@@ -33,7 +33,9 @@ class ContributionRulesServiceTest {
 
         Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
                 CaseType.EITHER_WAY, null, null);
-        assertThat(response.isPresent() ? response.get() : Optional.empty()).isEqualTo(TestModelDataBuilder.getContributionVariationDTO());
+
+        assertThat(response.isPresent() ? response.get() : Optional.empty())
+                .isEqualTo(TestModelDataBuilder.getContributionVariationDTO());
     }
 
     @Test
@@ -44,7 +46,9 @@ class ContributionRulesServiceTest {
 
         Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
                 CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null);
-        assertThat(response.isPresent() ? response.get() : Optional.empty()).isEqualTo(TestModelDataBuilder.getContributionVariationDTO());
+
+        assertThat(response.isPresent() ? response.get() : Optional.empty())
+                .isEqualTo(TestModelDataBuilder.getContributionVariationDTO());
     }
 
     @Test
@@ -55,6 +59,7 @@ class ContributionRulesServiceTest {
 
         Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
                 CaseType.EITHER_WAY, null, CrownCourtOutcome.PART_CONVICTED);
+
         assertThat(response).isEmpty();
     }
 
@@ -66,6 +71,7 @@ class ContributionRulesServiceTest {
 
         Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
                 CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.AQUITTED);
+
         assertThat(response).isEmpty();
     }
 
@@ -82,8 +88,9 @@ class ContributionRulesServiceTest {
 
     @Test
     void givenNoContributionRulesAvailable_whenIsContributionRuleApplicableIsInvoked_thenFalseIsReturned() {
-        assertThat(contributionRulesService
-                .isContributionRuleApplicable(CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.CONVICTED)).isFalse();
+        assertThat(contributionRulesService.isContributionRuleApplicable(
+                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.CONVICTED
+        )).isFalse();
     }
 
     @Test
@@ -91,8 +98,9 @@ class ContributionRulesServiceTest {
         when(contributionRulesRepository.findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
                 CaseType.EITHER_WAY.getCaseTypeString(), MagCourtOutcome.COMMITTED.getOutcome(), null))
                 .thenReturn(TestModelDataBuilder.getContributionRules());
-        assertThat(contributionRulesService
-                .isContributionRuleApplicable(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null)).isTrue();
+        assertThat(contributionRulesService.isContributionRuleApplicable(
+                CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null
+        )).isTrue();
     }
 
 }
