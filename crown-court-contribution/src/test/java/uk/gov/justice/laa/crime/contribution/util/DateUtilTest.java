@@ -41,4 +41,14 @@ class DateUtilTest {
     void givenAEmptyLocalDate_whenConvertDateToDateTimeIsInvoked_thenReturnNull() {
         assertThat(DateUtil.convertDateToDateTime(null)).isNull();
     }
+
+    @Test
+    void givenNullLocalDate_whenGetLocalDateStringIsInvoked_thenReturnNull() {
+        assertThat(DateUtil.getLocalDateString(null)).isNull();
+    }
+
+    @Test
+    void givenAValidLocalDate_whenGetLocalDateStringIsInvoked_thenReturnCorrectString() {
+        assertThat(DateUtil.getLocalDateString(LocalDate.of(2023, 10, 6))).isEqualTo("06-Oct-2023");
+    }
 }
