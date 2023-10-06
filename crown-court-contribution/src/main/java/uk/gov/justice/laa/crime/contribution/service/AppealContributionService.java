@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.contribution.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
@@ -44,15 +45,18 @@ public class AppealContributionService {
 
         Integer repId = calculateContributionDTO.getRepId();
         List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, laaTransactionId, true);
-        Contribution currContribution = currContributionList.get(0);
-        if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
-            CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
-            Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);
-            log.info("Contribution data has been updated");
-            return MaatCalculateContributionResponseBuilder.build(newContribution);
+        if (!CollectionUtils.isEmpty(currContributionList)) {
+            Contribution currContribution = currContributionList.get(0);
+            if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
+                CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
+                Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);
+                log.info("Contribution data has been updated");
+                return MaatCalculateContributionResponseBuilder.build(newContribution);
+            }
+            log.info("Contribution data is already up to date");
+            return MaatCalculateContributionResponseBuilder.build(currContribution);
         }
-        log.info("Contribution data is already up to date");
-        return MaatCalculateContributionResponseBuilder.build(currContribution);
+        return null;
     }
 
 }
