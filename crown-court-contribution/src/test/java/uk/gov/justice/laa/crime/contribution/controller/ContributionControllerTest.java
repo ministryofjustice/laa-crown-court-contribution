@@ -40,9 +40,8 @@ class ContributionControllerTest {
     private static final String BASE_URL = "/api/internal/v1/contribution/";
     private static final String ENDPOINT_URL = BASE_URL + "calculate-contribution";
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL =
-            BASE_URL + TestModelDataBuilder.REP_ID + "/summaries";
+            BASE_URL + "summaries/" + TestModelDataBuilder.REP_ID;
     private static final String REQUEST_CONTRIBUTIONS_TRANSFER_ENDPOINT_URL = BASE_URL + "request-transfer";
-
 
     @Autowired
     private MockMvc mvc;
