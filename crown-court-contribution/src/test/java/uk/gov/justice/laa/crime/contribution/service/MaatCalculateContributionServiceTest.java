@@ -406,6 +406,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(apiCalculateHardshipByDetailResponse);
         ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
                 .variationRule("+")
+                .variation(HardshipReviewDetailType.ACTION.toString())
                 .build();
         BigDecimal variationAmount = maatCalculateContributionService.calculateVariationAmount(
                 TestModelDataBuilder.REP_ID, TestModelDataBuilder.LAA_TRANSACTION_ID, contributionVariationDTO);
@@ -421,6 +422,7 @@ class MaatCalculateContributionServiceTest {
         when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
                 .thenReturn(apiCalculateHardshipByDetailResponse);
         ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
+                .variation(HardshipReviewDetailType.FUNDING.toString())
                 .build();
         BigDecimal variationAmount = maatCalculateContributionService.calculateVariationAmount(
                 TestModelDataBuilder.REP_ID, TestModelDataBuilder.LAA_TRANSACTION_ID, contributionVariationDTO);
@@ -711,7 +713,7 @@ class MaatCalculateContributionServiceTest {
 
         when(contributionRulesService.getContributionVariation(
                 CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(Optional.of(ContributionVariationDTO.builder().build()));
+        )).thenReturn(Optional.of(ContributionVariationDTO.builder().variation("FUNDING").build()));
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,

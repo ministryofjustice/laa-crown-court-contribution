@@ -45,7 +45,7 @@ public class AppealContributionService {
 
         Integer repId = calculateContributionDTO.getRepId();
         List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, laaTransactionId, true);
-        if (!CollectionUtils.isEmpty(currContributionList)) {
+        if (CollectionUtils.isNotEmpty(currContributionList)) {
             Contribution currContribution = currContributionList.get(0);
             if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
                 CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);

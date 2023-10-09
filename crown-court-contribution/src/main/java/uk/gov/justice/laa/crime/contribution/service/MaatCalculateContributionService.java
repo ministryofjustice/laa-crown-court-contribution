@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.contribution.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.builder.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
@@ -25,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -146,8 +146,8 @@ public class MaatCalculateContributionService {
     }
 
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
-                                                                              final String laaTransactionId,
-                                                                              final RepOrderDTO repOrderDTO) {
+                                                                                 final String laaTransactionId,
+                                                                                 final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
         boolean isReassessment = contributionService.checkReassessment(repOrderDTO, laaTransactionId);
 
@@ -171,11 +171,11 @@ public class MaatCalculateContributionService {
     }
 
     public ApiMaatCalculateContributionResponse doContribs(final CalculateContributionDTO calculateContributionDTO,
-                                                        final String laaTransactionId,
-                                                        final ContributionResponseDTO contributionResponseDTO,
-                                                        final String fullResult,
-                                                        final boolean isReassessment,
-                                                        final RepOrderDTO repOrderDTO) {
+                                                           final String laaTransactionId,
+                                                           final ContributionResponseDTO contributionResponseDTO,
+                                                           final String fullResult,
+                                                           final boolean isReassessment,
+                                                           final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
 
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
@@ -204,11 +204,11 @@ public class MaatCalculateContributionService {
     }
 
     public Contribution verifyAndCreateContribs(final CalculateContributionDTO calculateContributionDTO,
-                                         final String laaTransactionId,
-                                         final boolean isReassessment,
-                                         final RepOrderDTO repOrderDTO,
-                                         final ApiMaatCalculateContributionResponse response,
-                                         final Contribution currentContribution) {
+                                                final String laaTransactionId,
+                                                final boolean isReassessment,
+                                                final RepOrderDTO repOrderDTO,
+                                                final ApiMaatCalculateContributionResponse response,
+                                                final Contribution currentContribution) {
         TransferStatus currentTransferStatus = null;
         Integer currentContributionFileId = null;
 
@@ -291,8 +291,8 @@ public class MaatCalculateContributionService {
     }
 
     public ApiMaatCalculateContributionResponse calcContribs(final CalculateContributionDTO calculateContributionDTO,
-                                                          final ContributionResponseDTO contributionResponseDTO,
-                                                          final String laaTransactionId) {
+                                                             final ContributionResponseDTO contributionResponseDTO,
+                                                             final String laaTransactionId) {
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO = maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assEffectiveDate), laaTransactionId);
         CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
@@ -341,7 +341,7 @@ public class MaatCalculateContributionService {
                                                final ContributionVariationDTO contributionVariation) {
         ApiCalculateHardshipByDetailResponse apiCalculateHardshipByDetailResponse =
                 crimeHardshipService.calculateHardshipForDetail(new ApiCalculateHardshipByDetailRequest()
-                        .withDetailType(contributionVariation.getVariation())
+                        .withDetailType(Objects.requireNonNull(HardshipReviewDetailType.getFrom(contributionVariation.getVariation())).toString())
                         .withRepId(repId)
                         .withLaaTransactionId(laaTransactionId));
         if ("+".equals(contributionVariation.getVariationRule())) {
