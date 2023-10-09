@@ -111,9 +111,9 @@ public class ContributionService {
                 contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
                 contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());
                 contributionResponse.setDoContribs(contributionResponseDTO.getDoContribs());
-                if (CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType()) != null) {
-                    contributionResponse.setCorrespondenceTypeDesc(
-                            Objects.requireNonNull(CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType())).getDescription());
+                CorrespondenceType correspondenceType = CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
+                if (correspondenceType != null) {
+                    contributionResponse.setCorrespondenceTypeDesc(correspondenceType.getDescription());
                 }
             }
         }
