@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,7 +70,7 @@ class ContributionControllerTest {
         when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class)))
                 .thenReturn(Optional.empty());
 
-        when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
+        when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class)))
                 .thenReturn(new ApiMaatCalculateContributionResponse());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
@@ -104,7 +103,7 @@ class ContributionControllerTest {
         when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class)))
                 .thenReturn(Optional.empty());
 
-        when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class), any()))
+        when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class)))
                 .thenThrow(new APIClientException("Test api client exception"));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
@@ -114,7 +113,7 @@ class ContributionControllerTest {
 
     @Test
     void givenValidRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
-        when(maatCalculateContributionService.getContributionSummaries(anyInt(), any()))
+        when(maatCalculateContributionService.getContributionSummaries(anyInt()))
                 .thenReturn(List.of(new ApiContributionSummary()));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL, false))
@@ -124,7 +123,7 @@ class ContributionControllerTest {
 
     @Test
     void givenClientApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        when(maatCalculateContributionService.getContributionSummaries(anyInt(), any()))
+        when(maatCalculateContributionService.getContributionSummaries(anyInt()))
                 .thenThrow(new APIClientException("Test api client exception"));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL, false))
@@ -142,7 +141,7 @@ class ContributionControllerTest {
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, body, REQUEST_CONTRIBUTIONS_TRANSFER_ENDPOINT_URL, true))
                 .andExpect(status().isOk());
 
-        verify(contributionService).requestTransfer(any(ApiContributionTransferRequest.class), anyString());
+        verify(contributionService).requestTransfer(any(ApiContributionTransferRequest.class));
     }
 
     @Test

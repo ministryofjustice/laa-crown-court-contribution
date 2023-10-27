@@ -50,13 +50,12 @@ public class ContributionController {
                     )
             )
             @Valid @RequestBody
-            ApiMaatCalculateContributionRequest maatCalculateContributionRequest,
-            @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
+            ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
 
         log.info("Received request to calculate contributions for ID {}", maatCalculateContributionRequest.getRepId());
         calculateContributionValidator.validate(maatCalculateContributionRequest);
         CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
-        return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO, laaTransactionId));
+        return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO));
     }
 
     private CalculateContributionDTO preProcessRequest(ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
@@ -73,10 +72,9 @@ public class ContributionController {
     )
     @DefaultHTTPErrorResponse
     public ResponseEntity<List<ApiContributionSummary>> getContributionSummaries(
-            @PathVariable int repId,
-            @RequestHeader(value = "Laa-Transaction-Id", required = false) String laaTransactionId) {
+            @PathVariable int repId) {
         log.info("Received request to get contribution summaries for repId {}", repId);
-        return ResponseEntity.ok(maatCalculateContributionService.getContributionSummaries(repId, laaTransactionId));
+        return ResponseEntity.ok(maatCalculateContributionService.getContributionSummaries(repId));
     }
 
 
@@ -84,11 +82,9 @@ public class ContributionController {
     @Operation(description = "Request Contributions Transfer")
     @ApiResponse(responseCode = "200")
     @DefaultHTTPErrorResponse
-    public ResponseEntity<Void> requestTransfer(@Valid @RequestBody ApiContributionTransferRequest request,
-                                          @RequestHeader(value = "Laa-Transaction-Id", required = false)
-                                          String laaTransactionId) {
+    public ResponseEntity<Void> requestTransfer(@Valid @RequestBody ApiContributionTransferRequest request) {
         log.info("Received request to transfer contribution for ID: {}", request.getContributionId());
-        contributionService.requestTransfer(request, laaTransactionId);
+        contributionService.requestTransfer(request);
         return ResponseEntity.ok().build();
     }
 
