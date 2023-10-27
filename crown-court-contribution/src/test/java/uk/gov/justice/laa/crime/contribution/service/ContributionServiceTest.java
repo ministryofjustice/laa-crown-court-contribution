@@ -43,7 +43,6 @@ class ContributionServiceTest {
     private static final String CONTRIBUTION_YES = "Y";
     private static final String RORS_STATUS = "rors-status";
     private static final String RORS_STATUS_CURR = "CURR";
-    private static final String LAA_TRANSACTION_ID = "laaTransactionId";
     private static final LocalDateTime dateCreated = LocalDateTime.parse("2023-07-10T15:01:25");
 
     @InjectSoftAssertions
@@ -587,11 +586,11 @@ class ContributionServiceTest {
 
     @Test
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinReassessmentTrueAndContribCountAs1_thenReassessmentTrueIsReturned() {
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(1L);
 
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isTrue();
@@ -601,9 +600,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinReassessmentFalseAndContribCountAs0_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(0L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -613,9 +612,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinReassessmentFalseAndContribCountAs1_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -625,9 +624,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentTrueAndContribCountAs1_thenReassessmentTrueIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isTrue();
@@ -637,9 +636,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentTrueAndContribCountAs0_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(0L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -649,9 +648,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentFalseAndContribCountAs0_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setReplaced("N");
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(0L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -661,9 +660,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportAssessmentAsNull_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setPassportAssessments(null);
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -673,10 +672,10 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinancialAssessmentAsNull_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.setFinancialAssessments(null);
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).getContributionCount(REP_ID, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
+        verify(maatCourtDataService).getContributionCount(REP_ID);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -686,9 +685,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinancialAssessmentDateCreatedAsNull_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getFinancialAssessments().get(0).setDateCreated(null);
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -698,9 +697,9 @@ class ContributionServiceTest {
     void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportAssessmentDateCreatedAsNull_thenReassessmentFalseIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setDateCreated(null);
-        when(maatCourtDataService.getContributionCount(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getContributionCount(REP_ID))
                 .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO, LAA_TRANSACTION_ID);
+        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         assertThat(isReassessment)
                 .isFalse();
@@ -833,9 +832,9 @@ class ContributionServiceTest {
 
     @Test
     void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID))
                 .thenReturn(null);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
 
         assertThat(hasCCOutcomeChanged)
                 .isFalse();
@@ -844,9 +843,9 @@ class ContributionServiceTest {
 
     @Test
     void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID, LAA_TRANSACTION_ID))
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID))
                 .thenReturn(Collections.emptyList());
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
 
         assertThat(hasCCOutcomeChanged)
                 .isFalse();
@@ -858,9 +857,9 @@ class ContributionServiceTest {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.ABANDONED.getCode()));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any()))
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any()))
                 .thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
 
         assertThat(hasCCOutcomeChanged)
                 .isTrue();
@@ -872,9 +871,9 @@ class ContributionServiceTest {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any()))
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any()))
                 .thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
 
         assertThat(hasCCOutcomeChanged)
                 .isFalse();
@@ -886,9 +885,9 @@ class ContributionServiceTest {
         List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
         outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.AQUITTED.getCode()));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any(), any()))
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any()))
                 .thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
 
         assertThat(hasCCOutcomeChanged)
                 .isFalse();
@@ -950,9 +949,9 @@ class ContributionServiceTest {
 
     @Test
     void givenValidRepIdEmptyContribution_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.findContribution(any(), any(), any()))
+        when(maatCourtDataService.findContribution(any(), any()))
                 .thenReturn(null);
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
 
         assertThat(hasContributionBeenSent)
                 .isFalse();
@@ -960,9 +959,9 @@ class ContributionServiceTest {
 
     @Test
     void givenValidRepIdEmptyTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.findContribution(any(), any(), any()))
+        when(maatCourtDataService.findContribution(any(), any()))
                 .thenReturn(List.of(TestModelDataBuilder.buildContribution()));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
 
         assertThat(hasContributionBeenSent)
                 .isFalse();
@@ -973,9 +972,9 @@ class ContributionServiceTest {
         Contribution contribution = TestModelDataBuilder.buildContribution();
         contribution.setTransferStatus(TransferStatus.MANUAL);
         contribution.setMonthlyContributions(BigDecimal.ONE);
-        when(maatCourtDataService.findContribution(any(), any(), any()))
+        when(maatCourtDataService.findContribution(any(), any()))
                 .thenReturn(List.of(contribution));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
 
         assertThat(hasContributionBeenSent)
                 .isFalse();
@@ -986,9 +985,9 @@ class ContributionServiceTest {
         Contribution contribution = TestModelDataBuilder.buildContribution();
         contribution.setTransferStatus(TransferStatus.SENT);
         contribution.setMonthlyContributions(BigDecimal.ONE);
-        when(maatCourtDataService.findContribution(any(), any(), any()))
+        when(maatCourtDataService.findContribution(any(), any()))
                 .thenReturn(List.of(contribution));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID, LAA_TRANSACTION_ID);
+        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
 
         assertThat(hasContributionBeenSent)
                 .isTrue();
@@ -1000,8 +999,8 @@ class ContributionServiceTest {
                 .withUserModified("mock-u")
                 .withContributionId(1000);
 
-        contributionService.requestTransfer(data, LAA_TRANSACTION_ID);
-        verify(maatCourtDataService).updateContribution(any(UpdateContributionRequest.class), anyString());
+        contributionService.requestTransfer(data);
+        verify(maatCourtDataService).updateContribution(any(UpdateContributionRequest.class));
     }
 }
 

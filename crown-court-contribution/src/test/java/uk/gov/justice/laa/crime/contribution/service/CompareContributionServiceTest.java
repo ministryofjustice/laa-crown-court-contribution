@@ -34,7 +34,7 @@ class CompareContributionServiceTest {
 
     @Test
     void givenNoPreviousContributionAndCaseTypeIsAppealCC_whenCompareContributionServiceIsInvoked_thenReturnZero() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of());
 
         CalculateContributionDTO calculateContributionDTO =
@@ -52,12 +52,12 @@ class CompareContributionServiceTest {
         assertThat(result).isZero();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenNoPreviousContributionAndCds15WorkAroundIsTrue_whenCompareContributionServiceIsInvoked_thenReturnZero() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of());
         when(contributionService.isCds15WorkAround(any()))
                 .thenReturn(true);
@@ -77,14 +77,14 @@ class CompareContributionServiceTest {
         assertThat(result).isZero();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenNoPreviousContributionAndIsReassessment_whenCompareContributionServiceIsInvoked_thenReturnZero() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of());
-        when(contributionService.checkReassessment(any(), anyString()))
+        when(contributionService.checkReassessment(any()))
                 .thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO =
@@ -102,12 +102,12 @@ class CompareContributionServiceTest {
         assertThat(result).isZero();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveIdenticalContributionAndHasMagCourtOutcome_whenCompareContributionServiceIsInvoked_thenReturnOne() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
@@ -130,17 +130,17 @@ class CompareContributionServiceTest {
         assertThat(result).isOne();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveNonIdenticalContributionWithReassessment_whenCompareContributionServiceIsInvoked_thenReturnOne() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
                 );
-        when(contributionService.checkReassessment(any(), anyString()))
+        when(contributionService.checkReassessment(any()))
                 .thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO =
@@ -158,17 +158,17 @@ class CompareContributionServiceTest {
         assertThat(result).isOne();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveIdenticalContributionWithCaseTypeAndCorrespondenceStatusAppealCC_whenCompareContributionServiceIsInvoked_thenReturnOne() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
                 );
-        when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString())).
+        when(maatCourtDataService.findCorrespondenceState(anyInt())).
                 thenReturn(CorrespondenceState.builder()
                         .status(CorrespondenceStatus.APPEAL_CC.getStatus())
                         .build()
@@ -188,17 +188,17 @@ class CompareContributionServiceTest {
         assertThat(result).isOne();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveIdenticalContributionWithCorrespondenceStatusAppealCC_whenCompareContributionServiceIsInvoked_thenReturnTwo() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
                 );
-        when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString())).
+        when(maatCourtDataService.findCorrespondenceState(anyInt())).
                 thenReturn(CorrespondenceState.builder()
                         .status(CorrespondenceStatus.APPEAL_CC.getStatus())
                         .build()
@@ -218,19 +218,19 @@ class CompareContributionServiceTest {
         assertThat(result).isEqualTo(2);
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveIdenticalContributionForCds15WorkAroundAndCorrespondenceStatusCds15_whenCompareContributionServiceIsInvoked_thenReturnTwo() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
                 );
         when(contributionService.isCds15WorkAround(any()))
                 .thenReturn(true);
-        when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString()))
+        when(maatCourtDataService.findCorrespondenceState(anyInt()))
                 .thenReturn(CorrespondenceState.builder()
                         .status(CorrespondenceStatus.CDS15.getStatus())
                         .build()
@@ -250,19 +250,19 @@ class CompareContributionServiceTest {
         assertThat(result).isEqualTo(2);
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveIdenticalContributionForCds15WorkAroundAndCorrespondenceStatusReass_whenCompareContributionServiceIsInvoked_thenReturnOne() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
                 );
         when(contributionService.isCds15WorkAround(any()))
                 .thenReturn(true);
-        when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString())).
+        when(maatCourtDataService.findCorrespondenceState(anyInt())).
                 thenReturn(CorrespondenceState.builder()
                         .status(CorrespondenceStatus.REASS.getStatus())
                         .build()
@@ -283,22 +283,22 @@ class CompareContributionServiceTest {
         assertThat(result).isOne();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveIdenticalContributionForReassessmentAndCorrespondenceStatusReass_whenCompareContributionServiceIsInvoked_thenReturnTwo() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
                 );
-        when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString()))
+        when(maatCourtDataService.findCorrespondenceState(anyInt()))
                 .thenReturn(CorrespondenceState.builder()
                         .status(CorrespondenceStatus.REASS.getStatus())
                         .build()
                 );
-        when(contributionService.checkReassessment(any(), anyString())).thenReturn(true);
+        when(contributionService.checkReassessment(any())).thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO =
                 TestModelDataBuilder.getContributionDTOForCompareContributionService(
@@ -314,22 +314,22 @@ class CompareContributionServiceTest {
         assertThat(result).isEqualTo(2);
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
     @Test
     void givenActiveIdenticalContributionForReassessmentAndCorrespondenceStatusNotReass_whenCompareContributionServiceIsInvoked_thenReturnOne() {
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
                                 TestModelDataBuilder.buildContributionForCompareContributionService()
                         )
                 );
-        when(maatCourtDataService.findCorrespondenceState(anyInt(), anyString())).
+        when(maatCourtDataService.findCorrespondenceState(anyInt())).
                 thenReturn(CorrespondenceState.builder()
                         .status(CorrespondenceStatus.CDS15.getStatus())
                         .build()
                 );
-        when(contributionService.checkReassessment(any(), anyString()))
+        when(contributionService.checkReassessment(any()))
                 .thenReturn(true);
 
         CalculateContributionDTO calculateContributionDTO =
@@ -346,7 +346,7 @@ class CompareContributionServiceTest {
         assertThat(result).isOne();
 
         verify(maatCourtDataService, times(1))
-                .updateCorrespondenceState(any(CorrespondenceState.class), anyString());
+                .updateCorrespondenceState(any(CorrespondenceState.class));
     }
 
 }

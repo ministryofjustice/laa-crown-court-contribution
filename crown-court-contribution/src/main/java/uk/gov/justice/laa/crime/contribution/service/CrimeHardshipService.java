@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
-import uk.gov.justice.laa.crime.commons.common.Constants;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
@@ -26,9 +25,10 @@ public class CrimeHardshipService {
     public ApiCalculateHardshipByDetailResponse calculateHardshipForDetail(ApiCalculateHardshipByDetailRequest calcHardshipRequest) {
         ApiCalculateHardshipByDetailResponse response = hardshipApiClient.post(
                 calcHardshipRequest,
-                new ParameterizedTypeReference<ApiCalculateHardshipByDetailResponse>() {},
+                new ParameterizedTypeReference<ApiCalculateHardshipByDetailResponse>() {
+                },
                 configuration.getHardshipApi().getHardshipEndpoints().getCalculateHardshipForDetailUrl(),
-                Map.of(Constants.LAA_TRANSACTION_ID, calcHardshipRequest.getLaaTransactionId())
+                Map.of()
         );
         log.info(RESPONSE_STRING, response);
         return response;
