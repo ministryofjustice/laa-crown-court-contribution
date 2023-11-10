@@ -24,6 +24,8 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
 
 import java.math.BigDecimal;
@@ -34,8 +36,8 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_IMPLEMENTED;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getApiCrownCourtOutcome;
 import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @DirtiesContext
@@ -47,7 +49,10 @@ class ContributionControllerContributionIntegrationTest {
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
+    private static final String BASE_URL = "/api/internal/v1/contribution/";
+
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/summaries/" + TestModelDataBuilder.REP_ID;
+    private static final String CHECK_CONTRIBUTION_RULE_ENDPOINT_URL = BASE_URL + "/check-contribution-rule";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -272,6 +277,30 @@ class ContributionControllerContributionIntegrationTest {
         );
         mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
                         .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void givenApiMaatCalculateContributionRequest_whenCheckContributionRuleIsInvoked_thenOkResponse() throws Exception {
+        ApiMaatCalculateContributionRequest calculateContributionRequest =
+                TestModelDataBuilder.buildCalculateContributionRequest();
+        String requestData = objectMapper.writeValueAsString(calculateContributionRequest);
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").value(Boolean.TRUE));
+    }
+
+    @Test
+    void givenApiMaatCalculateContributionRequest_whenCheckContributionRuleIsInvoked_thenFalseIsReturned() throws Exception {
+        ApiMaatCalculateContributionRequest calculateContributionRequest =
+                TestModelDataBuilder.buildCalculateContributionRequest();
+        calculateContributionRequest.setCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.AQUITTED)));
+        String requestData = objectMapper.writeValueAsString(calculateContributionRequest);
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").value(Boolean.FALSE));
     }
 
 }

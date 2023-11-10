@@ -20,8 +20,12 @@ import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferReques
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
 import java.util.List;
@@ -29,8 +33,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @DirtiesContext
@@ -41,6 +44,7 @@ class ContributionControllerTest {
 
     private static final String BASE_URL = "/api/internal/v1/contribution/";
     private static final String ENDPOINT_URL = BASE_URL + "calculate-contribution";
+    private static final String CHECK_CONTRIBUTION_RULE_ENDPOINT_URL = BASE_URL + "/check-contribution-rule";
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL =
             BASE_URL + "summaries/" + TestModelDataBuilder.REP_ID;
     private static final String REQUEST_CONTRIBUTIONS_TRANSFER_ENDPOINT_URL = BASE_URL + "request-transfer";
@@ -59,6 +63,9 @@ class ContributionControllerTest {
 
     @MockBean
     private MaatCalculateContributionService maatCalculateContributionService;
+
+    @MockBean
+    private ContributionRulesService contributionRulesService;
 
     @Test
     void givenValidRequest_whenCalculateAppealContributionIsInvoked_thenOkResponse() throws Exception {
@@ -152,6 +159,34 @@ class ContributionControllerTest {
         String body = objectMapper.writeValueAsString(request);
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, body, REQUEST_CONTRIBUTIONS_TRANSFER_ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void givenValidRequest_whenCheckContributionRuleIsInvoked_thenOkResponse() throws Exception {
+        ApiMaatCalculateContributionRequest calculateContributionRequest =
+                TestModelDataBuilder.buildCalculateContributionRequest();
+        String requestData = objectMapper.writeValueAsString(calculateContributionRequest);
+        when(contributionRulesService.getActiveCCOutcome(any()))
+                .thenReturn(CrownCourtOutcome.SUCCESSFUL);
+        when(contributionRulesService.isContributionRuleApplicable(any(), any(), any()))
+                .thenReturn(Boolean.TRUE);
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").value(Boolean.TRUE));
+    }
+
+    @Test
+    void givenInvalidRequest_whenCheckContributionRuleIsInvoked_thenInternalServerErrorResponse() throws Exception {
+        ApiMaatCalculateContributionRequest calculateContributionRequest =
+                TestModelDataBuilder.buildCalculateContributionRequest();
+        String requestData = objectMapper.writeValueAsString(calculateContributionRequest);
+        when(contributionRulesService.getActiveCCOutcome(any()))
+                .thenThrow(new RuntimeException("Test Exception"));
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
+                .andExpect(status().is5xxServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
 }

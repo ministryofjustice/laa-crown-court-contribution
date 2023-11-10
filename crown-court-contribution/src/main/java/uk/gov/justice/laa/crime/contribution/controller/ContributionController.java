@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
 import java.util.List;
@@ -33,6 +36,7 @@ public class ContributionController {
     private final ContributionService contributionService;
     private final CalculateContributionValidator calculateContributionValidator;
     private final MaatCalculateContributionService maatCalculateContributionService;
+    private final ContributionRulesService contributionRulesService;
 
 
     @PostMapping(value = "/calculate-contribution", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,6 +90,29 @@ public class ContributionController {
         log.info("Received request to transfer contribution for ID: {}", request.getContributionId());
         contributionService.requestTransfer(request);
         return ResponseEntity.ok().build();
+    }
+
+
+    @PostMapping(value = "/check-contribution-rule", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "Check if contribution Rule is applicable")
+    @ApiResponse(responseCode = "200",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE
+            )
+    )
+    @DefaultHTTPErrorResponse
+    public ResponseEntity<Boolean> checkContributionRule(
+            @Parameter(description = "Data required to check contribution rule",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiCalculateContributionRequest.class)
+                    )
+            )
+            @Valid @RequestBody
+            ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
+        log.info("Received request to check contribution rule");
+        CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
+        CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
+        return ResponseEntity.ok(contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
+                calculateContributionDTO.getMagCourtOutcome(), crownCourtOutcome));
     }
 
 }
