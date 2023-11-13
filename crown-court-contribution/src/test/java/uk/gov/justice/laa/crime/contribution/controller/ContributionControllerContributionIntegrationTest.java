@@ -49,7 +49,7 @@ class ContributionControllerContributionIntegrationTest {
     private MockMvc mvc;
     private static final WireMockServer wiremock = new WireMockServer(9999);
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
-    private static final String BASE_URL = "/api/internal/v1/contribution/";
+    private static final String BASE_URL = "/api/internal/v1/contribution";
 
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/summaries/" + TestModelDataBuilder.REP_ID;
     private static final String CHECK_CONTRIBUTION_RULE_ENDPOINT_URL = BASE_URL + "/check-contribution-rule";
