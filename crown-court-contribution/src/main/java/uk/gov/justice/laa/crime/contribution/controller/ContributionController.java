@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.contribution.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
@@ -103,16 +103,15 @@ public class ContributionController {
     public ResponseEntity<Boolean> checkContributionRule(
             @Parameter(description = "Data required to check contribution rule",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiCalculateContributionRequest.class)
+                            schema = @Schema(implementation = ApiMaatCheckContributionRuleRequest.class)
                     )
             )
             @Valid @RequestBody
-            ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
+            ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest) {
         log.info("Received request to check contribution rule");
-        CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
-        CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
-        return ResponseEntity.ok(contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
-                calculateContributionDTO.getMagCourtOutcome(), crownCourtOutcome));
+        CrownCourtOutcome crownCourtOutcome = contributionRulesService.getActiveCCOutcome(apiMaatCheckContributionRuleRequest.getCrownCourtOutcome());
+        return ResponseEntity.ok(contributionRulesService.isContributionRuleApplicable(apiMaatCheckContributionRuleRequest.getCaseType(),
+                apiMaatCheckContributionRuleRequest.getMagCourtOutcome(), crownCourtOutcome));
     }
 
 }

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "apiMaatCheckContributionRuleRequest.json",
+  "type": "object",
+  "title": "Calculate Contribution Request from MAAT application",
+  "description": "Request data for calculating contributions following an appeal",
+  "properties": {
+    "magCourtOutcome": {
+      "type": "object",
+      "description": "Magistrate Court Outcome",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome"
+    },
+    "caseType": {
+      "type": "object",
+      "description": "The case type",
+      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType"
+    },
+    "crownCourtOutcome": {
+      "type": "array",
+      "description": "list of crown court outcome",
+      "items": {
+        "$ref": "common/apiCrownCourtOutcome.json"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": ["caseType"]
+}

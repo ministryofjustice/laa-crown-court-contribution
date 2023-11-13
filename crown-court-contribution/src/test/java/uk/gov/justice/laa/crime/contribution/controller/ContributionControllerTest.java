@@ -23,9 +23,7 @@ import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 
 import java.util.List;
