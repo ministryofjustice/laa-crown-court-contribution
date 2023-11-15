@@ -283,6 +283,11 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
+    public static ApiMaatCheckContributionRuleRequest buildCheckContributionRuleRequest() {
+        return new ApiMaatCheckContributionRuleRequest()
+                .withCaseType(CaseType.EITHER_WAY);
+    }
+
     public static ApiCalculateContributionRequest buildApiCalculateContributionRequest() {
         return new ApiCalculateContributionRequest()
                 .withAnnualDisposableIncome(new BigDecimal(1000))
