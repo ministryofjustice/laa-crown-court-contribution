@@ -19,6 +19,7 @@ import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
@@ -162,9 +163,9 @@ class ContributionControllerTest {
 
     @Test
     void givenValidRequest_whenCheckContributionRuleIsInvoked_thenOkResponse() throws Exception {
-        ApiMaatCalculateContributionRequest calculateContributionRequest =
-                TestModelDataBuilder.buildCalculateContributionRequest();
-        String requestData = objectMapper.writeValueAsString(calculateContributionRequest);
+        ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
+                TestModelDataBuilder.buildCheckContributionRuleRequest();
+        String requestData = objectMapper.writeValueAsString(apiMaatCheckContributionRuleRequest);
         when(contributionRulesService.getActiveCCOutcome(any()))
                 .thenReturn(CrownCourtOutcome.SUCCESSFUL);
         when(contributionRulesService.isContributionRuleApplicable(any(), any(), any()))
@@ -177,14 +178,23 @@ class ContributionControllerTest {
 
     @Test
     void givenInvalidRequest_whenCheckContributionRuleIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        ApiMaatCalculateContributionRequest calculateContributionRequest =
-                TestModelDataBuilder.buildCalculateContributionRequest();
-        String requestData = objectMapper.writeValueAsString(calculateContributionRequest);
+        ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
+                TestModelDataBuilder.buildCheckContributionRuleRequest();
+        String requestData = objectMapper.writeValueAsString(apiMaatCheckContributionRuleRequest);
         when(contributionRulesService.getActiveCCOutcome(any()))
                 .thenThrow(new RuntimeException("Test Exception"));
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
                 .andExpect(status().is5xxServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void givenInValidRequest_whenCheckContributionRuleIsInvoked_thenBadRequestResponse() throws Exception {
+        ApiContributionTransferRequest request = new ApiContributionTransferRequest()
+                .withContributionId(1000);
+        String body = objectMapper.writeValueAsString(request);
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, body, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
+                .andExpect(status().isBadRequest());
     }
 
 }

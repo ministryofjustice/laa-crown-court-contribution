@@ -2,8 +2,8 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "apiMaatCheckContributionRuleRequest.json",
   "type": "object",
-  "title": "Calculate Contribution Request from MAAT application",
-  "description": "Request data for calculating contributions following an appeal",
+  "title": "Check Contribution Rule",
+  "description": "Request data to check contribution rule",
   "properties": {
     "magCourtOutcome": {
       "type": "object",
