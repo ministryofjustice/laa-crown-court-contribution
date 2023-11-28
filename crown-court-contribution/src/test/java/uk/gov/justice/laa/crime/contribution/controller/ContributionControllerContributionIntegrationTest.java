@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -45,6 +46,7 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
+@AutoConfigureObservability
 class ContributionControllerContributionIntegrationTest {
 
     private MockMvc mvc;
