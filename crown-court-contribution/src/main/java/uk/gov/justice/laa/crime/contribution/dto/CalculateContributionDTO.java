@@ -22,7 +22,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CalculateContributionDTO {
 
-    private String laaTransactionId;
     private Integer contributionId;
     private Integer applId;
     private Integer repId;

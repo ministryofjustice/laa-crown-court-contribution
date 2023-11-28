@@ -6,7 +6,7 @@ import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.*;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
@@ -31,11 +31,8 @@ public class TestModelDataBuilder {
     public static final LocalDate CALC_DATE = LocalDate.of(2023, 8, 28);
     public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2023, 7, 20);
     public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2023, 8, 20);
-    public static final String LAA_TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
     public static final LocalDate COMMITTAL_DATE = LocalDate.of(2023, 8, 8);
     public static final Integer CONTRIBUTION_ID = 999;
-
-    public static final String TEST_USER = "TEST_USER";
 
     public static ContributionRequestDTO getContributionRequestDTO() {
         return ContributionRequestDTO.builder()
@@ -46,26 +43,6 @@ public class TestModelDataBuilder {
                 .hardshipResult(PASS)
                 .passportResult(PASS).build();
     }
-
-    public static CreateContributionRequest getCreateContributionRequest(TransferStatus transferStatus, LocalDateTime dateTime){
-        return new CreateContributionRequest()
-                .withRepId(REP_ID)
-                .withApplId(123)
-                .withUserCreated(TEST_USER)
-                .withContributionFileId(123)
-                .withEffectiveDate(dateTime)
-                .withCalcDate(dateTime)
-                .withContributionCap(BigDecimal.valueOf(250))
-                .withMonthlyContributions(BigDecimal.valueOf(250))
-                .withUpfrontContributions(BigDecimal.valueOf(250))
-                .withUpliftApplied("N")
-                .withBasedOn("N")
-                .withTransferStatus(transferStatus)
-                .withDateUpliftApplied(dateTime)
-                .withDateUpliftRemoved(dateTime)
-                .withCreateContributionOrder("N")
-                .withCorrespondenceId(123);
-        }
 
     public static CorrespondenceRuleAndTemplateInfo getCorrespondenceRuleAndTemplateInfo() {
         return new CorrespondenceRuleAndTemplateInfo() {
@@ -306,6 +283,11 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
+    public static ApiMaatCheckContributionRuleRequest buildCheckContributionRuleRequest() {
+        return new ApiMaatCheckContributionRuleRequest()
+                .withCaseType(CaseType.EITHER_WAY);
+    }
+
     public static ApiCalculateContributionRequest buildApiCalculateContributionRequest() {
         return new ApiCalculateContributionRequest()
                 .withAnnualDisposableIncome(new BigDecimal(1000))
@@ -355,7 +337,6 @@ public class TestModelDataBuilder {
         return CalculateContributionDTO.builder()
                 .repId(123)
                 .applId(123)
-                .laaTransactionId("123456")
                 .contributionCap(contributionCap)
                 .upfrontContributions(upfrontContributions)
                 .monthlyContributions(monthlyContributions)
@@ -398,8 +379,7 @@ public class TestModelDataBuilder {
     public static ApiCalculateHardshipByDetailRequest getApiCalculateHardshipByDetailRequest() {
         return new ApiCalculateHardshipByDetailRequest()
                 .withDetailType("TEST")
-                .withRepId(REP_ID)
-                .withLaaTransactionId(LAA_TRANSACTION_ID);
+                .withRepId(REP_ID);
     }
 
     public static ApiMaatCalculateContributionResponse getApiMaatCalculateContributionResponse() {

@@ -140,10 +140,10 @@ public class ContributionService {
                 contributionRequestDTO.getInitResult());
     }
 
-    public boolean checkReassessment(RepOrderDTO repOrderDTO, final String laaTransactionId) {
+    public boolean checkReassessment(RepOrderDTO repOrderDTO) {
         log.info("Check if reassessment is required for REP_ID={}", repOrderDTO.getId());
 
-        long contributionCount = maatCourtDataService.getContributionCount(repOrderDTO.getId(), laaTransactionId);
+        long contributionCount = maatCourtDataService.getContributionCount(repOrderDTO.getId());
         List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
         List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
 
@@ -191,8 +191,8 @@ public class ContributionService {
         return false;
     }
 
-    public boolean hasCCOutcomeChanged(final int repId, final String laaTransactionId) {
-        List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId, laaTransactionId);
+    public boolean hasCCOutcomeChanged(final int repId) {
+        List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId);
         if (CollectionUtils.isNotEmpty(repOrderCCOutcomeList)) {
             Optional<RepOrderCCOutcomeDTO> outcomeDTO = repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
             return outcomeDTO.isPresent() && outcomeDTO.get().getOutcome() != null
@@ -208,8 +208,8 @@ public class ContributionService {
                 && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
     }
 
-    public boolean hasContributionBeenSent(final int repId, final String laaTransactionId) {
-        List<Contribution> contribList = maatCourtDataService.findContribution(repId, laaTransactionId, Boolean.FALSE);
+    public boolean hasContributionBeenSent(final int repId) {
+        List<Contribution> contribList = maatCourtDataService.findContribution(repId, Boolean.FALSE);
         List<Contribution> contributionList = Optional.ofNullable(contribList).orElse(Collections.emptyList()).stream().filter(
                 contribution -> (TransferStatus.SENT.equals(contribution.getTransferStatus()) &&
                         contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0)
@@ -218,11 +218,11 @@ public class ContributionService {
         return !contributionList.isEmpty();
     }
 
-    public void requestTransfer(final ApiContributionTransferRequest transferRequest, final String laaTransactionId) {
+    public void requestTransfer(final ApiContributionTransferRequest transferRequest) {
         UpdateContributionRequest updateRequest = new UpdateContributionRequest()
                 .withId(transferRequest.getContributionId())
                 .withTransferStatus(TransferStatus.REQUESTED)
                 .withUserModified(transferRequest.getUserModified());
-        maatCourtDataService.updateContribution(updateRequest, laaTransactionId);
+        maatCourtDataService.updateContribution(updateRequest);
     }
 }

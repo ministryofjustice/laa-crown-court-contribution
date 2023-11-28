@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
@@ -37,19 +38,19 @@ public class AppealContributionService {
         return AssessmentResult.FAIL;
     }
 
-    public ApiMaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO, String laaTransactionId) {
+    public ApiMaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO) {
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
-        BigDecimal appealContributionAmount = maatCourtDataService.getContributionAppealAmount(getContributionAmountRequest, laaTransactionId);
+        BigDecimal appealContributionAmount = maatCourtDataService.getContributionAppealAmount(getContributionAmountRequest);
 
         Integer repId = calculateContributionDTO.getRepId();
-        List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, laaTransactionId, true);
+        List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, true);
         if (CollectionUtils.isNotEmpty(currContributionList)) {
             Contribution currContribution = currContributionList.get(0);
             if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
                 CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
-                Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest, laaTransactionId);
+                Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
                 log.info("Contribution data has been updated");
                 return MaatCalculateContributionResponseBuilder.build(newContribution);
             }

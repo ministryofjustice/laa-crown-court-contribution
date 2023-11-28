@@ -26,8 +26,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AppealContributionServiceTest {
 
-    private static final String LAA_TRANSACTION_ID = "99999";
-
     @Mock
     private MaatCourtDataService maatCourtDataService;
 
@@ -61,22 +59,22 @@ class AppealContributionServiceTest {
 
         when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
                 .thenReturn(new GetContributionAmountRequest());
-        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
+        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class)))
                 .thenReturn(BigDecimal.valueOf(500));
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
         when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
-        when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), anyString()))
+        when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
                 .thenReturn(TestModelDataBuilder.buildContribution());
 
         ApiMaatCalculateContributionResponse response =
-                appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
+                appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.valueOf(250));
 
         verify(maatCourtDataService, times(1))
-                .createContribution(any(CreateContributionRequest.class), anyString());
+                .createContribution(any(CreateContributionRequest.class));
     }
 
     @Test
@@ -96,17 +94,17 @@ class AppealContributionServiceTest {
 
         when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
                 .thenReturn(new GetContributionAmountRequest());
-        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
+        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class)))
                 .thenReturn(BigDecimal.valueOf(0));
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
         ApiMaatCalculateContributionResponse response =
-                appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
+                appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
 
         verify(maatCourtDataService, times(0))
-                .createContribution(any(CreateContributionRequest.class), anyString());
+                .createContribution(any(CreateContributionRequest.class));
     }
 
     @Test
@@ -126,12 +124,12 @@ class AppealContributionServiceTest {
 
         when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
                 .thenReturn(new GetContributionAmountRequest());
-        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class), anyString()))
+        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class)))
                 .thenReturn(BigDecimal.valueOf(0));
-        when(maatCourtDataService.findContribution(anyInt(), anyString(), anyBoolean()))
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(null);
         ApiMaatCalculateContributionResponse response =
-                appealContributionService.calculateAppealContribution(calculateContributionDTO, LAA_TRANSACTION_ID);
+                appealContributionService.calculateAppealContribution(calculateContributionDTO);
         assertThat(response).isNull();
     }
 }
