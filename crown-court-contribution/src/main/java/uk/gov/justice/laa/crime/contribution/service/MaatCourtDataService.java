@@ -39,7 +39,7 @@ public class MaatCourtDataService {
         queryParams.add("findLatestContribution", findLatestContribution.toString());
 
         List<Contribution> response = maatAPIClient.get(
-                new ParameterizedTypeReference<List<Contribution>>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
                 queryParams,
@@ -52,7 +52,7 @@ public class MaatCourtDataService {
 
     public Contribution findLatestSentContribution(Integer repId) {
         Contribution response = maatAPIClient.get(
-                new ParameterizedTypeReference<Contribution>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getFindLatestSentContributionUrl(),
                 repId
@@ -64,7 +64,7 @@ public class MaatCourtDataService {
     public Contribution createContribution(CreateContributionRequest createContributionRequest) {
         Contribution response = maatAPIClient.post(
                 createContributionRequest,
-                new ParameterizedTypeReference<Contribution>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of()
@@ -76,7 +76,7 @@ public class MaatCourtDataService {
     public Contribution updateContribution(UpdateContributionRequest request) {
         Contribution response = maatAPIClient.put(
                 request,
-                new ParameterizedTypeReference<Contribution>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of()
@@ -87,7 +87,7 @@ public class MaatCourtDataService {
 
     public BigDecimal getContributionAppealAmount(GetContributionAmountRequest request) {
         BigDecimal response = maatAPIClient.get(
-                new ParameterizedTypeReference<BigDecimal>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getGetAppealAmountUrl(),
                 request.getCaseType(), request.getAppealType(), request.getOutcome(), request.getAssessmentResult()
@@ -98,7 +98,7 @@ public class MaatCourtDataService {
 
     public CorrespondenceState findCorrespondenceState(Integer repId) {
         CorrespondenceState response = maatAPIClient.get(
-                new ParameterizedTypeReference<CorrespondenceState>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getFindUrl(),
                 repId
@@ -110,7 +110,7 @@ public class MaatCourtDataService {
     public CorrespondenceState createCorrespondenceState(CorrespondenceState state) {
         CorrespondenceState response = maatAPIClient.post(
                 state,
-                new ParameterizedTypeReference<CorrespondenceState>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
                 Map.of()
@@ -122,7 +122,7 @@ public class MaatCourtDataService {
     public CorrespondenceState updateCorrespondenceState(CorrespondenceState state) {
         CorrespondenceState response = maatAPIClient.put(
                 state,
-                new ParameterizedTypeReference<CorrespondenceState>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
                 Map.of()
@@ -157,7 +157,7 @@ public class MaatCourtDataService {
 
     public List<RepOrderCCOutcomeDTO> getRepOrderCCOutcomeByRepId(Integer repId) {
         List<RepOrderCCOutcomeDTO> response = maatAPIClient.get(
-                new ParameterizedTypeReference<List<RepOrderCCOutcomeDTO>>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getRepOrderEndpoints().getFindOutcomeUrl(),
                 repId
@@ -168,7 +168,7 @@ public class MaatCourtDataService {
 
     public List<ContributionsSummaryDTO> getContributionsSummary(Integer repId) {
         List<ContributionsSummaryDTO> response = maatAPIClient.get(
-                new ParameterizedTypeReference<List<ContributionsSummaryDTO>>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getSummaryUrl(),
                 repId
@@ -179,7 +179,7 @@ public class MaatCourtDataService {
 
     public ContributionCalcParametersDTO getContributionCalcParameters(String effectiveDate) {
         ContributionCalcParametersDTO response = maatAPIClient.get(
-                new ParameterizedTypeReference<ContributionCalcParametersDTO>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getContribsParametersUrl(),
                 effectiveDate
