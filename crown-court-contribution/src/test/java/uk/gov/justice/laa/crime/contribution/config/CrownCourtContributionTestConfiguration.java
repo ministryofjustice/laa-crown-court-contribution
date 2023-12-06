@@ -17,12 +17,7 @@ public class CrownCourtContributionTestConfiguration {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return new JwtDecoder() {
-            @Override
-            public Jwt decode(String token) {
-                return jwt();
-            }
-        };
+        return token -> jwt();
     }
 
     public Jwt jwt() {

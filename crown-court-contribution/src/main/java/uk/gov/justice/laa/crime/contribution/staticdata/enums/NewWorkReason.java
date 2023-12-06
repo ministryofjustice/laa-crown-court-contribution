@@ -25,9 +25,9 @@ public enum NewWorkReason {
     INF("INF", NewWorkReasonType.ASS, "Re-assessment Following New Information"),
     CSP("CSP", NewWorkReasonType.ASS, "Change in Partner Status");
 
-    private String code;
-    private String type;
-    private String description;
+    private final String code;
+    private final String type;
+    private final String description;
 
     public static NewWorkReason getFrom(String code) {
         if (StringUtils.isBlank(code)) return null;
