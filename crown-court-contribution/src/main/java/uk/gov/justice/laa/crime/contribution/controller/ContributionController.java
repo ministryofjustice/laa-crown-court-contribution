@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.justice.laa.crime.contribution.annotation.DefaultHTTPErrorResponse;
+import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
@@ -22,8 +22,8 @@ import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 
 import java.util.List;
 

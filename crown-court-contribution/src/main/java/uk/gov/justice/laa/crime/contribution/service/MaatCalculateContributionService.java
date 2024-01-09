@@ -18,6 +18,7 @@ import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRe
 import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
+import uk.gov.justice.laa.crime.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

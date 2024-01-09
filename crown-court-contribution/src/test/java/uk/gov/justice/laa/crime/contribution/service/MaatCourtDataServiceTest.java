@@ -26,8 +26,8 @@ import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmoun
 import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 import java.math.BigDecimal;
 import java.util.List;
