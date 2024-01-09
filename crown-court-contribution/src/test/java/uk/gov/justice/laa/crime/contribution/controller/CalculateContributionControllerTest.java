@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
-import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
+import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
@@ -26,7 +25,6 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 
 @DirtiesContext
 @AutoConfigureMockMvc(addFilters = false)
-@Import(CrownCourtContributionTestConfiguration.class)
 @WebMvcTest(CalculateContributionController.class)
 class CalculateContributionControllerTest {
 
@@ -40,6 +38,9 @@ class CalculateContributionControllerTest {
 
     @MockBean
     private CalculateContributionService calculateContributionService;
+
+    @MockBean
+    private TraceIdHandler traceIdHandler;
 
     @Test
     void givenValidRequest_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {

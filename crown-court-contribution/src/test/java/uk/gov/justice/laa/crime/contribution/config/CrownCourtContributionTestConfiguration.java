@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.contribution.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -10,7 +9,6 @@ import java.time.Instant;
 import java.util.Map;
 
 @Configuration(proxyBeanMethods = false)
-@ComponentScan(basePackages = {"uk.gov.justice.laa.crime.commons.tracing"})
 public class CrownCourtContributionTestConfiguration {
 
     static final String SUB = "sub";
@@ -19,12 +17,7 @@ public class CrownCourtContributionTestConfiguration {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return new JwtDecoder() {
-            @Override
-            public Jwt decode(String token) {
-                return jwt();
-            }
-        };
+        return token -> jwt();
     }
 
     public Jwt jwt() {

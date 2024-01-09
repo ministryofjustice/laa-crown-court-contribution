@@ -15,7 +15,12 @@ import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMa
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
@@ -24,7 +29,14 @@ import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.HardshipReviewDetailType;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,8 +45,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
@@ -1224,7 +1240,7 @@ class MaatCalculateContributionServiceTest {
                         .build()
                 );
         when(maatCalculateContributionService.verifyAndCreateContribs(
-                calculateContributionDTO,true, null, maatCalculateContributionResponse, null
+                calculateContributionDTO, true, null, maatCalculateContributionResponse, null
         )).thenReturn(new Contribution());
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
@@ -1292,9 +1308,9 @@ class MaatCalculateContributionServiceTest {
                 .build();
         when(maatCourtDataService.findContribution(any(), any()))
                 .thenReturn(List.of(
-                        Contribution.builder()
-                                .id(TestModelDataBuilder.CONTRIBUTION_ID)
-                                .build()
+                                Contribution.builder()
+                                        .id(TestModelDataBuilder.CONTRIBUTION_ID)
+                                        .build()
                         )
                 );
         Contribution contribution = maatCalculateContributionService.getCurrentContribution(

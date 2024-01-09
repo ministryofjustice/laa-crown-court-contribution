@@ -25,7 +25,7 @@ public class CrimeHardshipService {
     public ApiCalculateHardshipByDetailResponse calculateHardshipForDetail(ApiCalculateHardshipByDetailRequest calcHardshipRequest) {
         ApiCalculateHardshipByDetailResponse response = hardshipApiClient.post(
                 calcHardshipRequest,
-                new ParameterizedTypeReference<ApiCalculateHardshipByDetailResponse>() {
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getHardshipApi().getHardshipEndpoints().getCalculateHardshipForDetailUrl(),
                 Map.of()

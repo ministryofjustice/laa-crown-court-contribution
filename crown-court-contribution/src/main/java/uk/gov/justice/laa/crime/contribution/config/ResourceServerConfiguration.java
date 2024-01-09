@@ -3,8 +3,11 @@ package uk.gov.justice.laa.crime.contribution.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
@@ -35,7 +38,7 @@ public class ResourceServerConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf((csrf) -> csrf.disable())
+                .csrf(disableCsrfAsMadeRedundantByOath2AndJwt())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/open-api/**").permitAll()
@@ -49,4 +52,7 @@ public class ResourceServerConfiguration {
         return http.build();
     }
 
+    private Customizer<CsrfConfigurer<HttpSecurity>> disableCsrfAsMadeRedundantByOath2AndJwt() {
+        return AbstractHttpConfigurer::disable;
+    }
 }
