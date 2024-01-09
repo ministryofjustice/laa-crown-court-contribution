@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 @Component
 @AllArgsConstructor

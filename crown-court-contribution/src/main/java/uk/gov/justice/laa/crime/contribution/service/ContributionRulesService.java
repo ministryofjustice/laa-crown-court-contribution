@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.repository.ContributionRulesRepository;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import java.util.List;
 import java.util.Optional;

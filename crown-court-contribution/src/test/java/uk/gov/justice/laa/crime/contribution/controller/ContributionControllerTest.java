@@ -14,7 +14,6 @@ import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
@@ -23,8 +22,9 @@ import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 
 import java.util.List;
 import java.util.Optional;

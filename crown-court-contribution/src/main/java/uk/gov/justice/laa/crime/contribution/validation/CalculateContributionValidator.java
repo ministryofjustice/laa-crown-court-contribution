@@ -2,10 +2,10 @@ package uk.gov.justice.laa.crime.contribution.validation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.exeption.ValidationException;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

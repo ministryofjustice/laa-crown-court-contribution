@@ -8,9 +8,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceStatus;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

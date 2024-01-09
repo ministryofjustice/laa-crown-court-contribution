@@ -10,8 +10,8 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class GetContributionAmountRequestMapperTest {

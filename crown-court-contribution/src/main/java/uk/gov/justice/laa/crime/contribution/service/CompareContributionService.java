@@ -8,9 +8,9 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceStatus;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import java.util.Collections;
 import java.util.List;
