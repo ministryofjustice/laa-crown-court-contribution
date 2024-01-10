@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.contribution.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public final class DateUtil {
 
@@ -12,5 +13,15 @@ public final class DateUtil {
 
     public static LocalDate parseLocalDate(final LocalDateTime date) {
         return date != null ? date.toLocalDate() : null;
+    }
+
+    public static String getLocalDateString(final LocalDate date) {
+        return date != null ? date.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")) : null;
+    }
+
+    public static LocalDateTime convertDateToDateTime(LocalDate date) {
+        if (date != null) {
+            return date.atTime(0, 0);
+        } else return null;
     }
 }

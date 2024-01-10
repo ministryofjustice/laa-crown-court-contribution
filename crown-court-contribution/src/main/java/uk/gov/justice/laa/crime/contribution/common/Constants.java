@@ -9,10 +9,16 @@ public class Constants {
     public static final String TEMP = "TEMP";
     public static final String PASS = "PASS";
     public static final String FAIL = "FAIL";
+    public static final String INEL = "INEL";
     public static final String FULL = "FULL";
     public static final String NONE = "NONE";
     public static final String INIT = "INIT";
     public static final String PASSPORT = "PASSPORT";
     public static final String FAILPORT = "FAILPORT";
     public static final String HARDSHIP_APPLICATION = "HARDSHIP APPLICATION";
+    public static final String Y = "Y";
+    public static final String N = "N";
+
+    public static final String OFFENCE_TYPE = "Offence Type";
+    public static final String MEANS = "Means";
 }

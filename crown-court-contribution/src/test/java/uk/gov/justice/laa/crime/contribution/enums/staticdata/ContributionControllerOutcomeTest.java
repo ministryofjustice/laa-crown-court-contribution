@@ -6,7 +6,7 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-class CrownCourtOutcomeTest {
+class ContributionControllerOutcomeTest {
 
     @Test
     void givenValidResultString_whenGetFromIsInvoked_thenCorrectEnumIsReturned() {

@@ -1,8 +1,12 @@
 package uk.gov.justice.laa.crime.contribution.data.builder;
 
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
@@ -10,7 +14,6 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,19 +28,11 @@ public class TestModelDataBuilder {
     public static final Integer CORRESPONDENCE_ID = 1;
     public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
 
-    public static final String LAA_TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
-
-    public static AssessmentRequestDTO getAssessmentRequestDTO() {
-
-        return AssessmentRequestDTO.builder()
-                .iojResult(PASS)
-                .decisionResult(PASS)
-                .passportResult(PASS)
-                .initResult(PASS)
-                .fullResult(FULL)
-                .hardshipResult(PASS)
-                .build();
-    }
+    public static final LocalDate CALC_DATE = LocalDate.of(2023, 8, 28);
+    public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2023, 7, 20);
+    public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2023, 8, 20);
+    public static final LocalDate COMMITTAL_DATE = LocalDate.of(2023, 8, 8);
+    public static final Integer CONTRIBUTION_ID = 999;
 
     public static ContributionRequestDTO getContributionRequestDTO() {
         return ContributionRequestDTO.builder()
@@ -136,13 +131,10 @@ public class TestModelDataBuilder {
                 .withOutcome(crownCourtOutcome);
     }
 
-    public static ApiCrownCourtSummary getApiCrownCourtSummary() {
-        List<ApiCrownCourtOutcome> apiCrownCourtOutcomeList = new ArrayList<>();
-        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED));
-        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED));
-        apiCrownCourtOutcomeList.add(getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));
-        return new ApiCrownCourtSummary()
-                .withCrownCourtOutcome(apiCrownCourtOutcomeList);
+    public static List<ApiCrownCourtOutcome> getApiCrownCourtSummary() {
+        return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED),
+                getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED),
+                getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));
     }
 
     public static RepOrderDTO getRepOrderDTO() {
@@ -236,7 +228,7 @@ public class TestModelDataBuilder {
                 .upfrontContributions(BigDecimal.valueOf(250))
                 .upliftApplied("NS")
                 .basedOn("Means")
-                .transferStatus("NOT SENT")
+                .transferStatus(TransferStatus.MANUAL)
                 .dateUpliftApplied(LocalDate.now())
                 .dateUpliftRemoved(LocalDate.now())
                 .dateCreated(LocalDateTime.now())
@@ -269,8 +261,19 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static AppealContributionRequest buildAppealContributionRequest() {
-        return new AppealContributionRequest()
+    public static ApiMaatCalculateContributionRequest buildAppealContributionRequest() {
+        return new ApiMaatCalculateContributionRequest()
+                .withApplId(999)
+                .withRepId(999)
+                .withCaseType(CaseType.APPEAL_CC)
+                .withAppealType(AppealType.ACS)
+                .withUserCreated("TEST")
+                .withLastOutcome(buildLastOutcome())
+                .withAssessments(List.of(buildAssessment()));
+    }
+
+    public static ApiMaatCalculateContributionRequest buildCalculateContributionRequest() {
+        return new ApiMaatCalculateContributionRequest()
                 .withApplId(999)
                 .withRepId(999)
                 .withCaseType(CaseType.EITHER_WAY)
@@ -280,44 +283,28 @@ public class TestModelDataBuilder {
                 .withAssessments(List.of(buildAssessment()));
     }
 
-    public static CalculateContributionRequest buildCalculateContributionRequest() {
-        return new CalculateContributionRequest()
-                .withApplId(999)
-                .withRepId(999)
-                .withCaseType(CaseType.EITHER_WAY)
-                .withAppealType(AppealType.ACS)
-                .withUserCreated("TEST")
-                .withLastOutcome(buildLastOutcome_1())
-                .withAssessments(List.of(buildAssessment()));
+    public static ApiMaatCheckContributionRuleRequest buildCheckContributionRuleRequest() {
+        return new ApiMaatCheckContributionRuleRequest()
+                .withCaseType(CaseType.EITHER_WAY);
     }
 
-    public static AppealContributionResponse buildAppealContributionResponse() {
-        return new AppealContributionResponse()
-                .withId(9)
-                .withApplId(9)
-                .withRepId(9)
-                .withContributionFileId(9)
-                .withEffectiveDate(LocalDateTime.now())
-                .withCalcDate(LocalDateTime.now())
-                .withContributionCap(BigDecimal.valueOf(250))
-                .withMonthlyContributions(BigDecimal.valueOf(50))
-                .withUpfrontContributions(BigDecimal.ZERO)
-                .withUpliftApplied("N")
-                .withBasedOn("test")
-                .withTransferStatus(TransferStatus.SENT)
-                .withDateUpliftApplied(null)
-                .withDateUpliftRemoved(null)
-                .withDateCreated(LocalDateTime.now())
-                .withUserCreated("test")
-                .withDateModified(null)
-                .withUserModified(null)
-                .withCreateContributionOrder(null)
-                .withCorrespondenceId(9)
-                .withActive("Y")
-                .withReplacedDate(null)
-                .withLatest(true)
-                .withCcOutcomeCount(9)
-                .withSeHistoryId(9);
+    public static ApiCalculateContributionRequest buildApiCalculateContributionRequest() {
+        return new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(new BigDecimal(1000))
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withMinimumMonthlyAmount(new BigDecimal(100))
+                .withContributionCap(new BigDecimal(50))
+                .withUpliftApplied(false)
+                .withUpfrontTotalMonths(12);
+    }
+
+    public static ApiCalculateContributionRequest buildInvalidApiCalculateContributionRequest() {
+        return new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(new BigDecimal(1000))
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withMinimumMonthlyAmount(new BigDecimal(100))
+                .withContributionCap(new BigDecimal(50))
+                .withUpliftApplied(false);
     }
 
     public static LastOutcome buildLastOutcome() {
@@ -326,16 +313,10 @@ public class TestModelDataBuilder {
                 .withDateSet(TEST_DATE);
     }
 
-    public static LastOutcome__1 buildLastOutcome_1() {
-        return new LastOutcome__1()
-                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withDateSet(TEST_DATE);
-    }
-
-    public static Assessment buildAssessment() {
-        return new Assessment()
+    public static ApiAssessment buildAssessment() {
+        return new ApiAssessment()
                 .withAssessmentType(AssessmentType.INIT)
-                .withStatus(AssessmentStatus.COMPLETE)
+                .withStatus(CurrentStatus.COMPLETE)
                 .withResult(AssessmentResult.PASS);
     }
 
@@ -347,30 +328,31 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static ContributionDTO getContributionDTOForCompareContributionService(String caseType,
-                                                                                  BigDecimal contributionCap,
-                                                                                  BigDecimal upfrontContributions,
-                                                                                  BigDecimal monthlyContributions,
-                                                                                  LocalDate effectiveDate,
-                                                                                  String isActive,
-                                                                                  MagCourtOutcome magCourtOutcome) {
-        return ContributionDTO.builder()
+    public static CalculateContributionDTO getContributionDTOForCompareContributionService(String caseType,
+                                                                                           BigDecimal contributionCap,
+                                                                                           BigDecimal upfrontContributions,
+                                                                                           BigDecimal monthlyContributions,
+                                                                                           LocalDate effectiveDate,
+                                                                                           MagCourtOutcome magCourtOutcome) {
+        return CalculateContributionDTO.builder()
                 .repId(123)
                 .applId(123)
-                .laaTransactionId("123456")
                 .contributionCap(contributionCap)
                 .upfrontContributions(upfrontContributions)
                 .monthlyContributions(monthlyContributions)
-                .replacedDate(null)
                 .effectiveDate(effectiveDate)
-                .active(isActive).magCourtOutcome(magCourtOutcome)
+                .magCourtOutcome(magCourtOutcome)
                 .assessments(List.of(buildAssessment()))
-                .lastOutcome(buildLastOutcome_1())
+                .lastOutcome(buildLastOutcome())
                 .userCreated("TEST")
-                .repOrderDTO(getRepOrderDTOForCaseType(caseType)).build();
+                .repOrderDTO(getRepOrderDTOForCaseType(caseType))
+                .calcDate(CALC_DATE)
+                .dateUpliftApplied(UPLIFT_APPLIED_DATE)
+                .dateUpliftRemoved(UPLIFT_REMOVED_DATE)
+                .transferStatus(TransferStatus.REQUESTED)
+                .build();
 
     }
-
 
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
         return RepOrderDTO.builder()
@@ -394,4 +376,81 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static ApiCalculateHardshipByDetailRequest getApiCalculateHardshipByDetailRequest() {
+        return new ApiCalculateHardshipByDetailRequest()
+                .withDetailType("TEST")
+                .withRepId(REP_ID);
+    }
+
+    public static ApiMaatCalculateContributionResponse getApiMaatCalculateContributionResponse() {
+        return new ApiMaatCalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.N)
+                .withEffectiveDate(TEST_DATE)
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withTotalMonths(0);
+    }
+
+    public static ApiCalculateContributionResponse getCalculateContributionResponse() {
+        return new ApiCalculateContributionResponse()
+                .withMonthlyContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.N)
+                .withUpfrontContributions(BigDecimal.ZERO);
+    }
+
+    public static CalculateContributionDTO getContributionDTOForCalcContribs() {
+        return CalculateContributionDTO.builder()
+                .committalDate(COMMITTAL_DATE)
+                .assessments(List.of(new ApiAssessment()
+                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentDate(TEST_DATE)))
+                .caseType(CaseType.INDICTABLE)
+                .magCourtOutcome(MagCourtOutcome.COMMITTED)
+                .build();
+    }
+
+    public static ContributionsSummaryDTO getContributionSummaryDTO() {
+        return ContributionsSummaryDTO.builder()
+                .id(CONTRIBUTION_ID)
+                .monthlyContributions(BigDecimal.TEN)
+                .upfrontContributions(BigDecimal.ONE)
+                .basedOn("Means")
+                .upliftApplied(Constants.Y)
+                .effectiveDate(TEST_DATE.toLocalDate())
+                .calcDate(CALC_DATE)
+                .fileName("TEST")
+                .dateSent(LocalDate.of(2023, 1, 1))
+                .dateReceived(LocalDate.of(2023, 2, 2))
+                .build();
+    }
+
+    public static ContributionCalcParametersDTO getContributionCalcParametersDTO() {
+        return ContributionCalcParametersDTO.builder()
+                .disposableIncomePercent(BigDecimal.TEN)
+                .minUpliftedMonthlyAmount(new BigDecimal(50))
+                .minimumMonthlyAmount(new BigDecimal(100))
+                .upfrontTotalMonths(12)
+                .upliftedIncomePercent(BigDecimal.ONE)
+                .build();
+    }
+
+    public static ApiCalculateContributionResponse getApiCalculateContributionResponse() {
+        return new ApiCalculateContributionResponse()
+                .withBasedOn(Constants.MEANS)
+                .withMonthlyContributions(BigDecimal.TEN)
+                .withUpfrontContributions(BigDecimal.ZERO)
+                .withUpliftApplied(Constants.Y);
+    }
+
+    public static CalculateContributionDTO getCalculateContributionDTO() {
+        return CalculateContributionDTO.builder()
+                .repId(TestModelDataBuilder.REP_ID)
+                .assessments(List.of(new ApiAssessment()
+                        .withAssessmentType(AssessmentType.INIT)
+                        .withResult(AssessmentResult.PASS)
+                        .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
+                .effectiveDate(LocalDate.now())
+                .monthlyContributions(BigDecimal.ZERO)
+                .build();
+    }
 }

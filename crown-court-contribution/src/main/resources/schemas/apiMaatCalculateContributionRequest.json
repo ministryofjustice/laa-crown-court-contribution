@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "CalculateContributionRequest.json",
+  "id": "apiMaatCalculateContributionRequest.json",
   "type": "object",
-  "title": "Calculate Contribution Request",
+  "title": "Calculate Contribution Request from MAAT application",
   "description": "Request data for calculating contributions following an appeal",
   "properties": {
-    "id": {
+    "contributionId": {
       "type": "integer",
       "description": "ID"
     },
@@ -17,18 +17,9 @@
       "type": "integer",
       "description": "The representation order ID"
     },
-    "contributionFileId": {
-      "type": "integer",
-      "description": "The Contribution File Id"
-    },
     "effectiveDate": {
       "type": "string",
       "description": "Effective Date",
-      "format": "date-time"
-    },
-    "calcDate": {
-      "type": "string",
-      "description": "Calculate Contribution Date",
       "format": "date-time"
     },
     "contributionCap": {
@@ -43,18 +34,6 @@
       "type": "number",
       "description": "Upfront Contributions"
     },
-    "upliftApplied": {
-      "type": "string",
-      "description": "Uplift Applied"
-    },
-    "basedOn": {
-      "type": "string",
-      "description": "Based On"
-    },
-    "transferStatus": {
-      "type": "string",
-      "description": "Transfer status"
-    },
     "dateUpliftApplied": {
       "type": "string",
       "description": "Date Uplift Applied",
@@ -65,51 +44,13 @@
       "description": "Date Uplift Removed",
       "format": "date-time"
     },
-    "dateCreated": {
-      "type": "string",
-      "description": "Date Contribution Created",
-      "format": "date-time"
-    },
     "userCreated": {
       "type": "string",
       "description": "The user creating the record"
     },
-    "dateModified": {
-      "type": "string",
-      "description": "Date Modified",
-      "format": "date-time"
-    },
-    "userModified": {
-      "type": "string",
-      "description": "User Modified"
-    },
-    "createContributionOrder": {
-      "type": "string",
-      "description": "Create Contribution Order"
-    },
-    "correspondenceId": {
-      "type": "integer",
-      "description": "Correspondence Id"
-    },
-    "active": {
-      "type": "string",
-      "description": "Active Record Indicator"
-    },
-    "replacedDate": {
-      "type": "string",
-      "description": "Replaced Date"
-    },
-    "latest": {
-      "type": "boolean",
-      "description": "Latest Record Indicator"
-    },
     "ccOutcomeCount": {
       "type": "integer",
       "description": "Crown Court Outcome Count"
-    },
-    "seHistoryId": {
-      "type": "integer",
-      "description": "History Id"
     },
     "magCourtOutcome": {
       "type": "object",
@@ -147,10 +88,38 @@
       "description": "List of assessments performed",
       "minItems": 1,
       "items": {
-        "$ref": "common/Assessment.json"
+        "$ref": "common/apiAssessment.json"
       }
+    },
+    "removeContributions": {
+      "type": "string",
+      "description": "Indicator to Remove Contributions"
+    },
+    "committalDate": {
+      "type": "string",
+      "description": "Committal date",
+      "format": "date-time"
+    },
+    "crownCourtOutcome": {
+      "type": "array",
+      "description": "list of crown court outcome",
+      "items": {
+        "$ref": "common/apiCrownCourtOutcome.json"
+      }
+    },
+    "disposableIncomeAfterCrownHardship": {
+      "type": "number",
+      "description": "Disposable Income after Crown Court Hardship Review"
+    },
+    "disposableIncomeAfterMagHardship": {
+      "type": "number",
+      "description": "Disposable Income after Mags Court Hardship Review"
+    },
+    "totalAnnualDisposableIncome": {
+      "type": "number",
+      "description": "Total Annual Disposable Income"
     }
   },
   "additionalProperties": false,
-  "required": ["applId", "repId", "caseType", "appealType", "lastOutcome", "assessments"]
+  "required": ["applId", "repId", "caseType", "assessments"]
 }

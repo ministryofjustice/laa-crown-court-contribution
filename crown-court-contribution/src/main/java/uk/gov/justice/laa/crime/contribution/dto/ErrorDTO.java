@@ -6,6 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class ErrorDTO {
-    private String code;
-    private String message;
+    String traceId;
+    String code;
+    String message;
 }

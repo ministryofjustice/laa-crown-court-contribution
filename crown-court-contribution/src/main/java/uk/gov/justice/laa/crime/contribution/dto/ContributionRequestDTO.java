@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -21,7 +22,7 @@ public class ContributionRequestDTO {
     private String initResult;
     private String fullResult;
     private String hardshipResult;
-    private Integer monthlyContribs;
+    private BigDecimal monthlyContribs;
     private String removeContribs;
     private String meansResult;
 

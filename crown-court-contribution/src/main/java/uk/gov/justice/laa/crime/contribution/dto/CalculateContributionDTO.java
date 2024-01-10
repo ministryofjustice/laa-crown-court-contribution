@@ -4,25 +4,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.justice.laa.crime.contribution.model.Assessment;
-import uk.gov.justice.laa.crime.contribution.model.LastOutcome__1;
+import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
+import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContributionDTO {
+public class CalculateContributionDTO {
 
-    private String laaTransactionId;
-    private Integer id;
+    private Integer contributionId;
     private Integer applId;
     private Integer repId;
     private Integer contributionFileId;
@@ -33,25 +33,22 @@ public class ContributionDTO {
     private BigDecimal upfrontContributions;
     private String upliftApplied;
     private String basedOn;
-    private String transferStatus;
+    private TransferStatus transferStatus;
     private LocalDate dateUpliftApplied;
     private LocalDate dateUpliftRemoved;
-    private LocalDateTime dateCreated;
     private String userCreated;
-    private LocalDateTime dateModified;
-    private String userModified;
     private String createContributionOrder;
-    private Integer correspondenceId;
-    private String active;
-    private LocalDate replacedDate;
-    private Boolean latest;
-    private Integer ccOutcomeCount;
-    private Integer seHistoryId;
     private CaseType caseType;
-    private List<Assessment> assessments;
+    private List<ApiAssessment> assessments;
     private AppealType appealType;
-    private LastOutcome__1 lastOutcome;
+    private LastOutcome lastOutcome;
     private MagCourtOutcome magCourtOutcome;
     private RepOrderDTO repOrderDTO;
-
+    private String removeContribs;
+    private LocalDate committalDate;
+    private String applicationStatus;
+    private List<ApiCrownCourtOutcome> crownCourtOutcomeList;
+    private BigDecimal disposableIncomeAfterCrownHardship;
+    private BigDecimal disposableIncomeAfterMagHardship;
+    private BigDecimal totalAnnualDisposableIncome;
 }

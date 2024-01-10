@@ -19,6 +19,6 @@ public class ContributionResponseDTO {
     private String templateDesc;
     private Integer template;
     private String header;
-    private char doContribs;
-    private char calcContribs;
+    private String doContribs;
+    private String calcContribs;
 }

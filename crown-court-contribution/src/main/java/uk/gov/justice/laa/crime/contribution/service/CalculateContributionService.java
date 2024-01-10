@@ -3,40 +3,40 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
-import uk.gov.justice.laa.crime.contribution.model.CalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.util.CalculateContributionUtil;
+
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CalculateContributionService {
-
-    private final MaatCourtDataService maatCourtDataService;
-    private final AppealContributionService appealContributionService;
-
-    private final CompareContributionService compareContributionService;
-
-
-
-    public CalculateContributionResponse calculateContribution(ContributionDTO contributionDTO, String laaTransactionId) {
-        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(contributionDTO.getRepId(), laaTransactionId);
-        contributionDTO.setRepOrderDTO(repOrderDTO);
-
-        if (CaseType.APPEAL_CC.equals(contributionDTO.getCaseType())) {
-            appealContributionService.calculateContribution(contributionDTO, laaTransactionId);
+    public ApiCalculateContributionResponse calculateContribution(ApiCalculateContributionRequest request) {
+        ApiCalculateContributionResponse response = new ApiCalculateContributionResponse();
+        if (Boolean.TRUE.equals(request.getUpliftApplied())) {
+            BigDecimal monthlyContributions = CalculateContributionUtil.calculateUpliftedMonthlyAmount(request.getAnnualDisposableIncome(),
+                    request.getUpliftedIncomePercent(), request.getMinUpliftedMonthlyAmount());
+            response.setMonthlyContributions(monthlyContributions);
+            response.setUpliftApplied(Constants.Y);
+        } else {
+            BigDecimal monthlyContributions = CalculateContributionUtil.calculateMonthlyContribution(request.getAnnualDisposableIncome(),
+                    request.getDisposableIncomePercent(),
+                    request.getMinimumMonthlyAmount());
+            response.setUpliftApplied(Constants.N);
+            BigDecimal contributionCap = request.getContributionCap();
+            if (contributionCap != null && monthlyContributions.compareTo(contributionCap) > 0) {
+                response.setMonthlyContributions(contributionCap);
+                response.setBasedOn(Constants.OFFENCE_TYPE);
+            } else {
+                response.setMonthlyContributions(monthlyContributions);
+                response.setBasedOn(Constants.MEANS);
+            }
+            response.setUpfrontContributions(CalculateContributionUtil.calculateUpfrontContributions(monthlyContributions,
+                    request.getContributionCap(), request.getUpfrontTotalMonths()));
         }
-        return new CalculateContributionResponse();
+        return response;
     }
-
-    public Contribution createContribs(CreateContributionRequest request, String laaTransactionId) {
-        log.info("Inactivate existing Contribution and create a new Contribution");
-        return compareContributionService.compareContribution(ContributionDTOBuilder.build(request)) < 2 ?
-                maatCourtDataService.createContribution(request, laaTransactionId) : null;
-    }
-
 }

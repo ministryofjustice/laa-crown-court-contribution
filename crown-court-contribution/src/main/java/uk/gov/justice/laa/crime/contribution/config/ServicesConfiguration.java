@@ -15,6 +15,9 @@ public class ServicesConfiguration {
     @NotNull
     private MaatApi maatApi;
 
+    @NotNull
+    private HardshipApi hardshipApi;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -55,19 +58,22 @@ public class ServicesConfiguration {
             @NotNull
             private String getRepOrderUrl;
 
+            @NotNull
+            private String contribsParametersUrl;
+
+            @NotNull
+            private String findLatestSentContributionUrl;
         }
 
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
         public static class CorrespondenceStateEndpoints {
-
             @NotNull
             private String baseUrl;
 
             @NotNull
             private String findUrl;
-
         }
 
         @Data
@@ -76,6 +82,25 @@ public class ServicesConfiguration {
         public static class RepOrderEndpoints {
             @NotNull
             private String findOutcomeUrl;
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class HardshipApi {
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private HardshipEndpoints hardshipEndpoints;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class HardshipEndpoints {
+            @NotNull
+            private String calculateHardshipForDetailUrl;
         }
     }
 }

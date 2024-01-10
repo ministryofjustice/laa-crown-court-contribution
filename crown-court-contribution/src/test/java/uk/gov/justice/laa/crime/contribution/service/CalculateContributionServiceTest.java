@@ -1,65 +1,136 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import java.math.BigDecimal;
+import java.util.stream.Stream;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SoftAssertionsExtension.class)
 class CalculateContributionServiceTest {
 
-    @Mock
-    private MaatCourtDataService maatCourtDataService;
-
-    @Mock
-    private AppealContributionService appealContributionService;
-
-    @InjectMocks
-    private CalculateContributionService calculateContributionService;
-
-    @Mock
-    private CompareContributionService compareContributionService;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @Test
-    void givenAInvalidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
-        when(maatCourtDataService.getRepOrderByRepId(anyInt(), anyString())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
-        calculateContributionService.calculateContribution(ContributionDTO.builder().repId(120).build(), TestModelDataBuilder.LAA_TRANSACTION_ID);
-        verify(appealContributionService, times(0)).calculateContribution(any(), anyString());
+    void givenValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMonthlyContributionWhenGreaterThanMinUpliftedMonthlyAmount() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
+        BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
+        BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(80);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withUpliftApplied(true)
+                .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
+                .withUpliftedIncomePercent(new BigDecimal(10));
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isGreaterThan(minUpliftedMonthlyAmount);
+        softly.assertThat(Constants.Y)
+                .isEqualTo(response.getUpliftApplied());
     }
 
     @Test
-    void givenAValidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
-        when(maatCourtDataService.getRepOrderByRepId(anyInt(), anyString())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
-        when(appealContributionService.calculateContribution(any(ContributionDTO.class), anyString())).thenReturn(ContributionDTO.builder().build());
-        calculateContributionService.calculateContribution(ContributionDTO.builder().repId(120).caseType(CaseType.APPEAL_CC).build(),
-                TestModelDataBuilder.LAA_TRANSACTION_ID);
-        verify(appealContributionService, times(1)).calculateContribution(any(), anyString());
-    }
+    void givenValidRequestWithUpliftApplied_whenCalculateContributionServiceIsInvoked_thenReturnMinUpliftedMonthlyAmountWhenMonthlyContributionIsSmaller() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
+        BigDecimal annualDisposableIncome = BigDecimal.valueOf(500);
+        BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(80);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withUpliftApplied(true)
+                .withMinUpliftedMonthlyAmount(minUpliftedMonthlyAmount)
+                .withUpliftedIncomePercent(new BigDecimal(10));
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
 
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(minUpliftedMonthlyAmount);
+        softly.assertThat(Constants.Y)
+                .isEqualTo(response.getUpliftApplied());
+    }
 
     @Test
-    void givenValidContributionAndCompareResultIsLessThanTwo_whenCreateContribsIsInvoked_thenContributionIsReturn() {
-        when(compareContributionService.compareContribution(any())).thenReturn(1);
-        when(maatCourtDataService.createContribution(any(CreateContributionRequest.class), any())).thenReturn(TestModelDataBuilder.getContribution());
-        Contribution result = calculateContributionService.createContribs(new CreateContributionRequest(), TestModelDataBuilder.LAA_TRANSACTION_ID);
-        assertThat(result).isNotNull();
+    void givenValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenReturnZeroWhenMonthlyContributionIsSmaller() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
+        BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
+        BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(100);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withUpliftApplied(false)
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withContributionCap(BigDecimal.ONE)
+                .withMinimumMonthlyAmount(minimumMonthlyAmount)
+                .withUpfrontTotalMonths(12);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(BigDecimal.ZERO);
+        softly.assertThat(response.getUpfrontContributions())
+                .isEqualTo(BigDecimal.ZERO);
+        softly.assertThat(Constants.N)
+                .isEqualTo(response.getUpliftApplied());
+        softly.assertThat(Constants.MEANS)
+                .isEqualTo(response.getBasedOn());
+    }
+
+    @ParameterizedTest
+    @MethodSource("contributionCap")
+    void givenValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenMonthlyContributionsIsReturned(BigDecimal contributionCap) {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
+        BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
+        BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withUpliftApplied(false)
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withContributionCap(contributionCap)
+                .withMinimumMonthlyAmount(minimumMonthlyAmount)
+                .withUpfrontTotalMonths(12);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
+
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(new BigDecimal(83));
+        softly.assertThat(response.getUpfrontContributions())
+                .isEqualTo(contributionCap);
+        softly.assertThat(Constants.N)
+                .isEqualTo(response.getUpliftApplied());
+        softly.assertThat(Constants.MEANS)
+                .isEqualTo(response.getBasedOn());
     }
 
     @Test
-    void givenValidContributionAndCompareResultIsGreaterThanTwo_whenCreateContribsIsInvoked_thenNullIsReturn() {
-        when(compareContributionService.compareContribution(any())).thenReturn(3);
-        Contribution result = calculateContributionService.createContribs(new CreateContributionRequest(), TestModelDataBuilder.LAA_TRANSACTION_ID);
-        assertThat(result).isNull();
-    }
+    void givenValidRequestWithDisposableIncome_whenCalculateContributionServiceIsInvoked_thenContributionCapIsReturnedWhenMonthlyContributionIsGreater() {
+        CalculateContributionService calculateContributionService = new CalculateContributionService();
+        BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
+        BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
+        BigDecimal contributionCap = new BigDecimal(53);
+        ApiCalculateContributionRequest request = new ApiCalculateContributionRequest()
+                .withUpliftApplied(false)
+                .withAnnualDisposableIncome(annualDisposableIncome)
+                .withDisposableIncomePercent(BigDecimal.TEN)
+                .withContributionCap(contributionCap)
+                .withMinimumMonthlyAmount(minimumMonthlyAmount)
+                .withUpfrontTotalMonths(12);
+        ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
 
+        softly.assertThat(response.getMonthlyContributions())
+                .isEqualTo(contributionCap);
+        softly.assertThat(response.getUpfrontContributions())
+                .isEqualTo(contributionCap);
+        softly.assertThat(Constants.N)
+                .isEqualTo(response.getUpliftApplied());
+        softly.assertThat(Constants.OFFENCE_TYPE)
+                .isEqualTo(response.getBasedOn());
+    }
+    private static Stream<Arguments> contributionCap() {
+        return Stream.of(Arguments.of(null, new BigDecimal(100)));
+    }
 }

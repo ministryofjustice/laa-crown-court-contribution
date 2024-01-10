@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
-public enum AssessmentStatus {
+public enum CurrentStatus {
     COMPLETE("COMPLETE"),
     IN_PROGRESS("IN PROGRESS");
 
@@ -16,11 +16,11 @@ public enum AssessmentStatus {
 
     private final String value;
 
-    public static AssessmentStatus getFrom(String value) {
+    public static CurrentStatus getFrom(String value) {
         if (StringUtils.isBlank(value)) return null;
 
-        return Stream.of(AssessmentStatus.values())
-                .filter(assessmentStatus -> assessmentStatus.value.equals(value))
+        return Stream.of(CurrentStatus.values())
+                .filter(currentStatus -> currentStatus.value.equals(value))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(String.format(EXCEPTION_MESSAGE, value)));
     }

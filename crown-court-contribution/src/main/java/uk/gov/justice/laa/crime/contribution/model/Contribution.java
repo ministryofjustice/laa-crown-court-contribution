@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Contribution {
-
     private Integer id;
     private Integer applId;
     private Integer repId;
@@ -26,7 +26,7 @@ public class Contribution {
     private BigDecimal upfrontContributions;
     private String upliftApplied;
     private String basedOn;
-    private String transferStatus;
+    private TransferStatus transferStatus;
     private LocalDate dateUpliftApplied;
     private LocalDate dateUpliftRemoved;
     private LocalDateTime dateCreated;

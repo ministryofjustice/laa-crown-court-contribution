@@ -1,34 +1,34 @@
 package uk.gov.justice.laa.crime.contribution.enums.staticdata;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.HardshipReviewDetailType;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-class CrownCourtAppealOutcomeTest {
+class HardshipReviewDetailTypeTest {
 
     @Test
     void givenABlankString_whenGetFromIsInvoked_thenNullIsReturned() {
-        assertThat(CrownCourtAppealOutcome.getFrom(null)).isNull();
+        assertThat(HardshipReviewDetailType.getFrom(null)).isNull();
     }
 
     @Test
     void givenValidResultString_whenGetFromIsInvoked_thenCorrectEnumIsReturned() {
-        assertThat(CrownCourtAppealOutcome.getFrom("SUCCESSFUL"))
-                .isEqualTo(CrownCourtAppealOutcome.SUCCESSFUL);
+        assertThat(HardshipReviewDetailType.getFrom("FUNDING")).isEqualTo(HardshipReviewDetailType.FUNDING);
     }
 
     @Test
     void valueOfCurrentStatusFromString_nullParameter_ReturnsNull() {
         assertThatThrownBy(
-                () -> CaseType.getFrom("MOCK_RESULT_STRING")
+                () -> HardshipReviewDetailType.getFrom("MOCK_RESULT_STRING")
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void givenValidInput_ValidateEnumValues() {
-        assertThat("UNSUCCESSFUL").isEqualTo(CrownCourtAppealOutcome.UNSUCCESSFUL.getValue());
+        assertThat("INCOME").isEqualTo(HardshipReviewDetailType.INCOME.getType());
+        assertThat("Income Denied Access To").isEqualTo(HardshipReviewDetailType.INCOME.getDescription());
     }
+
 }

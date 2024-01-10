@@ -1,5 +1,5 @@
 server:
-  port: 8087
+  port: 8089
 
 management:
   server:
@@ -8,6 +8,9 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+  tracing:
+    propagation:
+      type: w3c,b3
 
 spring:
   datasource:
@@ -36,10 +39,16 @@ spring:
         provider:
           maat-api:
             token-uri: ${MAAT_API_OAUTH_URL}
+          hardship:
+            token-uri: ${HARDSHIP_API_OAUTH_URL}
         registration:
           maat-api:
             client-id: ${MAAT_API_OAUTH_CLIENT_ID}
             client-secret: ${MAAT_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+          hardship:
+            client-id: ${HARDSHIP_API_OAUTH_CLIENT_ID}
+            client-secret: ${HARDSHIP_API_OAUTH_CLIENT_SECRET}
             authorization-grant-type: client_credentials
       resource-server:
         jwt:
@@ -52,15 +61,21 @@ services:
     contribution-endpoints:
       base-url: ${services.maat-api.assessments-domain}/contributions
       find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
+      find-latest-sent-contribution-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}/latest-sent
       summary-url: ${services.maat-api.assessments-domain}/contributions/{repId}/summary
-      get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal
+      get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal/caty-case-type/{caseType}/apty-code/{appealType}/cc-outcome/{outcome}/assessmentResult/{assessmentResult}
       get-contribution-count-url: ${services.maat-api.assessments-domain}/{repId}/contribution
       get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
+      contribs-parameters-url: ${services.maat-api.assessments-domain}/contribution-calc-params/{effectiveDate}
     correspondence-state-endpoints:
       base-url: ${services.maat-api.assessments-domain}/correspondence-state
       find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
     rep-order-endpoints:
       find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
+  hardship-api:
+    base-url: ${HARDSHIP_API_BASE_URL}
+    hardship-endpoints:
+      calculate-hardship-for-detail-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/calculate-hardship-for-detail
 
 springdoc:
   packagesToScan: uk.gov.justice.laa.crime.contribution
@@ -78,7 +93,7 @@ sentry:
   servername: aws-eks-container
   send-default-pii: true
   attach-stacktrace: true
-  sample-rate: 0.05
+  sample-rate: ${SENTRY_SAMPLE_RATE}
 
 retry-config:
   max-retries: 3

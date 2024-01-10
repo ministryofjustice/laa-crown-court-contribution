@@ -1,25 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "AppealContributionResponse.json",
+  "id": "apiMAATCalculateContributionResponse.json",
   "type": "object",
-  "title": "Appeal Contribution Response",
+  "title": "Calculate Contribution Response to MAAT",
   "description": "Response data following calculation of appeal contributions",
   "properties": {
-    "id": {
+    "contributionId": {
       "type": "integer",
       "description": "The ID of the contribution entry"
-    },
-    "applId": {
-      "type": "integer",
-      "description": "The application ID"
     },
     "repId": {
       "type": "integer",
       "description": "The ID of the representation order"
-    },
-    "contributionFileId": {
-      "type": "integer",
-      "description": "The ID of the contribution file"
     },
     "effectiveDate": {
       "type": "string",
@@ -51,67 +43,26 @@
       "type": "string",
       "description": "Indicates what the contributions are based on (e.g. Means assessment)"
     },
-    "transferStatus": {
-      "type": "object",
-      "description": "The transfer status of the contribution record",
-      "existingJavaType": "uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus"
-    },
-    "dateUpliftApplied": {
-      "type": "string",
-      "format": "date-time",
-      "description": "The date that an income uplift was applied"
-    },
-    "dateUpliftRemoved": {
-      "type": "string",
-      "format": "date-time",
-      "description": "The date that an income uplift was removed"
-    },
-    "dateCreated": {
-      "type": "string",
-      "format": "date-time",
-      "description": "The creation date"
-    },
-    "userCreated": {
-      "type": "string",
-      "description": "The user that created the record"
-    },
-    "dateModified": {
-      "type": "string",
-      "format": "date-time",
-      "description": "The date the contribution entry was modified"
-    },
-    "userModified": {
-      "type": "string",
-      "description": "The user modifying the record"
-    },
     "createContributionOrder": {
       "type": "string",
       "description": "Indicates whether a contribution order should be created"
-    },
-    "correspondenceId": {
-      "type": "integer",
-      "description": "The associated correspondence ID"
-    },
-    "active": {
-      "type": "string",
-      "description": "Indicates if this is a currently active contribution entry"
     },
     "replacedDate": {
       "type": "string",
       "format": "date-time",
       "description": "The date that this contribution entry was replaced"
     },
-    "latest": {
-      "type": "boolean",
-      "description": "Indicates if this is the latest contribution entry"
-    },
     "ccOutcomeCount": {
       "type": "integer",
       "description": "The count of crown court outcomes"
     },
-    "seHistoryId": {
+    "totalMonths": {
       "type": "integer",
-      "description": "The se history ID"
+      "description": "Total months"
+    },
+    "processActivity": {
+      "type": "boolean",
+      "description": "Indicator to call MATRIX process activity"
     }
   },
   "additionalProperties": false

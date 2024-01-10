@@ -8,7 +8,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class TransferStatusTest {
     @Test
-    void givenValidValue_whenGetFromIsInvoked_thenValidAssessmentStatusIsReturned() {
+    void givenValidValue_whenGetFromIsInvoked_thenValidTransferStatusIsReturned() {
         assertThat(TransferStatus.getFrom("SENT")).isEqualTo(TransferStatus.SENT);
     }
 
