@@ -10,8 +10,8 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 import java.time.LocalDateTime;
 

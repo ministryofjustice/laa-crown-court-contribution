@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardship
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+import uk.gov.justice.laa.crime.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

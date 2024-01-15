@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CaseType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

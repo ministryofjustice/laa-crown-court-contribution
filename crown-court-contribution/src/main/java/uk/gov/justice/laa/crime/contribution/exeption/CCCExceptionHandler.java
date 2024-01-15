@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.contribution.dto.ErrorDTO;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 
 @Slf4j
 @RestControllerAdvice

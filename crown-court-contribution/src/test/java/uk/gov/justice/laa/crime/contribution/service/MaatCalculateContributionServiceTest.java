@@ -30,13 +30,8 @@ import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.HardshipReviewDetailType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
+import uk.gov.justice.laa.crime.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
