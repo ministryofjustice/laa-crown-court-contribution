@@ -8,6 +8,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -37,11 +38,14 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
 @AutoConfigureObservability
+@AutoConfigureWireMock(port = 9999)
 class ContributionControllerCalculateContributionIntegrationTest {
 
     private MockMvc mvc;
-    private static final WireMockServer wiremock = new WireMockServer(9999);
     private static final String ENDPOINT_URL = "/api/internal/v2/contribution/calculate";
+
+    @Autowired
+    private WireMockServer wiremock;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -55,11 +59,6 @@ class ContributionControllerCalculateContributionIntegrationTest {
     @AfterEach
     void after() {
         wiremock.resetAll();
-    }
-
-    @AfterAll
-    static void clean() {
-        wiremock.shutdown();
     }
 
     @BeforeAll
