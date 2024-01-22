@@ -15,7 +15,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 def versions = [
-        pitest                          : "1.4.10",
+        pitest                          : "1.15.4",
         springdocVersion                : "2.1.0",
         crimeCommonsVersion             : "2.13.6",
         springCloudStubRunnerVersion    : "4.0.4"
