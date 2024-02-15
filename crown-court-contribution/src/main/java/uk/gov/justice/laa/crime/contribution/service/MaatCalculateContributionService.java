@@ -255,10 +255,10 @@ public class MaatCalculateContributionService {
     public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
                                                 final RepOrderDTO repOrderDTO,
                                                 final TransferStatus currentTransferStatus) {
-        return ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
+        return (!TransferStatus.REQUESTED.equals(currentTransferStatus)
                 && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId())
-                || contributionService.isCds15WorkAround(repOrderDTO))));
+                || contributionService.isCds15WorkAround(repOrderDTO)));
     }
 
     public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,
