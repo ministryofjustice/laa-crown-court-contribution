@@ -131,19 +131,6 @@ public class MaatCourtDataService {
         return response;
     }
 
-    public long getContributionCount(Integer repId) {
-        var response = maatAPIClient.head(
-                configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
-                Map.of(),
-                repId
-        );
-        log.info(RESPONSE_STRING, response);
-        if (response != null) {
-            return response.getHeaders().getContentLength();
-        }
-        return 0L;
-    }
-
     public RepOrderDTO getRepOrderByRepId(Integer repId) {
         var response = maatAPIClient.get(
                 new ParameterizedTypeReference<RepOrderDTO>() {

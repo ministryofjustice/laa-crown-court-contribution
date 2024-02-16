@@ -22,7 +22,6 @@ import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Optional.ofNullable;
@@ -36,7 +35,6 @@ public class ContributionService {
     private static final String INEL = "INEL";
     private final CorrespondenceRuleRepository correspondenceRuleRepository;
     private final MaatCourtDataService maatCourtDataService;
-
 
     protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
         List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
@@ -144,38 +142,6 @@ public class ContributionService {
                 contributionRequestDTO.getInitResult());
     }
 
-    public boolean checkReassessment(RepOrderDTO repOrderDTO) {
-        log.info("Check if reassessment is required for REP_ID={}", repOrderDTO.getId());
-
-        long contributionCount = maatCourtDataService.getContributionCount(repOrderDTO.getId());
-        List<FinancialAssessmentDTO> financialAssessments = repOrderDTO.getFinancialAssessments();
-        List<PassportAssessmentDTO> passportAssessments = repOrderDTO.getPassportAssessments();
-
-        if (contributionCount > 0) {
-            Optional<LocalDateTime> latestFinAssessmentDate = ofNullable(financialAssessments)
-                    .orElseGet(Collections::emptyList).stream()
-                    .map(FinancialAssessmentDTO::getDateCreated)
-                    .filter(Objects::nonNull)
-                    .max(LocalDateTime::compareTo);
-
-            Optional<LocalDateTime> latestPassportAssessmentDate = ofNullable(passportAssessments)
-                    .orElseGet(Collections::emptyList).stream()
-                    .map(PassportAssessmentDTO::getDateCreated)
-                    .filter(Objects::nonNull)
-                    .max(LocalDateTime::compareTo);
-
-            if (latestFinAssessmentDate.isPresent() && latestPassportAssessmentDate.isPresent()) {
-                if (latestFinAssessmentDate.get().isAfter(latestPassportAssessmentDate.get())) {
-                    return financialAssessments.stream().anyMatch(fa -> fa.getReplaced().equals(Constants.Y));
-                } else {
-                    return passportAssessments.stream().anyMatch(pa -> pa.getReplaced().equals(Constants.Y));
-                }
-            }
-        }
-        return false;
-    }
-
-
     public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {
 
         String passportAssessmentResult = getPassportAssessmentResult(repOrderDTO);
@@ -185,7 +151,6 @@ public class ContributionService {
         return PassportAssessmentResult.FAIL.getResult().equals(passportAssessmentResult)
                 && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
     }
-
 
     public boolean hasMessageOutcomeChanged(String msgOutcome, RepOrderDTO repOrderDTO) {
         if (null != repOrderDTO) {

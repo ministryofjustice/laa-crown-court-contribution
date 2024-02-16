@@ -149,7 +149,6 @@ public class MaatCalculateContributionService {
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
                                                                                  final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
         Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
@@ -165,7 +164,7 @@ public class MaatCalculateContributionService {
                 .build());
 
         if (Constants.Y.equals(contributionResponseDTO.getDoContribs())) {
-            response = doContribs(calculateContributionDTO, contributionResponseDTO, fullResult, isReassessment, repOrderDTO);
+            response = doContribs(calculateContributionDTO, contributionResponseDTO, fullResult, repOrderDTO);
         }
         return response;
     }
@@ -173,7 +172,6 @@ public class MaatCalculateContributionService {
     public ApiMaatCalculateContributionResponse doContribs(final CalculateContributionDTO calculateContributionDTO,
                                                            final ContributionResponseDTO contributionResponseDTO,
                                                            final String fullResult,
-                                                           final boolean isReassessment,
                                                            final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
 
@@ -191,7 +189,7 @@ public class MaatCalculateContributionService {
 
         Contribution currentContribution = getCurrentContribution(calculateContributionDTO);
 
-        Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, isReassessment, repOrderDTO,
+        Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, repOrderDTO,
                 response, currentContribution);
 
         requestEarlyTransfer(calculateContributionDTO, response, currentContribution);
@@ -203,7 +201,6 @@ public class MaatCalculateContributionService {
     }
 
     public Contribution verifyAndCreateContribs(final CalculateContributionDTO calculateContributionDTO,
-                                                final boolean isReassessment,
                                                 final RepOrderDTO repOrderDTO,
                                                 final ApiMaatCalculateContributionResponse response,
                                                 final Contribution currentContribution) {
@@ -228,7 +225,7 @@ public class MaatCalculateContributionService {
             }
             //Revisit the createContribs logic - do we need to change the input?
             return createContribs(calculateContributionDTO);
-        } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
+        } else if (isCreateContributionRequired(calculateContributionDTO, repOrderDTO, currentTransferStatus)) {
             return createContribs(calculateContributionDTO);
         }
         return null;
@@ -256,14 +253,12 @@ public class MaatCalculateContributionService {
     }
 
     public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
-                                                final boolean isReassessment,
                                                 final RepOrderDTO repOrderDTO,
                                                 final TransferStatus currentTransferStatus) {
-        return ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
+        return (!TransferStatus.REQUESTED.equals(currentTransferStatus)
                 && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId())
-                || contributionService.isCds15WorkAround(repOrderDTO))) || isReassessment) || (TransferStatus.REQUESTED.equals(currentTransferStatus)
-                && CaseType.APPEAL_CC.equals(calculateContributionDTO.getCaseType()));
+                || contributionService.isCds15WorkAround(repOrderDTO)));
     }
 
     public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,

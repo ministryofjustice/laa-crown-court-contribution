@@ -914,26 +914,13 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenTransferRequestedAndAppealCC_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .caseType(CaseType.APPEAL_CC)
-                .build();
-
-        boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, false, null, TransferStatus.REQUESTED
-        );
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
     void givenTransferRequestedAndIndictableCase_whenIsCreateContributionRequiredIsInvoked_FalseIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .caseType(CaseType.INDICTABLE)
                 .build();
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, false, null, TransferStatus.REQUESTED
+                calculateContributionDTO, null, TransferStatus.REQUESTED
         );
 
         assertThat(result).isFalse();
@@ -956,7 +943,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(false);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, false, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
         );
 
         assertThat(result).isFalse();
@@ -974,40 +961,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(true);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, false, repOrderDTO, TransferStatus.SENT
-        );
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void givenReassessmentAndTransferRequested_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
-
-        boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                null, true, null, TransferStatus.REQUESTED
-        );
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void givenReassessmentAndTransferSent_whenIsCreateContributionRequiredIsInvoked_TrueIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .caseType(CaseType.APPEAL_CC)
-                .build();
-        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
-                .id(1234)
-                .build();
-
-        when(contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.APPEAL_CC, null))
-                .thenReturn(false);
-        when(contributionService.hasCCOutcomeChanged(repOrderDTO.getId()))
-                .thenReturn(false);
-        when(contributionService.isCds15WorkAround(repOrderDTO))
-                .thenReturn(false);
-
-        boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, true, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
         );
 
         assertThat(result).isTrue();
@@ -1028,7 +982,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(true);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, true, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
         );
 
         assertThat(result).isTrue();
@@ -1051,7 +1005,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(true);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, true, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
         );
 
         assertThat(result).isTrue();
@@ -1069,8 +1023,6 @@ class MaatCalculateContributionServiceTest {
 
         when(maatCourtDataService.getRepOrderByRepId(null))
                 .thenReturn(repOrderDTO);
-        when(contributionService.checkReassessment(repOrderDTO))
-                .thenReturn(true);
         when(contributionService.checkContribsCondition(any()))
                 .thenReturn(ContributionResponseDTO.builder().build());
 
@@ -1107,8 +1059,6 @@ class MaatCalculateContributionServiceTest {
                 .withUpliftApplied(Constants.N)
                 .withBasedOn("Means");
 
-        when(contributionService.checkReassessment(repOrderDTO))
-                .thenReturn(true);
         when(contributionService.checkContribsCondition(any()))
                 .thenReturn(contributionResponseDTO);
         when(maatCourtDataService.getContributionCalcParameters(any()))
@@ -1157,8 +1107,6 @@ class MaatCalculateContributionServiceTest {
                 .withUpfrontContributions(BigDecimal.ZERO)
                 .withContributionCap(BigDecimal.ZERO);
 
-        when(contributionService.checkReassessment(repOrderDTO))
-                .thenReturn(true);
         when(contributionService.checkContribsCondition(any()))
                 .thenReturn(contributionResponseDTO);
         when(maatCourtDataService.findLatestSentContribution(any()))
@@ -1235,7 +1183,7 @@ class MaatCalculateContributionServiceTest {
                         .build()
                 );
         when(maatCalculateContributionService.verifyAndCreateContribs(
-                calculateContributionDTO, true, null, maatCalculateContributionResponse, null
+                calculateContributionDTO, null, maatCalculateContributionResponse, null
         )).thenReturn(new Contribution());
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
@@ -1247,7 +1195,6 @@ class MaatCalculateContributionServiceTest {
                 calculateContributionDTO,
                 contributionResponseDTO,
                 null,
-                true,
                 null
         );
 
@@ -1277,7 +1224,7 @@ class MaatCalculateContributionServiceTest {
                         .build()
                 );
         when(maatCalculateContributionService.verifyAndCreateContribs(
-                calculateContributionDTO, true, null, maatCalculateContributionResponse, null
+                calculateContributionDTO, null, maatCalculateContributionResponse, null
         )).thenReturn(null);
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
@@ -1289,7 +1236,6 @@ class MaatCalculateContributionServiceTest {
                 calculateContributionDTO,
                 contributionResponseDTO,
                 null,
-                true,
                 null
         );
 
