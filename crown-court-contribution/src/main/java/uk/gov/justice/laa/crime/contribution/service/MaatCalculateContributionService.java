@@ -47,10 +47,6 @@ public class MaatCalculateContributionService {
     private final CalculateContributionRequestMapper calculateContributionRequestMapper;
     private final MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
 
-    private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
-            MagCourtOutcome.COMMITTED_FOR_TRIAL,
-            MagCourtOutcome.APPEAL_TO_CC);
-
     private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {
         return contributionResponseDTO.getUpliftCote() != null &&
                 calculateContributionDTO.getDateUpliftApplied() != null &&
@@ -192,8 +188,6 @@ public class MaatCalculateContributionService {
         Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, repOrderDTO,
                 response, currentContribution);
 
-        requestEarlyTransfer(calculateContributionDTO, response, currentContribution);
-
         if (contributionResponseDTO.getTemplate() != null && createdContribution != null) {
             response.setProcessActivity(true);
         }
@@ -231,18 +225,6 @@ public class MaatCalculateContributionService {
         return null;
     }
 
-    public void requestEarlyTransfer(final CalculateContributionDTO calculateContributionDTO,
-                                     final ApiMaatCalculateContributionResponse response,
-                                     final Contribution currentContribution) {
-        Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId());
-        if (isEarlyTransferRequired(calculateContributionDTO, response, latestSentContribution) && currentContribution != null) {
-            maatCourtDataService.updateContribution(new UpdateContributionRequest()
-                    .withId(currentContribution.getId())
-                    .withTransferStatus(TransferStatus.REQUESTED)
-                    .withUserModified(calculateContributionDTO.getUserCreated()));
-        }
-    }
-
     public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO) {
         final Integer contributionId = calculateContributionDTO.getContributionId();
         List<Contribution> contributionsList = new ArrayList<>();
@@ -259,18 +241,6 @@ public class MaatCalculateContributionService {
                 && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId())
                 || contributionService.isCds15WorkAround(repOrderDTO)));
-    }
-
-    public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,
-                                           final ApiMaatCalculateContributionResponse response,
-                                           final Contribution latestSentContribution) {
-        return ((response.getMonthlyContributions().compareTo(latestSentContribution.getMonthlyContributions()) != 0
-                || response.getUpfrontContributions().compareTo(latestSentContribution.getUpfrontContributions()) != 0
-                || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().toLocalDate().equals(latestSentContribution.getEffectiveDate())
-                && BigDecimal.ZERO.compareTo(response.getMonthlyContributions()) < 0)
-                || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId()))
-                && (calculateContributionDTO.getMagCourtOutcome() != null && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome())))
-                || contributionService.hasContributionBeenSent(calculateContributionDTO.getRepId());
     }
 
     public Contribution createContribs(final CalculateContributionDTO calculateContributionDTO) {

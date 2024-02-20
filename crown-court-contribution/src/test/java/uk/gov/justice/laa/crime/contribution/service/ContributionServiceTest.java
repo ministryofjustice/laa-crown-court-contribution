@@ -14,10 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
@@ -826,52 +824,6 @@ class ContributionServiceTest {
 
         assertThat(hasApplicationStatusChanged)
                 .isFalse();
-    }
-
-    @Test
-    void givenValidRepIdEmptyContribution_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(null);
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isFalse();
-    }
-
-    @Test
-    void givenValidRepIdEmptyTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(List.of(TestModelDataBuilder.buildContribution()));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isFalse();
-    }
-
-    @Test
-    void givenAnInvalidTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        Contribution contribution = TestModelDataBuilder.buildContribution();
-        contribution.setTransferStatus(TransferStatus.MANUAL);
-        contribution.setMonthlyContributions(BigDecimal.ONE);
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(List.of(contribution));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isFalse();
-    }
-
-    @Test
-    void givenAnInvalidContribution_whenHasContributionBeenSentIsInvoked_thenTrueIsReturn() {
-        Contribution contribution = TestModelDataBuilder.buildContribution();
-        contribution.setTransferStatus(TransferStatus.SENT);
-        contribution.setMonthlyContributions(BigDecimal.ONE);
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(List.of(contribution));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isTrue();
     }
 
     @Test
