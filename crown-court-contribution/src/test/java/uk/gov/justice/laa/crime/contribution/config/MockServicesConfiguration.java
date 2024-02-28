@@ -14,10 +14,8 @@ public class MockServicesConfiguration {
                         "/contributions/{repId}",
                         "/contributions/{repId}/summary",
                         "/contribution-appeal",
-                        "/{repId}/contribution",
                         "/rep-orders/{repId}",
-                        "/contribution-calc-params/{effectiveDate}",
-                        "/contributions/{repId}/latest-sent"
+                        "/contribution-calc-params/{effectiveDate}"
                 );
 
         ServicesConfiguration.MaatApi.CorrespondenceStateEndpoints correspondenceStateEndpoints =
