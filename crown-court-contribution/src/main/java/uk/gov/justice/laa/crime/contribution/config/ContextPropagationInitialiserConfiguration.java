@@ -12,7 +12,7 @@ import reactor.core.publisher.Hooks;
 public class ContextPropagationInitialiserConfiguration implements ApplicationRunner {
 
     @Override
-    public void run(ApplicationArguments applicationArguments) throws Exception {
+    public void run(ApplicationArguments applicationArguments) {
         log.info("********** Context Propagation Initializer **************");
         Hooks.enableAutomaticContextPropagation();
     }
