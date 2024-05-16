@@ -9,8 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;

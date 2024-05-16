@@ -17,8 +17,9 @@ java {
 def versions = [
         pitest                          : "1.4.10",
         springdocVersion                : "2.1.0",
-        crimeCommonsClasses             : "3.4.0",
+        crimeCommonsClasses             : "3.19.0",
         commonsRestClient               : "3.4.0",
+        crimeCommonsModsSchemas         : "1.1.0",
         springCloudStubRunnerVersion    : "4.0.4",
         postgresqlVersion               : "42.7.2"
 ]
@@ -45,6 +46,7 @@ dependencies {
     implementation "org.liquibase:liquibase-core"
     implementation "io.micrometer:micrometer-registry-prometheus"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
+    implementation "uk.gov.justice.service.laa-crime:crime-commons-mod-schemas:$versions.crimeCommonsModsSchemas"
 
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"

@@ -21,7 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
 
 import java.math.BigDecimal;
 import java.util.Map;

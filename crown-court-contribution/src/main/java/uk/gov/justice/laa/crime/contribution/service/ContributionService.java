@@ -10,8 +10,8 @@ import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
@@ -19,6 +19,7 @@ import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.util.*;

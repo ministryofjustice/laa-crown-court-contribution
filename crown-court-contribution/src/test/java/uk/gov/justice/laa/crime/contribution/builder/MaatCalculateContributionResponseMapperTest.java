@@ -6,8 +6,8 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 
 import java.math.BigDecimal;
 

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
 

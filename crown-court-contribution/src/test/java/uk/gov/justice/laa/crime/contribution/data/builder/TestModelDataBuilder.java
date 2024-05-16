@@ -1,16 +1,19 @@
 package uk.gov.justice.laa.crime.contribution.data.builder;
 
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.contribution.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
+import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
+import uk.gov.justice.laa.crime.enums.contribution.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
