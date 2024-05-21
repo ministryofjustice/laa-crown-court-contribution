@@ -21,17 +21,17 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
+import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -117,7 +117,7 @@ class MaatCalculateContributionServiceTest {
         LocalDateTime passportAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withAssessmentDate(passportAssessmentDate)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -135,7 +135,7 @@ class MaatCalculateContributionServiceTest {
         LocalDateTime fullMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.FULL)
+                        .withAssessmentType(FULL)
                         .withAssessmentDate(fullMeansAssessmentDate)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -153,7 +153,7 @@ class MaatCalculateContributionServiceTest {
         LocalDateTime initMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withAssessmentDate(initMeansAssessmentDate)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -172,7 +172,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate committalDate = LocalDate.of(2023, 9, 28);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withAssessmentDate(initMeansAssessmentDate)))
                 .committalDate(committalDate)
                 .build();
@@ -188,7 +188,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate committalDate = LocalDate.of(2023, 7, 28);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withAssessmentDate(initMeansAssessmentDate)))
                 .committalDate(committalDate)
                 .build();
@@ -206,7 +206,7 @@ class MaatCalculateContributionServiceTest {
     void givenNoValidAssessments_whenGetEffectiveDateIsInvoked_thenNullIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.HARDSHIP)
+                        .withAssessmentType(HARDSHIP)
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -219,7 +219,7 @@ class MaatCalculateContributionServiceTest {
     void givenPassportNewWorkReason_whenGetNewWorkReasonIsInvoked_thenPassportNewWorkReasonIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.INF)))
                 .build();
 
@@ -231,7 +231,7 @@ class MaatCalculateContributionServiceTest {
     void givenInitialNewWorkReason_whenGetNewWorkReasonIsInvoked_thenInitialNewWorkReasonIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withNewWorkReason(NewWorkReason.NEW)))
                 .build();
 
@@ -243,7 +243,7 @@ class MaatCalculateContributionServiceTest {
     void givenFullNewWorkReason_whenGetNewWorkReasonIsInvoked_thenNullIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.FULL)
+                        .withAssessmentType(FULL)
                         .withNewWorkReason(NewWorkReason.NEW)))
                 .build();
 
@@ -256,7 +256,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate contributionDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.INF)))
                 .effectiveDate(contributionDate)
                 .build();
@@ -272,7 +272,7 @@ class MaatCalculateContributionServiceTest {
     void givenNewWorkReasonAsINF_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentDateIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.INF)))
                 .build();
         LocalDate assessmentDate = LocalDate.now();
@@ -288,7 +288,7 @@ class MaatCalculateContributionServiceTest {
     void givenNewWorkReasonAsFMA_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentDateIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.FMA)))
                 .build();
         LocalDate assessmentDate = LocalDate.now();
@@ -305,7 +305,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate effectiveDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.PAI)))
                 .effectiveDate(effectiveDate)
                 .monthlyContributions(BigDecimal.TEN)
@@ -324,7 +324,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate effectiveDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.PAI)))
                 .effectiveDate(effectiveDate)
                 .monthlyContributions(BigDecimal.TEN)
@@ -343,7 +343,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate assessmentDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.PAI)))
                 .monthlyContributions(BigDecimal.valueOf(12))
                 .build();
@@ -834,7 +834,7 @@ class MaatCalculateContributionServiceTest {
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.FULL)
+                        .withAssessmentType(FULL)
                         .withResult(AssessmentResult.PASS)
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .build();
@@ -864,7 +864,7 @@ class MaatCalculateContributionServiceTest {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .repId(TestModelDataBuilder.REP_ID)
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withResult(AssessmentResult.PASS)
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .effectiveDate(LocalDate.now())

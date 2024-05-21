@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 

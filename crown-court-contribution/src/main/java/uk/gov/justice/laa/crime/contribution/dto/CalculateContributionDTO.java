@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
+import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 

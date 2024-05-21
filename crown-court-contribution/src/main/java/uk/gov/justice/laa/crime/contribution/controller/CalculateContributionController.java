@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.service.CalculateContributionService;
 
 @Slf4j

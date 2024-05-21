@@ -2,8 +2,8 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
 import java.math.BigDecimal;
