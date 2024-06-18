@@ -18,9 +18,6 @@ public class ContributionSummaryMapper {
                 .withBasedOn(contributionsSummaryDTO.getBasedOn())
                 .withUpliftApplied(contributionsSummaryDTO.getUpliftApplied())
                 .withEffectiveDate(convertDateToDateTime(contributionsSummaryDTO.getEffectiveDate()))
-                .withCalcDate(convertDateToDateTime(contributionsSummaryDTO.getCalcDate()))
-                .withFileName(contributionsSummaryDTO.getFileName())
-                .withDateSent(convertDateToDateTime(contributionsSummaryDTO.getDateSent()))
-                .withDateReceived(convertDateToDateTime(contributionsSummaryDTO.getDateReceived()));
+                .withCalcDate(convertDateToDateTime(contributionsSummaryDTO.getCalcDate()));
     }
 }

@@ -20,7 +20,4 @@ public class ContributionsSummaryDTO {
     private String upliftApplied;
     private LocalDate effectiveDate;
     private LocalDate calcDate;
-    private String fileName;
-    private LocalDate dateSent;
-    private LocalDate dateReceived;
 }
