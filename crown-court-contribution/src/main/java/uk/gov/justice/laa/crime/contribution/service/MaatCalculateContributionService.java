@@ -57,17 +57,21 @@ public class MaatCalculateContributionService {
                 calculateContributionDTO.getDateUpliftRemoved() == null;
     }
 
-    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO, final BigDecimal annualDisposableIncome) {
-        if (annualDisposableIncome == null) {
-            if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
-                return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
-            } else {
-                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    return calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else return BigDecimal.ZERO;
-            }
+    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO, boolean isContributionRuleApplicable) {
+        BigDecimal disposableIncome;
+
+        if (isContributionRuleApplicable) {
+            disposableIncome = calculateContributionDTO.getDisposableIncomeAfterMagHardship();
+        } else {
+            disposableIncome = calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
         }
-        return annualDisposableIncome;
+
+        if (disposableIncome == null) {
+            disposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome();
+            return disposableIncome != null ? disposableIncome : BigDecimal.ZERO;
+        }
+
+        return disposableIncome;
     }
 
     public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
@@ -279,9 +283,9 @@ public class MaatCalculateContributionService {
     public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,
                                                       final CrownCourtOutcome crownCourtOutcome,
                                                       boolean isContributionRuleApplicable) {
-        BigDecimal annualDisposableIncome = calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
+        BigDecimal annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO, isContributionRuleApplicable);
+
         if (isContributionRuleApplicable) {
-            annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO, annualDisposableIncome);
             Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(), calculateContributionDTO.getMagCourtOutcome(),
                     crownCourtOutcome);
 
@@ -289,13 +293,8 @@ public class MaatCalculateContributionService {
                 annualDisposableIncome = annualDisposableIncome
                         .add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
             }
-        } else {
-            if (annualDisposableIncome == null) {
-                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    annualDisposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else annualDisposableIncome = BigDecimal.ZERO;
-            }
         }
+
         return annualDisposableIncome;
     }
 
