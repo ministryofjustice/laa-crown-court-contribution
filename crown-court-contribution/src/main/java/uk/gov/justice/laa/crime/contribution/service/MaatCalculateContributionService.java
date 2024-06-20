@@ -286,13 +286,11 @@ public class MaatCalculateContributionService {
         BigDecimal annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO, isContributionRuleApplicable);
 
         if (isContributionRuleApplicable) {
-            Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(), calculateContributionDTO.getMagCourtOutcome(),
-                    crownCourtOutcome);
+            Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(),
+                    calculateContributionDTO.getMagCourtOutcome(), crownCourtOutcome);
 
-            if (contributionVariation.isPresent()) {
-                annualDisposableIncome = annualDisposableIncome
-                        .add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
-            }
+            log.debug("Adding variation amount on to the disposable income.");
+            annualDisposableIncome = annualDisposableIncome.add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
         }
 
         return annualDisposableIncome;
