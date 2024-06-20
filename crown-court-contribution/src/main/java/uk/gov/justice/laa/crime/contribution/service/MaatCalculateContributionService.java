@@ -67,8 +67,8 @@ public class MaatCalculateContributionService {
         }
 
         if (disposableIncome == null) {
-            disposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome();
-            return disposableIncome != null ? disposableIncome : BigDecimal.ZERO;
+            disposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome() != null
+                    ? calculateContributionDTO.getTotalAnnualDisposableIncome() : BigDecimal.ZERO;
         }
 
         return disposableIncome;

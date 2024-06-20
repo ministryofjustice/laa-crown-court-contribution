@@ -357,55 +357,52 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenAValidAnnualIncome_whenGetAnnualDisposableIncomeIsInvoked_thenAnnualIncomeIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                null, annualDisposableIncome
-        );
-
-        assertThat(actual)
-                .isEqualTo(annualDisposableIncome);
-    }
-
-    @Test
-    void givenAValidAnnualIncomeAfterMagHardship_whenGetAnnualDisposableIncomeIsInvoked_thenAnnualIncomeAfterMagHardshipIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .disposableIncomeAfterMagHardship(annualDisposableIncome)
+    void givenContributionRuleApplicable_whenGetAnnualDisposableIncomeIsInvoked_thenDisposableIncomeAfterMagsHardshipIsReturned() {
+        boolean isContribRuleApplicable = true;
+        BigDecimal dispIncAfterMagsHardship = BigDecimal.valueOf(15000);
+        CalculateContributionDTO calcContribDTO = CalculateContributionDTO.builder()
+                .disposableIncomeAfterMagHardship(dispIncAfterMagsHardship)
                 .build();
 
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                calculateContributionDTO, null
-        );
+        BigDecimal annualDispInc = MaatCalculateContributionService.getAnnualDisposableIncome(calcContribDTO, isContribRuleApplicable);
 
-        assertThat(actual)
-                .isEqualTo(annualDisposableIncome);
+        assertThat(annualDispInc).isEqualTo(dispIncAfterMagsHardship);
     }
 
     @Test
-    void givenAValidTotalAnnualIncome_whenGetAnnualDisposableIncomeIsInvoked_thenTotalAnnualIncomeIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .totalAnnualDisposableIncome(annualDisposableIncome)
+    void givenContributionRuleNotApplicable_whenGetAnnualDisposableIncomeIsInvoked_thenDisposableIncomeAfterCrownHardshipIsReturned() {
+        boolean isContribRuleApplicable = false;
+        BigDecimal dispIncAfterCrownHardship = BigDecimal.valueOf(15000);
+        CalculateContributionDTO calcContribDTO = CalculateContributionDTO.builder()
+                .disposableIncomeAfterCrownHardship(dispIncAfterCrownHardship)
                 .build();
 
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                calculateContributionDTO, null
-        );
+        BigDecimal annualDispInc = MaatCalculateContributionService.getAnnualDisposableIncome(calcContribDTO, isContribRuleApplicable);
 
-        assertThat(actual)
-                .isEqualTo(annualDisposableIncome);
+        assertThat(annualDispInc).isEqualTo(dispIncAfterCrownHardship);
     }
 
     @Test
-    void givenNoIncome_whenGetAnnualDisposableIncomeIsInvoked_thenZeroIsReturned() {
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                CalculateContributionDTO.builder().build(), null
-        );
+    void givenContributionRuleNotApplicable_whenGetAnnualDisposableIncomeIsInvoked_thenTotalAnnualDisposableIncomeIsReturned() {
+        boolean isContribRuleApplicable = false;
+        BigDecimal totalAnnualDispInc = BigDecimal.valueOf(15000);
+        CalculateContributionDTO calcContribDTO = CalculateContributionDTO.builder()
+                .totalAnnualDisposableIncome(totalAnnualDispInc)
+                .build();
 
-        assertThat(actual)
-                .isEqualTo(BigDecimal.ZERO);
+        BigDecimal annualDispInc = MaatCalculateContributionService.getAnnualDisposableIncome(calcContribDTO, isContribRuleApplicable);
+
+        assertThat(annualDispInc).isEqualTo(totalAnnualDispInc);
+    }
+
+    @Test
+    void givenContributionRuleNotApplicable_whenGetAnnualDisposableIncomeIsInvoked_thenZeroIsReturned() {
+        boolean isContribRuleApplicable = false;
+        CalculateContributionDTO calcContribDTO = CalculateContributionDTO.builder().build();
+
+        BigDecimal annualDispInc = MaatCalculateContributionService.getAnnualDisposableIncome(calcContribDTO, isContribRuleApplicable);
+
+        assertThat(annualDispInc).isEqualTo(BigDecimal.ZERO);
     }
 
     @Test
@@ -695,40 +692,40 @@ class MaatCalculateContributionServiceTest {
                 .caseType(CaseType.INDICTABLE)
                 .build();
 
-        when(contributionRulesService.getContributionVariation(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(Optional.empty());
-
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
-                true
+                null,
+                false
         );
 
-        assertThat(result)
-                .isEqualTo(BigDecimal.TEN);
+        assertThat(result).isEqualTo(BigDecimal.TEN);
     }
 
     @Test
-    void givenDisposableIncomeAfterCrownHardshipAndValidVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
+    void givenDisposableIncomeAfterMagsHardshipAndValidVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .disposableIncomeAfterCrownHardship(BigDecimal.TEN)
+                .repId(1)
+                .disposableIncomeAfterMagHardship(BigDecimal.TEN)
                 .magCourtOutcome(MagCourtOutcome.COMMITTED)
-                .caseType(CaseType.INDICTABLE)
+                .caseType(CaseType.EITHER_WAY)
+                .build();
+        ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
+                .variation("SOL COSTS")
+                .variationRule("+")
                 .build();
 
-        when(contributionRulesService.getContributionVariation(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(Optional.of(ContributionVariationDTO.builder().variation("FUNDING").build()));
+        when(contributionRulesService.getContributionVariation(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null))
+                .thenReturn(Optional.of(contributionVariationDTO));
+        when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
+                .thenReturn(new ApiCalculateHardshipByDetailResponse().withHardshipSummary(BigDecimal.ONE));
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
+                null,
                 true
         );
 
-        assertThat(result)
-                .isEqualTo(BigDecimal.TEN);
+        assertThat(result).isEqualTo(BigDecimal.valueOf(11));
     }
 
     @Test
