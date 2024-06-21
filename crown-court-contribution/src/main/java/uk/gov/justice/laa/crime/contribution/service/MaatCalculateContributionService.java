@@ -60,9 +60,10 @@ public class MaatCalculateContributionService {
     public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO) {
         if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
             return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
+        } else if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null){
+            return calculateContributionDTO.getTotalAnnualDisposableIncome();
         } else {
-            return calculateContributionDTO.getTotalAnnualDisposableIncome() != null
-                    ? calculateContributionDTO.getTotalAnnualDisposableIncome() : BigDecimal.ZERO;
+            return BigDecimal.ZERO;
         }
     }
 
@@ -287,8 +288,11 @@ public class MaatCalculateContributionService {
                             .add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
                 }
             } else {
-                annualDisposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome() != null
-                        ? calculateContributionDTO.getTotalAnnualDisposableIncome() : BigDecimal.ZERO;
+                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
+                    annualDisposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome();
+                } else {
+                    annualDisposableIncome = BigDecimal.ZERO;
+                }
             }
         }
         return annualDisposableIncome;
