@@ -421,6 +421,7 @@ public class TestModelDataBuilder {
                 .basedOn("Means")
                 .upliftApplied(Constants.Y)
                 .effectiveDate(TEST_DATE.toLocalDate())
+                .calcDate(CALC_DATE)
                 .build();
     }
 
