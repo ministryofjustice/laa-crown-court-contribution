@@ -422,9 +422,6 @@ public class TestModelDataBuilder {
                 .upliftApplied(Constants.Y)
                 .effectiveDate(TEST_DATE.toLocalDate())
                 .calcDate(CALC_DATE)
-                .fileName("TEST")
-                .dateSent(LocalDate.of(2023, 1, 1))
-                .dateReceived(LocalDate.of(2023, 2, 2))
                 .build();
     }
 

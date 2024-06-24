@@ -32,9 +32,6 @@ class ContributionSummaryMapperTest {
         softly.assertThat(contributionSummary.getUpliftApplied()).isEqualTo(contributionsSummaryDTO.getUpliftApplied());
         softly.assertThat(contributionSummary.getEffectiveDate()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getEffectiveDate()));
         softly.assertThat(contributionSummary.getCalcDate()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getCalcDate()));
-        softly.assertThat(contributionSummary.getFileName()).isEqualTo(contributionsSummaryDTO.getFileName());
-        softly.assertThat(contributionSummary.getDateSent()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getDateSent()));
-        softly.assertThat(contributionSummary.getDateReceived()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getDateReceived()));
         softly.assertAll();
     }
 
