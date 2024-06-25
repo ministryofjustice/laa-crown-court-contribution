@@ -8,9 +8,9 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceStatus;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,9 +46,6 @@ public class CompareContributionService {
         if (isCds15WorkAround(repOrderDTO)) {
             setCorrespondenceStatus(CorrespondenceStatus.CDS15.getStatus(), repId);
         }
-        if (isReassessment(repOrderDTO)) {
-            setCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId);
-        }
         return 0;
     }
 
@@ -57,9 +54,6 @@ public class CompareContributionService {
         Contribution contribution = contributions.get(0);
         if (contributionRecordsAreIdentical(calculateContributionDTO, contribution)) {
             result = getResultOnIdenticalContributions(calculateContributionDTO, repOrderDTO, repId);
-        } else if (isReassessment(repOrderDTO)) {
-            result = 1;
-            setCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId);
         }
         return result;
     }
@@ -88,9 +82,6 @@ public class CompareContributionService {
         if (isCds15WorkAround(repOrderDTO)) {
             result = getResultOnCds15WorkAround(repId, status);
         }
-        if (isReassessment(repOrderDTO)) {
-            result = getResultOnReassessment(repId);
-        }
         return result;
     }
 
@@ -105,28 +96,12 @@ public class CompareContributionService {
         return result;
     }
 
-    private int getResultOnReassessment(int repId) {
-        int result = 2;
-        CorrespondenceState status = maatCourtDataService.findCorrespondenceState(repId);
-        if (isStatusReass(status)) {
-            setCorrespondenceStatus(CorrespondenceStatus.NONE.getStatus(), repId);
-        } else {
-            result = 1;
-            setCorrespondenceStatus(CorrespondenceStatus.REASS.getStatus(), repId);
-        }
-        return result;
-    }
-
     private static boolean isCaseTypeAppealCC(RepOrderDTO repOrderDTO) {
         return CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType());
     }
 
     private boolean isCds15WorkAround(RepOrderDTO repOrderDTO) {
         return contributionService.isCds15WorkAround(repOrderDTO);
-    }
-
-    private boolean isReassessment(RepOrderDTO repOrderDTO) {
-        return contributionService.checkReassessment(repOrderDTO);
     }
 
     private static boolean isStatusCds15(CorrespondenceState status) {

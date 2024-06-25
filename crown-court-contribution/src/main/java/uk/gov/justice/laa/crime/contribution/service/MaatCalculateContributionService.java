@@ -6,18 +6,23 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.builder.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.HardshipReviewDetailType;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,27 +51,20 @@ public class MaatCalculateContributionService {
     private final CalculateContributionRequestMapper calculateContributionRequestMapper;
     private final MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
 
-    private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
-            MagCourtOutcome.COMMITTED_FOR_TRIAL,
-            MagCourtOutcome.APPEAL_TO_CC);
-
     private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {
         return contributionResponseDTO.getUpliftCote() != null &&
                 calculateContributionDTO.getDateUpliftApplied() != null &&
                 calculateContributionDTO.getDateUpliftRemoved() == null;
     }
 
-    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO, final BigDecimal annualDisposableIncome) {
-        if (annualDisposableIncome == null) {
-            if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
-                return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
-            } else {
-                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    return calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else return BigDecimal.ZERO;
-            }
+    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO) {
+        if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
+            return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
+        } else if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null){
+            return calculateContributionDTO.getTotalAnnualDisposableIncome();
+        } else {
+            return BigDecimal.ZERO;
         }
-        return annualDisposableIncome;
     }
 
     public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
@@ -148,7 +146,6 @@ public class MaatCalculateContributionService {
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(final CalculateContributionDTO calculateContributionDTO,
                                                                                  final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
 
         Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
         Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream().filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
@@ -164,7 +161,7 @@ public class MaatCalculateContributionService {
                 .build());
 
         if (Constants.Y.equals(contributionResponseDTO.getDoContribs())) {
-            response = doContribs(calculateContributionDTO, contributionResponseDTO, fullResult, isReassessment, repOrderDTO);
+            response = doContribs(calculateContributionDTO, contributionResponseDTO, fullResult, repOrderDTO);
         }
         return response;
     }
@@ -172,7 +169,6 @@ public class MaatCalculateContributionService {
     public ApiMaatCalculateContributionResponse doContribs(final CalculateContributionDTO calculateContributionDTO,
                                                            final ContributionResponseDTO contributionResponseDTO,
                                                            final String fullResult,
-                                                           final boolean isReassessment,
                                                            final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
 
@@ -190,10 +186,8 @@ public class MaatCalculateContributionService {
 
         Contribution currentContribution = getCurrentContribution(calculateContributionDTO);
 
-        Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, isReassessment, repOrderDTO,
+        Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, repOrderDTO,
                 response, currentContribution);
-
-        requestEarlyTransfer(calculateContributionDTO, response, currentContribution);
 
         if (contributionResponseDTO.getTemplate() != null && createdContribution != null) {
             response.setProcessActivity(true);
@@ -202,7 +196,6 @@ public class MaatCalculateContributionService {
     }
 
     public Contribution verifyAndCreateContribs(final CalculateContributionDTO calculateContributionDTO,
-                                                final boolean isReassessment,
                                                 final RepOrderDTO repOrderDTO,
                                                 final ApiMaatCalculateContributionResponse response,
                                                 final Contribution currentContribution) {
@@ -227,22 +220,10 @@ public class MaatCalculateContributionService {
             }
             //Revisit the createContribs logic - do we need to change the input?
             return createContribs(calculateContributionDTO);
-        } else if (isCreateContributionRequired(calculateContributionDTO, isReassessment, repOrderDTO, currentTransferStatus)) {
+        } else if (isCreateContributionRequired(calculateContributionDTO, repOrderDTO, currentTransferStatus)) {
             return createContribs(calculateContributionDTO);
         }
         return null;
-    }
-
-    public void requestEarlyTransfer(final CalculateContributionDTO calculateContributionDTO,
-                                     final ApiMaatCalculateContributionResponse response,
-                                     final Contribution currentContribution) {
-        Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId());
-        if (isEarlyTransferRequired(calculateContributionDTO, response, latestSentContribution) && currentContribution != null) {
-            maatCourtDataService.updateContribution(new UpdateContributionRequest()
-                    .withId(currentContribution.getId())
-                    .withTransferStatus(TransferStatus.REQUESTED)
-                    .withUserModified(calculateContributionDTO.getUserCreated()));
-        }
     }
 
     public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO) {
@@ -255,26 +236,12 @@ public class MaatCalculateContributionService {
     }
 
     public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
-                                                final boolean isReassessment,
                                                 final RepOrderDTO repOrderDTO,
                                                 final TransferStatus currentTransferStatus) {
-        return ((!TransferStatus.REQUESTED.equals(currentTransferStatus)
+        return (!TransferStatus.REQUESTED.equals(currentTransferStatus)
                 && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId())
-                || contributionService.isCds15WorkAround(repOrderDTO))) || isReassessment) || (TransferStatus.REQUESTED.equals(currentTransferStatus)
-                && CaseType.APPEAL_CC.equals(calculateContributionDTO.getCaseType()));
-    }
-
-    public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,
-                                           final ApiMaatCalculateContributionResponse response,
-                                           final Contribution latestSentContribution) {
-        return ((response.getMonthlyContributions().compareTo(latestSentContribution.getMonthlyContributions()) != 0
-                || response.getUpfrontContributions().compareTo(latestSentContribution.getUpfrontContributions()) != 0
-                || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().toLocalDate().equals(latestSentContribution.getEffectiveDate())
-                && BigDecimal.ZERO.compareTo(response.getMonthlyContributions()) < 0)
-                || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId()))
-                && (calculateContributionDTO.getMagCourtOutcome() != null && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome())))
-                || contributionService.hasContributionBeenSent(calculateContributionDTO.getRepId());
+                || contributionService.isCds15WorkAround(repOrderDTO)));
     }
 
     public Contribution createContribs(final CalculateContributionDTO calculateContributionDTO) {
@@ -310,20 +277,22 @@ public class MaatCalculateContributionService {
                                                       final CrownCourtOutcome crownCourtOutcome,
                                                       boolean isContributionRuleApplicable) {
         BigDecimal annualDisposableIncome = calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
-        if (isContributionRuleApplicable) {
-            annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO, annualDisposableIncome);
-            Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(), calculateContributionDTO.getMagCourtOutcome(),
-                    crownCourtOutcome);
+        if (annualDisposableIncome == null) {
+            if (isContributionRuleApplicable) {
+                annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO);
+                Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(), calculateContributionDTO.getMagCourtOutcome(),
+                        crownCourtOutcome);
 
-            if (contributionVariation.isPresent()) {
-                annualDisposableIncome = annualDisposableIncome
-                        .add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
-            }
-        } else {
-            if (annualDisposableIncome == null) {
+                if (contributionVariation.isPresent()) {
+                    annualDisposableIncome = annualDisposableIncome
+                            .add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
+                }
+            } else {
                 if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
                     annualDisposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else annualDisposableIncome = BigDecimal.ZERO;
+                } else {
+                    annualDisposableIncome = BigDecimal.ZERO;
+                }
             }
         }
         return annualDisposableIncome;

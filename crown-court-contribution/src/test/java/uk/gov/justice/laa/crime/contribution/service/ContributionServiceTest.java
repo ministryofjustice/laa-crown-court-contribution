@@ -13,15 +13,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
+import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +44,6 @@ class ContributionServiceTest {
     private static final String CONTRIBUTION_YES = "Y";
     private static final String RORS_STATUS = "rors-status";
     private static final String RORS_STATUS_CURR = "CURR";
-    private static final LocalDateTime dateCreated = LocalDateTime.parse("2023-07-10T15:01:25");
 
     @InjectSoftAssertions
     private SoftAssertions softly;
@@ -585,127 +585,6 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinReassessmentTrueAndContribCountAs1_thenReassessmentTrueIsReturned() {
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(1L);
-
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isTrue();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinReassessmentFalseAndContribCountAs0_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(0L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinReassessmentFalseAndContribCountAs1_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getFinancialAssessments().get(0).setReplaced("N");
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentTrueAndContribCountAs1_thenReassessmentTrueIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isTrue();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentTrueAndContribCountAs0_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getPassportAssessments().get(0).setDateCreated(dateCreated);
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(0L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportReassessmentFalseAndContribCountAs0_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getPassportAssessments().get(0).setReplaced("N");
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(0L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportAssessmentAsNull_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.setPassportAssessments(null);
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinancialAssessmentAsNull_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.setFinancialAssessments(null);
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-        verify(maatCourtDataService).getContributionCount(REP_ID);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithFinancialAssessmentDateCreatedAsNull_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getFinancialAssessments().get(0).setDateCreated(null);
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
-    void givenAValidRepId_whenCheckReassessmentIsInvokedWithPassportAssessmentDateCreatedAsNull_thenReassessmentFalseIsReturned() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.getPassportAssessments().get(0).setDateCreated(null);
-        when(maatCourtDataService.getContributionCount(REP_ID))
-                .thenReturn(1L);
-        boolean isReassessment = contributionService.checkReassessment(repOrderDTO);
-
-        assertThat(isReassessment)
-                .isFalse();
-    }
-
-    @Test
     void givenAValidRepId_whenCds15WorkAroundIsInvokedWithFailPassportAssessment_thenTrueIsReturned() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
         repOrderDTO.getPassportAssessments().get(0).setReplaced("Y");
@@ -945,52 +824,6 @@ class ContributionServiceTest {
 
         assertThat(hasApplicationStatusChanged)
                 .isFalse();
-    }
-
-    @Test
-    void givenValidRepIdEmptyContribution_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(null);
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isFalse();
-    }
-
-    @Test
-    void givenValidRepIdEmptyTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(List.of(TestModelDataBuilder.buildContribution()));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isFalse();
-    }
-
-    @Test
-    void givenAnInvalidTransferStatus_whenHasContributionBeenSentIsInvoked_thenFalseIsReturn() {
-        Contribution contribution = TestModelDataBuilder.buildContribution();
-        contribution.setTransferStatus(TransferStatus.MANUAL);
-        contribution.setMonthlyContributions(BigDecimal.ONE);
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(List.of(contribution));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isFalse();
-    }
-
-    @Test
-    void givenAnInvalidContribution_whenHasContributionBeenSentIsInvoked_thenTrueIsReturn() {
-        Contribution contribution = TestModelDataBuilder.buildContribution();
-        contribution.setTransferStatus(TransferStatus.SENT);
-        contribution.setMonthlyContributions(BigDecimal.ONE);
-        when(maatCourtDataService.findContribution(any(), any()))
-                .thenReturn(List.of(contribution));
-        boolean hasContributionBeenSent = contributionService.hasContributionBeenSent(REP_ID);
-
-        assertThat(hasContributionBeenSent)
-                .isTrue();
     }
 
     @Test

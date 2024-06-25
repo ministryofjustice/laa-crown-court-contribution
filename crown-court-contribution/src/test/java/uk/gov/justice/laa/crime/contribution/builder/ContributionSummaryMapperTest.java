@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
 
@@ -32,9 +32,6 @@ class ContributionSummaryMapperTest {
         softly.assertThat(contributionSummary.getUpliftApplied()).isEqualTo(contributionsSummaryDTO.getUpliftApplied());
         softly.assertThat(contributionSummary.getEffectiveDate()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getEffectiveDate()));
         softly.assertThat(contributionSummary.getCalcDate()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getCalcDate()));
-        softly.assertThat(contributionSummary.getFileName()).isEqualTo(contributionsSummaryDTO.getFileName());
-        softly.assertThat(contributionSummary.getDateSent()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getDateSent()));
-        softly.assertThat(contributionSummary.getDateReceived()).isEqualTo(convertDateToDateTime(contributionsSummaryDTO.getDateReceived()));
         softly.assertAll();
     }
 

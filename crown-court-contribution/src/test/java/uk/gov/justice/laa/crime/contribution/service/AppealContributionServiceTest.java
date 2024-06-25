@@ -9,13 +9,13 @@ import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMa
 import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.enums.CaseType;
 
 import java.math.BigDecimal;
 import java.util.List;

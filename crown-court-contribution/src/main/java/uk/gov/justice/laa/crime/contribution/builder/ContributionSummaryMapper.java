@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 
 import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
 
@@ -18,9 +18,6 @@ public class ContributionSummaryMapper {
                 .withBasedOn(contributionsSummaryDTO.getBasedOn())
                 .withUpliftApplied(contributionsSummaryDTO.getUpliftApplied())
                 .withEffectiveDate(convertDateToDateTime(contributionsSummaryDTO.getEffectiveDate()))
-                .withCalcDate(convertDateToDateTime(contributionsSummaryDTO.getCalcDate()))
-                .withFileName(contributionsSummaryDTO.getFileName())
-                .withDateSent(convertDateToDateTime(contributionsSummaryDTO.getDateSent()))
-                .withDateReceived(convertDateToDateTime(contributionsSummaryDTO.getDateReceived()));
+                .withCalcDate(convertDateToDateTime(contributionsSummaryDTO.getCalcDate()));
     }
 }

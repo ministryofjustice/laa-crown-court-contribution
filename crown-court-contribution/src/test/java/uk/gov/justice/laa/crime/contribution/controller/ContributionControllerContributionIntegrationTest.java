@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -22,12 +23,12 @@ import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCheckContributionRuleRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.contribution.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -47,13 +48,16 @@ import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.bui
 @Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
 @AutoConfigureObservability
+@AutoConfigureWireMock(port = 9999)
 class ContributionControllerContributionIntegrationTest {
 
     private MockMvc mvc;
-    private static final WireMockServer wiremock = new WireMockServer(9999);
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/summaries/" + TestModelDataBuilder.REP_ID;
     private static final String CHECK_CONTRIBUTION_RULE_ENDPOINT_URL = "/api/internal/v1/contribution/check-contribution-rule";
+
+    @Autowired
+    private WireMockServer wiremock;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -82,11 +86,6 @@ class ContributionControllerContributionIntegrationTest {
     @AfterEach
     void after() {
         wiremock.resetAll();
-    }
-
-    @AfterAll
-    static void clean() {
-        wiremock.shutdown();
     }
 
     @BeforeAll

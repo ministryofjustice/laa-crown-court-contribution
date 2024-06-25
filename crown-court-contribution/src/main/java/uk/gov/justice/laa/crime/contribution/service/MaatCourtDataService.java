@@ -15,9 +15,9 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -43,18 +43,6 @@ public class MaatCourtDataService {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
                 queryParams,
-                repId
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
-
-    public Contribution findLatestSentContribution(Integer repId) {
-        Contribution response = maatAPIClient.get(
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getContributionEndpoints().getFindLatestSentContributionUrl(),
                 repId
         );
         log.info(RESPONSE_STRING, response);
@@ -129,19 +117,6 @@ public class MaatCourtDataService {
         );
         log.info(RESPONSE_STRING, response);
         return response;
-    }
-
-    public long getContributionCount(Integer repId) {
-        var response = maatAPIClient.head(
-                configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
-                Map.of(),
-                repId
-        );
-        log.info(RESPONSE_STRING, response);
-        if (response != null) {
-            return response.getHeaders().getContentLength();
-        }
-        return 0L;
     }
 
     public RepOrderDTO getRepOrderByRepId(Integer repId) {

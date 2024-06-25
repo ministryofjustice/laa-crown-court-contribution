@@ -7,8 +7,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
@@ -21,19 +19,17 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CaseType;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.anyInt;
@@ -41,7 +37,6 @@ import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MaatCourtDataServiceTest {
@@ -66,13 +61,6 @@ class MaatCourtDataServiceTest {
         verify(maatCourtDataClient).get(new ParameterizedTypeReference<List<Contribution>>() {
         }, "/contributions/{repId}", queryParams, 1234);
     }
-
-    @Test
-    void givenValidRepId_whenFindLatestSentContributionContributionIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.findLatestSentContribution(TEST_REP_ID);
-        verify(maatCourtDataClient).get(any(), anyString(), anyInt());
-    }
-
 
     @Test
     void givenValidParams_whenCreateContributionIsInvoked_thenResponseIsReturned() {
@@ -138,28 +126,6 @@ class MaatCourtDataServiceTest {
                 anyString(),
                 anyMap()
         );
-    }
-
-    @Test
-    void givenValidRepId_whenContributionCountIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.getContributionCount(TEST_REP_ID);
-        verify(maatCourtDataClient).head(configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
-                Map.of(), TEST_REP_ID);
-    }
-
-    @Test
-    void givenValidRepId_whenContributionCountIsInvoked_thenContentLengthOfResponseIsReturned() {
-        ResponseEntity<Void> responseEntity = ResponseEntity.ok().header(HttpHeaders.CONTENT_LENGTH, "23").build();
-        when(maatCourtDataClient.head(configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
-                Map.of(), TEST_REP_ID))
-                .thenReturn(responseEntity);
-
-        long actualContributionCount = maatCourtDataService.getContributionCount(TEST_REP_ID);
-
-        verify(maatCourtDataClient).head(configuration.getMaatApi().getContributionEndpoints().getGetContributionCountUrl(),
-                Map.of(), TEST_REP_ID);
-
-        assertEquals(23, actualContributionCount);
     }
 
     @Test

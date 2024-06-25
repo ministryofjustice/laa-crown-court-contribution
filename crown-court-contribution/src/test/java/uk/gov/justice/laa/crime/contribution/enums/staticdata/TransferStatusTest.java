@@ -1,7 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.enums.staticdata;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
