@@ -10,9 +10,8 @@ import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.ApiContributionTransferRequest;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
@@ -20,6 +19,7 @@ import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -175,16 +175,6 @@ public class ContributionService {
         return CaseType.INDICTABLE.equals(caseType) && repOrderDTO != null
                 && repOrderDTO.getRorsStatus() != null
                 && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
-    }
-
-    public boolean hasContributionBeenSent(final int repId) {
-        List<Contribution> contribList = maatCourtDataService.findContribution(repId, Boolean.FALSE);
-        List<Contribution> contributionList = Optional.ofNullable(contribList).orElse(Collections.emptyList()).stream().filter(
-                contribution -> (TransferStatus.SENT.equals(contribution.getTransferStatus()) &&
-                        contribution.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0)
-        ).toList();
-
-        return !contributionList.isEmpty();
     }
 
     public void requestTransfer(final ApiContributionTransferRequest transferRequest) {

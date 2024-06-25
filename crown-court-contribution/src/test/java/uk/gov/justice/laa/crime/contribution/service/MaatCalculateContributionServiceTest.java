@@ -21,17 +21,17 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.TransferStatus;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
+import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -117,7 +117,7 @@ class MaatCalculateContributionServiceTest {
         LocalDateTime passportAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withAssessmentDate(passportAssessmentDate)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -135,7 +135,7 @@ class MaatCalculateContributionServiceTest {
         LocalDateTime fullMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.FULL)
+                        .withAssessmentType(FULL)
                         .withAssessmentDate(fullMeansAssessmentDate)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -153,7 +153,7 @@ class MaatCalculateContributionServiceTest {
         LocalDateTime initMeansAssessmentDate = LocalDateTime.of(2023, 8, 28, 12, 12, 12);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withAssessmentDate(initMeansAssessmentDate)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -172,7 +172,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate committalDate = LocalDate.of(2023, 9, 28);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withAssessmentDate(initMeansAssessmentDate)))
                 .committalDate(committalDate)
                 .build();
@@ -188,7 +188,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate committalDate = LocalDate.of(2023, 7, 28);
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withAssessmentDate(initMeansAssessmentDate)))
                 .committalDate(committalDate)
                 .build();
@@ -206,7 +206,7 @@ class MaatCalculateContributionServiceTest {
     void givenNoValidAssessments_whenGetEffectiveDateIsInvoked_thenNullIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.HARDSHIP)
+                        .withAssessmentType(HARDSHIP)
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .build();
         LocalDate effectiveDate = MaatCalculateContributionService.getEffectiveDate(calculateContributionDTO);
@@ -219,7 +219,7 @@ class MaatCalculateContributionServiceTest {
     void givenPassportNewWorkReason_whenGetNewWorkReasonIsInvoked_thenPassportNewWorkReasonIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.INF)))
                 .build();
 
@@ -231,7 +231,7 @@ class MaatCalculateContributionServiceTest {
     void givenInitialNewWorkReason_whenGetNewWorkReasonIsInvoked_thenInitialNewWorkReasonIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withNewWorkReason(NewWorkReason.NEW)))
                 .build();
 
@@ -243,7 +243,7 @@ class MaatCalculateContributionServiceTest {
     void givenFullNewWorkReason_whenGetNewWorkReasonIsInvoked_thenNullIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.FULL)
+                        .withAssessmentType(FULL)
                         .withNewWorkReason(NewWorkReason.NEW)))
                 .build();
 
@@ -256,7 +256,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate contributionDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.INF)))
                 .effectiveDate(contributionDate)
                 .build();
@@ -272,7 +272,7 @@ class MaatCalculateContributionServiceTest {
     void givenNewWorkReasonAsINF_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentDateIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.INF)))
                 .build();
         LocalDate assessmentDate = LocalDate.now();
@@ -288,7 +288,7 @@ class MaatCalculateContributionServiceTest {
     void givenNewWorkReasonAsFMA_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentDateIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.FMA)))
                 .build();
         LocalDate assessmentDate = LocalDate.now();
@@ -305,7 +305,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate effectiveDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.PAI)))
                 .effectiveDate(effectiveDate)
                 .monthlyContributions(BigDecimal.TEN)
@@ -324,7 +324,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate effectiveDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.PAI)))
                 .effectiveDate(effectiveDate)
                 .monthlyContributions(BigDecimal.TEN)
@@ -343,7 +343,7 @@ class MaatCalculateContributionServiceTest {
         LocalDate assessmentDate = LocalDate.now();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.PASSPORT)
+                        .withAssessmentType(PASSPORT)
                         .withNewWorkReason(NewWorkReason.PAI)))
                 .monthlyContributions(BigDecimal.valueOf(12))
                 .build();
@@ -357,30 +357,15 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenAValidAnnualIncome_whenGetAnnualDisposableIncomeIsInvoked_thenAnnualIncomeIsReturned() {
-        BigDecimal annualDisposableIncome = BigDecimal.TEN;
-
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                null, annualDisposableIncome
-        );
-
-        assertThat(actual)
-                .isEqualTo(annualDisposableIncome);
-    }
-
-    @Test
     void givenAValidAnnualIncomeAfterMagHardship_whenGetAnnualDisposableIncomeIsInvoked_thenAnnualIncomeAfterMagHardshipIsReturned() {
         BigDecimal annualDisposableIncome = BigDecimal.TEN;
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .disposableIncomeAfterMagHardship(annualDisposableIncome)
                 .build();
 
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                calculateContributionDTO, null
-        );
+        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(calculateContributionDTO);
 
-        assertThat(actual)
-                .isEqualTo(annualDisposableIncome);
+        assertThat(actual).isEqualTo(annualDisposableIncome);
     }
 
     @Test
@@ -390,22 +375,16 @@ class MaatCalculateContributionServiceTest {
                 .totalAnnualDisposableIncome(annualDisposableIncome)
                 .build();
 
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                calculateContributionDTO, null
-        );
+        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(calculateContributionDTO);
 
-        assertThat(actual)
-                .isEqualTo(annualDisposableIncome);
+        assertThat(actual).isEqualTo(annualDisposableIncome);
     }
 
     @Test
     void givenNoIncome_whenGetAnnualDisposableIncomeIsInvoked_thenZeroIsReturned() {
-        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(
-                CalculateContributionDTO.builder().build(), null
-        );
+        BigDecimal actual = MaatCalculateContributionService.getAnnualDisposableIncome(CalculateContributionDTO.builder().build());
 
-        assertThat(actual)
-                .isEqualTo(BigDecimal.ZERO);
+        assertThat(actual).isEqualTo(BigDecimal.ZERO);
     }
 
     @Test
@@ -691,226 +670,73 @@ class MaatCalculateContributionServiceTest {
     void givenDisposableIncomeAfterCrownHardshipAndNoVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .disposableIncomeAfterCrownHardship(BigDecimal.TEN)
-                .magCourtOutcome(MagCourtOutcome.COMMITTED)
                 .caseType(CaseType.INDICTABLE)
                 .build();
-
-        when(contributionRulesService.getContributionVariation(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(Optional.empty());
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
                 CrownCourtOutcome.SUCCESSFUL,
-                true
+                false
         );
 
-        assertThat(result)
-                .isEqualTo(BigDecimal.TEN);
+        assertThat(result).isEqualTo(BigDecimal.TEN);
     }
 
     @Test
-    void givenDisposableIncomeAfterCrownHardshipAndValidVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
+    void givenTotalAnnualDisposableIncomeAndNoVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .disposableIncomeAfterCrownHardship(BigDecimal.TEN)
-                .magCourtOutcome(MagCourtOutcome.COMMITTED)
+                .totalAnnualDisposableIncome(BigDecimal.TEN)
                 .caseType(CaseType.INDICTABLE)
                 .build();
-
-        when(contributionRulesService.getContributionVariation(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(Optional.of(ContributionVariationDTO.builder().variation("FUNDING").build()));
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
                 CrownCourtOutcome.SUCCESSFUL,
+                false
+        );
+
+        assertThat(result).isEqualTo(BigDecimal.TEN);
+    }
+
+    @Test
+    void givenNoCalculatedDisposableIncomeAndNoVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenZeroIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .caseType(CaseType.INDICTABLE)
+                .build();
+
+        BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
+                calculateContributionDTO,
+                CrownCourtOutcome.SUCCESSFUL,
+                false
+        );
+
+        assertThat(result).isEqualTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    void givenDisposableIncomeAfterMagsHardshipAndValidVariation_whenCalculateAnnualDisposableIncomeIsInvoked_thenValidIncomeIsReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .disposableIncomeAfterMagHardship(BigDecimal.TEN)
+                .magCourtOutcome(MagCourtOutcome.COMMITTED)
+                .caseType(CaseType.EITHER_WAY)
+                .build();
+        ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
+                .variation("SOL COSTS")
+                .variationRule("+")
+                .build();
+
+        when(contributionRulesService.getContributionVariation(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null))
+                .thenReturn(Optional.of(contributionVariationDTO));
+        when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
+                .thenReturn(new ApiCalculateHardshipByDetailResponse().withHardshipSummary(BigDecimal.ONE));
+
+        BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
+                calculateContributionDTO,
+                null,
                 true
         );
 
-        assertThat(result)
-                .isEqualTo(BigDecimal.TEN);
-    }
-
-    @Test
-    void givenContributionSent_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .monthlyContributions(BigDecimal.ZERO)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-
-        when(contributionService.hasContributionBeenSent(anyInt()))
-                .thenReturn(true);
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result)
-                .isTrue();
-    }
-
-    @Test
-    void givenContributionIsNotSent_whenIsEarlyTransferRequiredIsInvoked_FalseIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .monthlyContributions(BigDecimal.ZERO)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-
-        when(contributionService.hasContributionBeenSent(anyInt()))
-                .thenReturn(false);
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result)
-                .isFalse();
-    }
-
-    @Test
-    void givenCCOutcomeChangedAdMagOutcomeIsSentForTrail_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .magCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .monthlyContributions(BigDecimal.ZERO)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-        when(contributionService.hasCCOutcomeChanged(anyInt()))
-                .thenReturn(true);
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void givenMonthlyContributionsNotEqualAdMagOutcomeIsCommittedForTrail_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .magCourtOutcome(MagCourtOutcome.COMMITTED_FOR_TRIAL)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .monthlyContributions(BigDecimal.ONE)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void givenUpfrontContributionsNotEqualAdMagOutcomeIsAppealToCC_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .monthlyContributions(BigDecimal.ZERO)
-                .upfrontContributions(BigDecimal.ONE)
-                .build();
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void givenDifferentEffectiveDatesAndMonthlyContributions_whenIsEarlyTransferRequiredIsInvoked_TrueIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(LocalDateTime.now())
-                .withMonthlyContributions(BigDecimal.TEN)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
-                .monthlyContributions(BigDecimal.TEN)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void givenDifferentEffectiveDatesAndZeroMonthlyContributions_whenIsEarlyTransferRequiredIsInvoked_FalseIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(LocalDateTime.now())
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
-                .monthlyContributions(BigDecimal.ZERO)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void givenSameEffectiveDates_whenIsEarlyTransferRequiredIsInvoked_FalseIsReturned() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(TestModelDataBuilder.TEST_DATE)
-                .withMonthlyContributions(BigDecimal.TEN)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
-                .monthlyContributions(BigDecimal.TEN)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-
-        boolean result = maatCalculateContributionService.isEarlyTransferRequired(
-                calculateContributionDTO, response, latestSentContribution
-        );
-
-        assertThat(result).isFalse();
+        assertThat(result).isEqualTo(BigDecimal.valueOf(11));
     }
 
     @Test
@@ -1016,7 +842,7 @@ class MaatCalculateContributionServiceTest {
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.FULL)
+                        .withAssessmentType(FULL)
                         .withResult(AssessmentResult.PASS)
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .build();
@@ -1046,7 +872,7 @@ class MaatCalculateContributionServiceTest {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
                 .repId(TestModelDataBuilder.REP_ID)
                 .assessments(List.of(new ApiAssessment()
-                        .withAssessmentType(AssessmentType.INIT)
+                        .withAssessmentType(INIT)
                         .withResult(AssessmentResult.PASS)
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .effectiveDate(LocalDate.now())
@@ -1067,12 +893,6 @@ class MaatCalculateContributionServiceTest {
                         .minimumMonthlyAmount(BigDecimal.valueOf(100))
                         .upfrontTotalMonths(2)
                         .totalMonths(2)
-                        .build()
-                );
-        when(maatCourtDataService.findLatestSentContribution(any()))
-                .thenReturn(Contribution.builder()
-                        .monthlyContributions(BigDecimal.TEN)
-                        .upfrontContributions(BigDecimal.ONE)
                         .build()
                 );
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
@@ -1109,12 +929,6 @@ class MaatCalculateContributionServiceTest {
 
         when(contributionService.checkContribsCondition(any()))
                 .thenReturn(contributionResponseDTO);
-        when(maatCourtDataService.findLatestSentContribution(any()))
-                .thenReturn(Contribution.builder()
-                        .monthlyContributions(BigDecimal.ZERO)
-                        .upfrontContributions(BigDecimal.ONE)
-                        .build()
-                );
 
         ApiMaatCalculateContributionResponse actualResponse =
                 maatCalculateContributionService.getCalculateContributionResponse(
@@ -1176,12 +990,6 @@ class MaatCalculateContributionServiceTest {
                 );
         when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any()))
                 .thenReturn(maatCalculateContributionResponse);
-        when(maatCourtDataService.findLatestSentContribution(any()))
-                .thenReturn(Contribution.builder()
-                        .monthlyContributions(BigDecimal.ZERO)
-                        .upfrontContributions(BigDecimal.ONE)
-                        .build()
-                );
         when(maatCalculateContributionService.verifyAndCreateContribs(
                 calculateContributionDTO, null, maatCalculateContributionResponse, null
         )).thenReturn(new Contribution());
@@ -1217,12 +1025,6 @@ class MaatCalculateContributionServiceTest {
                 );
         when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any()))
                 .thenReturn(maatCalculateContributionResponse);
-        when(maatCourtDataService.findLatestSentContribution(any()))
-                .thenReturn(Contribution.builder()
-                        .monthlyContributions(BigDecimal.ZERO)
-                        .upfrontContributions(BigDecimal.ONE)
-                        .build()
-                );
         when(maatCalculateContributionService.verifyAndCreateContribs(
                 calculateContributionDTO, null, maatCalculateContributionResponse, null
         )).thenReturn(null);
@@ -1259,29 +1061,6 @@ class MaatCalculateContributionServiceTest {
 
         assertThat(contribution.getId())
                 .isEqualTo(TestModelDataBuilder.CONTRIBUTION_ID);
-    }
-
-    @Test
-    void givenEarlyTransferRequired_whenRequestEarlyTransferIsInvoked_thenUpdateContributionIsCalled() {
-        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
-                .repId(TestModelDataBuilder.REP_ID)
-                .magCourtOutcome(MagCourtOutcome.APPEAL_TO_CC)
-                .build();
-        ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
-                .withEffectiveDate(LocalDateTime.now())
-                .withMonthlyContributions(BigDecimal.TEN)
-                .withUpfrontContributions(BigDecimal.ZERO);
-        Contribution latestSentContribution = Contribution.builder()
-                .effectiveDate(TestModelDataBuilder.TEST_DATE.toLocalDate())
-                .monthlyContributions(BigDecimal.TEN)
-                .upfrontContributions(BigDecimal.ZERO)
-                .build();
-        when(maatCourtDataService.findLatestSentContribution(any()))
-                .thenReturn(latestSentContribution);
-
-        maatCalculateContributionService.requestEarlyTransfer(calculateContributionDTO, response, new Contribution());
-
-        verify(maatCourtDataService, times(1)).updateContribution(any());
     }
 }
 

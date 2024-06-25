@@ -53,16 +53,10 @@ public class ServicesConfiguration {
             private String getAppealAmountUrl;
 
             @NotNull
-            private String getContributionCountUrl;
-
-            @NotNull
             private String getRepOrderUrl;
 
             @NotNull
             private String contribsParametersUrl;
-
-            @NotNull
-            private String findLatestSentContributionUrl;
         }
 
         @Data

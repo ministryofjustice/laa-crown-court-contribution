@@ -6,19 +6,23 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.contribution.builder.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.ApiCalculateHardshipByDetailResponse;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.maat_api.UpdateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
-import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.HardshipReviewDetailType;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -47,27 +51,20 @@ public class MaatCalculateContributionService {
     private final CalculateContributionRequestMapper calculateContributionRequestMapper;
     private final MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
 
-    private final List<MagCourtOutcome> earlyTransferMagOutcomes = List.of(MagCourtOutcome.SENT_FOR_TRIAL,
-            MagCourtOutcome.COMMITTED_FOR_TRIAL,
-            MagCourtOutcome.APPEAL_TO_CC);
-
     private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {
         return contributionResponseDTO.getUpliftCote() != null &&
                 calculateContributionDTO.getDateUpliftApplied() != null &&
                 calculateContributionDTO.getDateUpliftRemoved() == null;
     }
 
-    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO, final BigDecimal annualDisposableIncome) {
-        if (annualDisposableIncome == null) {
-            if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
-                return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
-            } else {
-                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    return calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else return BigDecimal.ZERO;
-            }
+    public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO) {
+        if ((calculateContributionDTO.getDisposableIncomeAfterMagHardship() != null)) {
+            return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
+        } else if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null){
+            return calculateContributionDTO.getTotalAnnualDisposableIncome();
+        } else {
+            return BigDecimal.ZERO;
         }
-        return annualDisposableIncome;
     }
 
     public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
@@ -192,8 +189,6 @@ public class MaatCalculateContributionService {
         Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, repOrderDTO,
                 response, currentContribution);
 
-        requestEarlyTransfer(calculateContributionDTO, response, currentContribution);
-
         if (contributionResponseDTO.getTemplate() != null && createdContribution != null) {
             response.setProcessActivity(true);
         }
@@ -231,18 +226,6 @@ public class MaatCalculateContributionService {
         return null;
     }
 
-    public void requestEarlyTransfer(final CalculateContributionDTO calculateContributionDTO,
-                                     final ApiMaatCalculateContributionResponse response,
-                                     final Contribution currentContribution) {
-        Contribution latestSentContribution = maatCourtDataService.findLatestSentContribution(calculateContributionDTO.getRepId());
-        if (isEarlyTransferRequired(calculateContributionDTO, response, latestSentContribution) && currentContribution != null) {
-            maatCourtDataService.updateContribution(new UpdateContributionRequest()
-                    .withId(currentContribution.getId())
-                    .withTransferStatus(TransferStatus.REQUESTED)
-                    .withUserModified(calculateContributionDTO.getUserCreated()));
-        }
-    }
-
     public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO) {
         final Integer contributionId = calculateContributionDTO.getContributionId();
         List<Contribution> contributionsList = new ArrayList<>();
@@ -259,18 +242,6 @@ public class MaatCalculateContributionService {
                 && (contributionService.hasApplicationStatusChanged(repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId())
                 || contributionService.isCds15WorkAround(repOrderDTO)));
-    }
-
-    public boolean isEarlyTransferRequired(final CalculateContributionDTO calculateContributionDTO,
-                                           final ApiMaatCalculateContributionResponse response,
-                                           final Contribution latestSentContribution) {
-        return ((response.getMonthlyContributions().compareTo(latestSentContribution.getMonthlyContributions()) != 0
-                || response.getUpfrontContributions().compareTo(latestSentContribution.getUpfrontContributions()) != 0
-                || (latestSentContribution.getEffectiveDate() != null && !response.getEffectiveDate().toLocalDate().equals(latestSentContribution.getEffectiveDate())
-                && BigDecimal.ZERO.compareTo(response.getMonthlyContributions()) < 0)
-                || contributionService.hasCCOutcomeChanged(calculateContributionDTO.getRepId()))
-                && (calculateContributionDTO.getMagCourtOutcome() != null && earlyTransferMagOutcomes.contains(calculateContributionDTO.getMagCourtOutcome())))
-                || contributionService.hasContributionBeenSent(calculateContributionDTO.getRepId());
     }
 
     public Contribution createContribs(final CalculateContributionDTO calculateContributionDTO) {
@@ -306,20 +277,22 @@ public class MaatCalculateContributionService {
                                                       final CrownCourtOutcome crownCourtOutcome,
                                                       boolean isContributionRuleApplicable) {
         BigDecimal annualDisposableIncome = calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
-        if (isContributionRuleApplicable) {
-            annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO, annualDisposableIncome);
-            Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(), calculateContributionDTO.getMagCourtOutcome(),
-                    crownCourtOutcome);
+        if (annualDisposableIncome == null) {
+            if (isContributionRuleApplicable) {
+                annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO);
+                Optional<ContributionVariationDTO> contributionVariation = contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(), calculateContributionDTO.getMagCourtOutcome(),
+                        crownCourtOutcome);
 
-            if (contributionVariation.isPresent()) {
-                annualDisposableIncome = annualDisposableIncome
-                        .add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
-            }
-        } else {
-            if (annualDisposableIncome == null) {
+                if (contributionVariation.isPresent()) {
+                    annualDisposableIncome = annualDisposableIncome
+                            .add(calculateVariationAmount(calculateContributionDTO.getRepId(), contributionVariation.get()));
+                }
+            } else {
                 if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
                     annualDisposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else annualDisposableIncome = BigDecimal.ZERO;
+                } else {
+                    annualDisposableIncome = BigDecimal.ZERO;
+                }
             }
         }
         return annualDisposableIncome;

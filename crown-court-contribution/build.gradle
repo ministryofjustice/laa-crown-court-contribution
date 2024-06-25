@@ -4,7 +4,7 @@ plugins {
     id "org.springframework.boot" version "3.1.5"
     id 'io.spring.dependency-management' version '1.1.4'
     id "org.sonarqube" version "4.0.0.2929"
-    id "info.solidsoft.pitest" version "1.9.11"
+    id "info.solidsoft.pitest" version "1.15.0"
     id "org.jsonschema2dataclass" version "6.0.0"
 }
 
@@ -17,8 +17,11 @@ java {
 def versions = [
         pitest                          : "1.15.8",
         springdocVersion                : "2.1.0",
-        crimeCommonsVersion             : "2.13.6",
-        springCloudStubRunnerVersion    : "4.0.4"
+        crimeCommonsClasses             : "3.22.0",
+        commonsRestClient               : "3.4.0",
+        crimeCommonsModsSchemas         : "1.5.0",
+        springCloudStubRunnerVersion    : "4.0.4",
+        postgresqlVersion               : "42.7.2"
 ]
 
 configurations {
@@ -36,13 +39,14 @@ repositories {
 
 dependencies {
 
-    implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.crimeCommonsVersion:all"
-    implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsVersion"
+    implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.commonsRestClient:all"
+    implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsClasses"
 
-    implementation "org.postgresql:postgresql"
+    implementation "org.postgresql:postgresql:$versions.postgresqlVersion"
     implementation "org.liquibase:liquibase-core"
     implementation "io.micrometer:micrometer-registry-prometheus"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
+    implementation "uk.gov.justice.service.laa-crime:crime-commons-mod-schemas:$versions.crimeCommonsModsSchemas"
 
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"

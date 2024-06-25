@@ -2,10 +2,10 @@ package uk.gov.justice.laa.crime.contribution.validation;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.model.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.model.LastOutcome;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.enums.contribution.CurrentStatus;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 
 import java.time.LocalDateTime;
