@@ -42,13 +42,21 @@ public class AppealContributionService {
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
-        BigDecimal appealContributionAmount = maatCourtDataService.getContributionAppealAmount(getContributionAmountRequest);
+        BigDecimal appealContributionAmount = null;
+        if(getContributionAmountRequest.getAppealType() != null
+                && getContributionAmountRequest.getCaseType() != null
+                && getContributionAmountRequest.getOutcome() != null &&
+                getContributionAmountRequest.getAssessmentResult() != null){
+             appealContributionAmount = maatCourtDataService.getContributionAppealAmount(getContributionAmountRequest);
+        }
 
         Integer repId = calculateContributionDTO.getRepId();
         List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, true);
         if (CollectionUtils.isNotEmpty(currContributionList)) {
             Contribution currContribution = currContributionList.get(0);
-            if (currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
+            if (currContribution.getUpfrontContributions() == null
+                    || (appealContributionAmount == null
+                    || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0)) {
                 CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
                 Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
                 log.info("Contribution data has been updated");
