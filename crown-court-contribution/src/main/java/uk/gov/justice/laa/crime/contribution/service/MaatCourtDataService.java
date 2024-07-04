@@ -43,7 +43,7 @@ public class MaatCourtDataService {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
                 queryParams,
-                repId
+                repId.intValue()
         );
         log.info(RESPONSE_STRING, response);
         return response;
