@@ -41,8 +41,7 @@ public class MaatCourtDataService {
         List<Contribution> response = maatAPIClient.get(
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
-                queryParams,
+                configuration.getMaatApi().getContributionEndpoints().getFindUrl() + "?findLatestContribution=" + findLatestContribution,
                 repId.intValue()
         );
         log.info(RESPONSE_STRING, response);

@@ -59,7 +59,7 @@ class MaatCourtDataServiceTest {
         queryParams.add("findLatestContribution", true);
         maatCourtDataService.findContribution(TEST_REP_ID, true);
         verify(maatCourtDataClient).get(new ParameterizedTypeReference<List<Contribution>>() {
-        }, "/contributions/{repId}", queryParams, 1234);
+        }, "/contributions/{repId}?findLatestContribution=true", 1234);
     }
 
     @Test
