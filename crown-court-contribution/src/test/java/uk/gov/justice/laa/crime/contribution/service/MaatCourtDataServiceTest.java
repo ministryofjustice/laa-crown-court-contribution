@@ -54,9 +54,6 @@ class MaatCourtDataServiceTest {
 
     @Test
     void givenValidRepId_whenFindContributionIsInvoked_thenResponseIsReturned() {
-
-        final MultiValueMap<String, Boolean> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("findLatestContribution", true);
         maatCourtDataService.findContribution(TEST_REP_ID, true);
         verify(maatCourtDataClient).get(new ParameterizedTypeReference<List<Contribution>>() {
         }, "/contributions/{repId}?findLatestContribution=true", 1234);
