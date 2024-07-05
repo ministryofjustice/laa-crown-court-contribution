@@ -7,8 +7,9 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
@@ -19,9 +20,6 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
@@ -32,11 +30,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MaatCourtDataServiceTest {
@@ -119,7 +113,8 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.updateCorrespondenceState(new CorrespondenceState());
         verify(maatCourtDataClient).put(
                 any(CorrespondenceState.class),
-                eq(new ParameterizedTypeReference<CorrespondenceState>() {}),
+                eq(new ParameterizedTypeReference<CorrespondenceState>() {
+                }),
                 anyString(),
                 anyMap()
         );
