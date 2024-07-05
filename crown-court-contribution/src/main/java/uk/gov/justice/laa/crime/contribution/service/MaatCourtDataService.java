@@ -34,15 +34,10 @@ public class MaatCourtDataService {
     private final ServicesConfiguration configuration;
 
     public List<Contribution> findContribution(Integer repId, Boolean findLatestContribution) {
-
-        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("findLatestContribution", findLatestContribution.toString());
-
         List<Contribution> response = maatAPIClient.get(
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getMaatApi().getContributionEndpoints().getFindUrl(),
-                queryParams,
+                configuration.getMaatApi().getContributionEndpoints().getFindUrl() + "?findLatestContribution=" + findLatestContribution,
                 repId
         );
         log.info(RESPONSE_STRING, response);
