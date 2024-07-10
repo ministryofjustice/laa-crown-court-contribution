@@ -134,8 +134,8 @@ public class MaatCalculateContributionService {
         } else {
             response = getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
         }
-        log.info("response: Monthly Contributions {}", response.getMonthlyContributions());
-        log.info("response: UpFront Contributions {}", response.getUpfrontContributions());
+        //log.info("response: Monthly Contributions {}", response.getMonthlyContributions());
+        //log.info("response: UpFront Contributions {}", response.getUpfrontContributions());
         log.info("response:  {}", response);
 
         return response;
