@@ -39,6 +39,7 @@ public class AppealContributionService {
     }
 
     public ApiMaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO) {
+        log.info("Start AppealContributionService.calculateAppealContribution()");
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
@@ -52,7 +53,7 @@ public class AppealContributionService {
 
         Integer repId = calculateContributionDTO.getRepId();
         List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, true);
-        if (CollectionUtils.isNotEmpty(currContributionList)) {
+        if (null !=currContributionList && CollectionUtils.isNotEmpty(currContributionList)) {
             Contribution currContribution = currContributionList.get(0);
             if (currContribution.getUpfrontContributions() == null
                     || (appealContributionAmount == null
@@ -65,6 +66,7 @@ public class AppealContributionService {
             log.info("Contribution data is already up to date");
             return MaatCalculateContributionResponseBuilder.build(currContribution);
         }
+        log.info("End AppealContributionService.calculateAppealContribution()");
         return null;
     }
 
