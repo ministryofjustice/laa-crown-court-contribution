@@ -57,6 +57,9 @@ public class ContributionController {
             ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
 
         log.info("Received request to calculate contributions for ID {}", maatCalculateContributionRequest.getRepId());
+        log.info("Contributions - {}", maatCalculateContributionRequest);
+        log.info("Monthly Contributions - {}", maatCalculateContributionRequest.getMonthlyContributions());
+        log.info("UpFront Contributions - {}", maatCalculateContributionRequest.getUpfrontContributions());
         calculateContributionValidator.validate(maatCalculateContributionRequest);
         CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
         return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO));

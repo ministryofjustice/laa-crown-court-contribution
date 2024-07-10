@@ -82,6 +82,9 @@ public class ContributionService {
 
     @Transactional
     public ContributionResponseDTO checkContribsCondition(ContributionRequestDTO request) {
+        log.info("Checking contribution conditions ");
+        log.info("Checking contribution conditions - Monthly Contribs: {}", request.getMonthlyContribs());
+
         ContributionResponseDTO contributionResponseDTO;
         AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
 

@@ -134,6 +134,9 @@ public class MaatCalculateContributionService {
         } else {
             response = getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
         }
+        log.info("response: Monthly Contributions {}", response.getMonthlyContributions());
+        log.info("response: UpFront Contributions {}", response.getUpfrontContributions());
+        log.info("response:  {}", response);
 
         return response;
     }
@@ -171,14 +174,19 @@ public class MaatCalculateContributionService {
                                                            final String fullResult,
                                                            final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
+        log.info("doContribs");
+        log.info("doContribs Monthly Contribs {} " + calculateContributionDTO.getMonthlyContributions());
+        log.info("doContribs UpFront Contribs {} " + calculateContributionDTO.getUpfrontContributions());
 
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
         if (Constants.Y.equals(contributionResponseDTO.getCalcContribution()) ||
                 contributionResponseDTO.getTemplate() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions().compareTo(BigDecimal.ZERO) > 0) ||
                 Constants.INEL.equals(fullResult)) {
+            log.info("doContribs Calc Contribs");
             response = calcContribs(calculateContributionDTO, contributionResponseDTO);
         } else if (calculateContributionDTO.getMonthlyContributions() != null) {
+            log.info("doContribs Set Contribs");
             response.setMonthlyContributions(BigDecimal.ZERO);
             response.setContributionCap(BigDecimal.ZERO);
             response.setUpfrontContributions(BigDecimal.ZERO);
