@@ -92,6 +92,8 @@ public class ContributionService {
         contributionResponse.setDoContribs(Constants.N);
         contributionResponse.setCalcContribs(Constants.N);
 
+        log.info("Contribution response before: {}", contributionResponse);
+
         AssessmentResponseDTO assessmentResponseDTO = getAssessmentResult(assessmentRequestDTO);
         request.setIojResult(assessmentResponseDTO.getIojResult());
         request.setMeansResult(assessmentResponseDTO.getMeansResult());
@@ -115,7 +117,6 @@ public class ContributionService {
                 contributionResponse.setCorrespondenceType(contributionResponseDTO.getCorrespondenceType());
                 contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
                 contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());
-                contributionResponse.setDoContribs(contributionResponseDTO.getDoContribs());
                 CorrespondenceType correspondenceType = CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
                 if (correspondenceType != null) {
                     contributionResponse.setCorrespondenceTypeDesc(correspondenceType.getDescription());
@@ -131,6 +132,9 @@ public class ContributionService {
         if (Constants.Y.equals(request.getRemoveContribs())) {
             contributionResponse.setCalcContribs(Constants.N);
         }
+
+        log.info("Value for DoContribs is: {}", contributionResponse.getDoContribs());
+        log.info("Value for CalcContribs is: {}", contributionResponse.getCalcContribs());
 
         return contributionResponse;
     }
