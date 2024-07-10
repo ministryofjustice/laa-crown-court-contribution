@@ -124,9 +124,14 @@ public class ContributionService {
             }
         }
 
-        if (INEL.equals(request.getFullResult()) ||
-                (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0)) {
+        if (INEL.equals(request.getFullResult())) {
             contributionResponse.setDoContribs(Constants.Y);
+        }
+
+        if ( request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0) {
+            contributionResponse.setDoContribs(Constants.Y);
+        } else {
+            contributionResponse.setDoContribs(Constants.N);
         }
 
         if (Constants.Y.equals(request.getRemoveContribs())) {
