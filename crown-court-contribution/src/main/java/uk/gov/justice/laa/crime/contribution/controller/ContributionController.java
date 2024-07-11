@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
+import uk.gov.justice.laa.crime.contribution.config.NotFoundApiResponse;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
@@ -47,6 +48,7 @@ public class ContributionController {
             )
     )
     @DefaultHTTPErrorResponse
+    @NotFoundApiResponse
     public ResponseEntity<ApiMaatCalculateContributionResponse> calculateContribution(
             @Parameter(description = "Data required to calculate contributions",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
