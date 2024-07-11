@@ -62,6 +62,11 @@ public class ContributionController {
         log.info("UpFront Contributions - {}", maatCalculateContributionRequest.getUpfrontContributions());
         calculateContributionValidator.validate(maatCalculateContributionRequest);
         CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
+        ApiMaatCalculateContributionResponse response = maatCalculateContributionService.calculateContribution(calculateContributionDTO);
+        if (null == response) {
+            log.info("Return 404 as response is empty");
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO));
     }
 
