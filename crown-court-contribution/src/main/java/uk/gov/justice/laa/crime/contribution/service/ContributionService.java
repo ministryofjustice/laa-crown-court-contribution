@@ -139,7 +139,8 @@ public class ContributionService {
                 contributionRequestDTO.getIojResult(),
                 contributionRequestDTO.getMagCourtOutcome(),
                 contributionRequestDTO.getCrownCourtOutcome(),
-                contributionRequestDTO.getInitResult());
+                contributionRequestDTO.getInitResult()
+        ).orElse(null);
     }
 
     public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {

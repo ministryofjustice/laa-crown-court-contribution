@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -522,7 +523,7 @@ class ContributionServiceTest {
             ContributionRequestDTO request) {
 
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo());
+                .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
 
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
 
@@ -546,7 +547,7 @@ class ContributionServiceTest {
             ContributionRequestDTO request) {
 
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo());
+                .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
 
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
 
@@ -572,7 +573,7 @@ class ContributionServiceTest {
             ContributionRequestDTO request) {
 
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo());
+                .thenReturn(Optional.of(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo()));
 
         ContributionResponseDTO response = contributionService.checkContribsCondition(request);
 
@@ -582,6 +583,28 @@ class ContributionServiceTest {
                 .isEqualTo(1);
         softly.assertThat(response.getCorrespondenceType())
                 .isEmpty();
+    }
+
+    @Test
+    void givenAValidContributionRequest_whenCheckContribConditionIsInvoked_thenReturnNoContribution() {
+        ContributionRequestDTO request  = ContributionRequestDTO.builder()
+                .caseType(CaseType.INDICTABLE)
+                .initResult("FULL")
+                .fullResult("PASS")
+                .magCourtOutcome("SENT FOR TRIAL")
+                .crownCourtOutcome("")
+                .iojResult("PASS")
+                .build();
+
+        when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(Optional.empty());
+
+        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
+
+        softly.assertThat(response.getDoContribs())
+                .isEqualTo("N");
+        softly.assertThat(response.getCalcContribs())
+                .isEqualTo("N");
     }
 
     @Test
