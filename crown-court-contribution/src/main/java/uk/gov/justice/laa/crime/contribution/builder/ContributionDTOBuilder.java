@@ -7,6 +7,8 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
+import java.time.LocalDate;
+
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContributionDTOBuilder {
@@ -33,6 +35,8 @@ public class ContributionDTOBuilder {
                 .disposableIncomeAfterCrownHardship(request.getDisposableIncomeAfterCrownHardship())
                 .disposableIncomeAfterMagHardship(request.getDisposableIncomeAfterMagHardship())
                 .totalAnnualDisposableIncome(request.getTotalAnnualDisposableIncome())
+                .userCreated(request.getUserCreated())
+                .calcDate(LocalDate.now())
                 .build();
     }
 }
