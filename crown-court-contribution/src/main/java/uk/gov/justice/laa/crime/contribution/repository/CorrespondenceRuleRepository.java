@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 import uk.gov.justice.laa.crime.contribution.entity.CorrespondenceRule;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 
+import java.util.Optional;
+
 @Repository
 public interface CorrespondenceRuleRepository extends JpaRepository<CorrespondenceRule, Integer> {
 
@@ -16,11 +18,11 @@ public interface CorrespondenceRuleRepository extends JpaRepository<Corresponden
             "AND (R.MCOO_OUTCOME = :magsOutcome OR MCOO_OUTCOME = 'ANY' OR MCOO_OUTCOME = 'NONE' ) " +
             "AND (R.CCOO_OUTCOME = :ccSummaryOutcome OR    R.CCOO_OUTCOME = 'ANY' OR    R.CCOO_OUTCOME = 'NONE' ) " +
             "AND (INIT_RESULT  = 'ANY' OR INIT_RESULT  = :initResult );", nativeQuery = true)
-    CorrespondenceRuleAndTemplateInfo getCoteInfo(String meansResult,
-                                                  String iojResult,
-                                                  String magsOutcome,
-                                                  String ccSummaryOutcome,
-                                                  String initResult
+    Optional<CorrespondenceRuleAndTemplateInfo> getCoteInfo(String meansResult,
+                                                            String iojResult,
+                                                            String magsOutcome,
+                                                            String ccSummaryOutcome,
+                                                            String initResult
     );
 
 }
