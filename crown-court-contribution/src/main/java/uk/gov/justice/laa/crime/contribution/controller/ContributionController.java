@@ -48,7 +48,6 @@ public class ContributionController {
             )
     )
     @DefaultHTTPErrorResponse
-    @NotFoundApiResponse
     public ResponseEntity<ApiMaatCalculateContributionResponse> calculateContribution(
             @Parameter(description = "Data required to calculate contributions",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -65,10 +64,6 @@ public class ContributionController {
         calculateContributionValidator.validate(maatCalculateContributionRequest);
         CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
         ApiMaatCalculateContributionResponse response = maatCalculateContributionService.calculateContribution(calculateContributionDTO);
-        if (null == response) {
-            log.info("Return 404 as response is empty");
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO));
     }
 

@@ -67,7 +67,7 @@ public class AppealContributionService {
             return MaatCalculateContributionResponseBuilder.build(currContribution);
         }
         log.info("End AppealContributionService.calculateAppealContribution()");
-        return null;
+        return new ApiMaatCalculateContributionResponse();
     }
 
 }
