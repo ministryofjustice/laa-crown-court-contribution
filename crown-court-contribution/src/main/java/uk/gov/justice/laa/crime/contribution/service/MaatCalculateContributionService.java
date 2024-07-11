@@ -154,6 +154,7 @@ public class MaatCalculateContributionService {
         ContributionResponseDTO contributionResponseDTO = contributionService.checkContribsCondition(ContributionRequestDTO.builder()
                 .caseType(calculateContributionDTO.getCaseType())
                 .effectiveDate(calculateContributionDTO.getEffectiveDate())
+                .iojResult(repOrderDTO.getIojResult())
                 .monthlyContribs(calculateContributionDTO.getMonthlyContributions())
                 .fullResult(fullResult)
                 .initResult(initAssessment.map(assessment -> assessment.getResult().name()).orElse(null))
