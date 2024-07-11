@@ -59,6 +59,7 @@ public class AppealContributionService {
                     || (appealContributionAmount == null
                     || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0)) {
                 CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
+                log.info("createContributionRequest--->" + createContributionRequest);
                 Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
                 log.info("Contribution data has been updated");
                 return MaatCalculateContributionResponseBuilder.build(newContribution);
