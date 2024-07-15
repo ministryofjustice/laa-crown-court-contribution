@@ -14,7 +14,7 @@ import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.enums.contribution.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
