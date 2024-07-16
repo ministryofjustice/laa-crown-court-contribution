@@ -264,6 +264,7 @@ public class MaatCalculateContributionService {
         CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO);
         if (compareContributionService.compareContribution(calculateContributionDTO) < 2) {
             log.info("Calling createContribution");
+            log.info("Calling createContribution request --> " + createContributionRequest);
             return maatCourtDataService.createContribution(createContributionRequest);
         } else return null;
     }
