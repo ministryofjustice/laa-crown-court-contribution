@@ -194,13 +194,14 @@ public class MaatCalculateContributionService {
         }
 
         Contribution currentContribution = getCurrentContribution(calculateContributionDTO);
-
+        log.info("Calling  verifyAndCreateContribs");
         Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, repOrderDTO,
                 response, currentContribution);
-
+        log.info("End Calling  verifyAndCreateContribs");
         if (contributionResponseDTO.getTemplate() != null && createdContribution != null) {
             response.setProcessActivity(true);
         }
+        log.info("End doContribs");
         return response;
     }
 
@@ -210,6 +211,8 @@ public class MaatCalculateContributionService {
                                                 final Contribution currentContribution) {
         TransferStatus currentTransferStatus = null;
         Integer currentContributionFileId = null;
+
+        log.info("start verifyAndCreateContribs");
 
         if (currentContribution != null) {
             currentTransferStatus = currentContribution.getTransferStatus();
@@ -228,10 +231,13 @@ public class MaatCalculateContributionService {
                 maatCourtDataService.updateContribution(updateContributionRequest);
             }
             //Revisit the createContribs logic - do we need to change the input?
+            log.info("Calling createContribution after updateContribution--");
             return createContribs(calculateContributionDTO);
         } else if (isCreateContributionRequired(calculateContributionDTO, repOrderDTO, currentTransferStatus)) {
+            log.info("Calling createContribution --");
             return createContribs(calculateContributionDTO);
         }
+        log.info("end verifyAndCreateContribs");
         return null;
     }
 
@@ -257,6 +263,7 @@ public class MaatCalculateContributionService {
         log.info("Inactivate existing Contribution and create a new Contribution");
         CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO);
         if (compareContributionService.compareContribution(calculateContributionDTO) < 2) {
+            log.info("Calling createContribution");
             return maatCourtDataService.createContribution(createContributionRequest);
         } else return null;
     }

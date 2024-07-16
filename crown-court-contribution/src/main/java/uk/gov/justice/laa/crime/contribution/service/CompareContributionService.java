@@ -28,11 +28,14 @@ public class CompareContributionService {
 
     @Transactional
     public int compareContribution(CalculateContributionDTO calculateContributionDTO) {
+        log.info("Start  compareContribution");
         int repId = calculateContributionDTO.getRepId();
         RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, false);
+        log.info(" compareContribution.contributions--"+ contributions);
         List<Contribution> activeContribution = Optional.ofNullable(contributions).orElse(Collections.emptyList()).stream()
                 .filter(isActiveContribution(repId)).toList();
+        log.info(" compareContribution.activeContribution--"+ activeContribution);
         if (activeContribution.isEmpty()) {
             return getResultOnNoPreviousContribution(repOrderDTO, repId);
         }
@@ -55,6 +58,7 @@ public class CompareContributionService {
         if (contributionRecordsAreIdentical(calculateContributionDTO, contribution)) {
             result = getResultOnIdenticalContributions(calculateContributionDTO, repOrderDTO, repId);
         }
+        log.info("getResultOnActiveContribution.result--"+ result);
         return result;
     }
 
