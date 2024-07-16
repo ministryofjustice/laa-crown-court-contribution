@@ -144,8 +144,6 @@ public class ContributionService {
 
         if ( request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0) {
             contributionResponse.setDoContribs(Constants.Y);
-        } else {
-            contributionResponse.setDoContribs(Constants.N);
         }
         log.info("DoContribs after MonthlyContribs check--" + contributionResponse.getDoContribs());
         log.info("Remove Contrib--" + request.getRemoveContribs());
