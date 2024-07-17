@@ -65,8 +65,6 @@ class MaatCalculateContributionServiceTest {
 
     @Mock
     private CompareContributionService compareContributionService;
-    @Mock
-    private CreateContributionRequestMapper createContributionRequestMapper;
 
     @Mock
     private CrimeHardshipService crimeHardshipService;
@@ -746,7 +744,7 @@ class MaatCalculateContributionServiceTest {
                 .build();
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, null, TransferStatus.REQUESTED
+                calculateContributionDTO, null
         );
 
         assertThat(result).isFalse();
@@ -769,7 +767,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(false);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO
         );
 
         assertThat(result).isFalse();
@@ -787,7 +785,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(true);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO
         );
 
         assertThat(result).isTrue();
@@ -808,7 +806,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(true);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO
         );
 
         assertThat(result).isTrue();
@@ -831,7 +829,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(true);
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, repOrderDTO, TransferStatus.SENT
+                calculateContributionDTO, repOrderDTO
         );
 
         assertThat(result).isTrue();
@@ -991,7 +989,7 @@ class MaatCalculateContributionServiceTest {
         when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any()))
                 .thenReturn(maatCalculateContributionResponse);
         when(maatCalculateContributionService.verifyAndCreateContribs(
-                calculateContributionDTO, null, maatCalculateContributionResponse, null
+                calculateContributionDTO, null, maatCalculateContributionResponse
         )).thenReturn(new Contribution());
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
@@ -1026,7 +1024,7 @@ class MaatCalculateContributionServiceTest {
         when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any()))
                 .thenReturn(maatCalculateContributionResponse);
         when(maatCalculateContributionService.verifyAndCreateContribs(
-                calculateContributionDTO, null, maatCalculateContributionResponse, null
+                calculateContributionDTO, null, maatCalculateContributionResponse
         )).thenReturn(null);
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
