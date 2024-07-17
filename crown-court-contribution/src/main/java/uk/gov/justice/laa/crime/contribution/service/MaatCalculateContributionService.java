@@ -158,6 +158,7 @@ public class MaatCalculateContributionService {
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(
             final CalculateContributionDTO calculateContributionDTO,
             final RepOrderDTO repOrderDTO) {
+        log.info("Start getCalculateContributionResponse");
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse();
 
         Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream()
@@ -168,11 +169,24 @@ public class MaatCalculateContributionService {
 
         String outcome = null;
         if (null != calculateContributionDTO.getCrownCourtOutcomeList()) {
+            log.info("getCrownCourtOutcomeList");
             ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
-            if (null != apiCrownCourtOutcome.getOutcome()) {
+            log.info("apiCrownCourtOutcome--"+apiCrownCourtOutcome);
+            if (null !=apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
+                log.info("apiCrownCourtOutcome--"+ apiCrownCourtOutcome.getOutcome());
                 outcome = apiCrownCourtOutcome.getOutcome().getCode();
             }
         }
+
+        log.info("outcome--" + outcome);
+
+        String msgCourtOutcome = null;
+
+        if (null != calculateContributionDTO.getMagCourtOutcome()) {
+            msgCourtOutcome = calculateContributionDTO.getMagCourtOutcome().getOutcome();
+        }
+
+        log.info("courtOutcome--" + msgCourtOutcome);
 
         ContributionResponseDTO contributionResponseDTO =
                 contributionService.checkContribsCondition(
@@ -187,7 +201,7 @@ public class MaatCalculateContributionService {
                                 .initResult(initAssessment.map(
                                                 assessment -> assessment.getResult().name())
                                                     .orElse(null))
-                                .magCourtOutcome(calculateContributionDTO.getMagCourtOutcome() != null ? calculateContributionDTO.getMagCourtOutcome().getOutcome() : null)
+                                .magCourtOutcome(msgCourtOutcome)
                                 .crownCourtOutcome(outcome)
                                 .removeContribs(
                                         calculateContributionDTO.getRemoveContribs())
