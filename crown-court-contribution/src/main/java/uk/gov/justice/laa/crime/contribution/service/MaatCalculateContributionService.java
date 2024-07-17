@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.contribution.builder.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
@@ -165,6 +166,14 @@ public class MaatCalculateContributionService {
                 .filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
         String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
 
+        String outcome = null;
+        if (null != calculateContributionDTO.getCrownCourtOutcomeList()) {
+            ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
+            if (null != apiCrownCourtOutcome.getOutcome()) {
+                outcome = apiCrownCourtOutcome.getOutcome().getCode();
+            }
+        }
+
         ContributionResponseDTO contributionResponseDTO =
                 contributionService.checkContribsCondition(
                         ContributionRequestDTO.builder()
@@ -178,6 +187,8 @@ public class MaatCalculateContributionService {
                                 .initResult(initAssessment.map(
                                                 assessment -> assessment.getResult().name())
                                                     .orElse(null))
+                                .magCourtOutcome(calculateContributionDTO.getMagCourtOutcome() != null ? calculateContributionDTO.getMagCourtOutcome().getOutcome() : null)
+                                .crownCourtOutcome(outcome)
                                 .removeContribs(
                                         calculateContributionDTO.getRemoveContribs())
                                 .build()

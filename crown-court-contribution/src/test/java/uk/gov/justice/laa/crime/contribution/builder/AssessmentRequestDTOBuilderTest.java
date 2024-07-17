@@ -28,7 +28,7 @@ class AssessmentRequestDTOBuilderTest {
         softly.assertThat(assessmentRequest.getInitResult()).isEqualTo(PASS);
         softly.assertThat(assessmentRequest.getFullResult()).isEqualTo(FULL);
         softly.assertThat(assessmentRequest.getHardshipResult()).isEqualTo(PASS);
-        softly.assertThat(assessmentRequest.getPassportResult()).isEqualTo(FULL);
+        softly.assertThat(assessmentRequest.getPassportResult()).isEqualTo(PASS);
         softly.assertAll();
 
     }

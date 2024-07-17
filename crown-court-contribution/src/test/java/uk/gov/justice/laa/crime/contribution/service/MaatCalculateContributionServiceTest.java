@@ -87,6 +87,9 @@ class MaatCalculateContributionServiceTest {
     @Mock
     private ContributionSummaryMapper contributionSummaryMapper;
 
+    @Mock
+    private CreateContributionRequestMapper contributionRequestMapper;
+
     @Test
     void givenAValidCaseType_whenCalculateContributionIsInvoked_thenShouldNotCalledCalculateContribution() {
         when(maatCourtDataService.getRepOrderByRepId(anyInt())).thenReturn(TestModelDataBuilder.getRepOrderDTO());
@@ -744,7 +747,7 @@ class MaatCalculateContributionServiceTest {
                 .build();
 
         boolean result = maatCalculateContributionService.isCreateContributionRequired(
-                calculateContributionDTO, null
+                calculateContributionDTO, TestModelDataBuilder.getRepOrderDTO()
         );
 
         assertThat(result).isFalse();

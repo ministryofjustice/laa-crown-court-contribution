@@ -159,6 +159,7 @@ public class ContributionService {
 
     @Transactional
     public CorrespondenceRuleAndTemplateInfo getCoteInfo(ContributionRequestDTO contributionRequestDTO) {
+        log.info("CorrespondenceRuleAndTemplateInfo: {}", contributionRequestDTO);
         return correspondenceRuleRepository.getCoteInfo(
                 contributionRequestDTO.getMeansResult(),
                 contributionRequestDTO.getIojResult(),
