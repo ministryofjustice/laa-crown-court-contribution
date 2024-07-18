@@ -17,13 +17,13 @@ public interface CorrespondenceRuleRepository extends JpaRepository<Corresponden
             "FROM crown_court_contribution.CORRESPONDENCE_RULES R JOIN crown_court_contribution.CORRESPONDENCE_TEMPLATES T on (T.ID = R.COTE_ID) " +
             "WHERE   MEANS_RESULT = :meansResult " +
             "AND (R.IOJ_RESULT = :iojResult or  IOJ_RESULT = 'ANY' ) " +
-            "AND (R.MCOO_OUTCOME = :magsOutcome OR MCOO_OUTCOME = 'ANY' OR (MCOO_OUTCOME = 'NONE' and MCOO_OUTCOME is null )) " +
-            "AND (R.CCOO_OUTCOME = :ccSummaryOutcome OR    R.CCOO_OUTCOME = 'ANY' OR    (R.CCOO_OUTCOME = 'NONE' and R.CCOO_OUTCOME is null)) " +
+            "AND (R.MCOO_OUTCOME = :magsOutcome OR MCOO_OUTCOME = 'ANY' OR (MCOO_OUTCOME = 'NONE' and :magsOutcome is null )) " +
+            "AND (R.CCOO_OUTCOME = :ccOutcome OR    R.CCOO_OUTCOME = 'ANY' OR    (R.CCOO_OUTCOME = 'NONE' and :ccOutcome is null)) " +
             "AND (INIT_RESULT  = 'ANY' OR INIT_RESULT  = :initResult );", nativeQuery = true)
     Optional<CorrespondenceRuleAndTemplateInfo> getCoteInfo(String meansResult,
                                                             String iojResult,
                                                             String magsOutcome,
-                                                            String ccSummaryOutcome,
+                                                            String ccOutcome,
                                                             String initResult
     );
 
