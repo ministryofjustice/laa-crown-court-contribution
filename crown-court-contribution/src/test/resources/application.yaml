@@ -58,7 +58,6 @@ services:
       base-url: ${services.maat-api.assessments-domain}/contributions
       find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
       summary-url: ${services.maat-api.assessments-domain}/contributions/{repId}/summary
-      get-appeal-amount-url: ${services.maat-api.assessments-domain}/contribution-appeal/caty-case-type/{caseType}/apty-code/{appealType}/cc-outcome/{outcome}/assessmentResult/{assessmentResult}
       get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
       contribs-parameters-url: ${services.maat-api.assessments-domain}/contribution-calc-params/{effectiveDate}
     correspondence-state-endpoints:
