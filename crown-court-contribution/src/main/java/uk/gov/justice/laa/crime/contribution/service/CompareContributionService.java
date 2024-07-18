@@ -69,6 +69,11 @@ public class CompareContributionService {
     private int getResultOnIdenticalContributions(CalculateContributionDTO calculateContributionDTO,
                                                   RepOrderDTO repOrderDTO, int repId) {
         CorrespondenceStatus status = maatCourtDataService.findCorrespondenceState(repId);
+
+        if (status == null) {
+            status = CorrespondenceStatus.NONE;
+        }
+
         MagCourtOutcome magCourtOutcome = calculateContributionDTO.getMagCourtOutcome();
         String magsOutcome = magCourtOutcome == null ? null : magCourtOutcome.getOutcome();
         if (magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(repOrderDTO, status, magsOutcome)) {
