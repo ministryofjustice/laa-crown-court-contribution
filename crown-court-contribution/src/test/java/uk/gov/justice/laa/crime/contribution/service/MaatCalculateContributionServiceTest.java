@@ -920,13 +920,10 @@ class MaatCalculateContributionServiceTest {
                 .id(1234)
                 .build();
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .doContribs(Constants.Y)
+                .doContribs(Constants.N)
                 .build();
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
-        ApiMaatCalculateContributionResponse expectedResponse = new ApiMaatCalculateContributionResponse()
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpfrontContributions(BigDecimal.ZERO)
-                .withContributionCap(BigDecimal.ZERO);
+        ApiMaatCalculateContributionResponse expectedResponse = new ApiMaatCalculateContributionResponse();
 
         when(contributionService.checkContribsCondition(any()))
                 .thenReturn(contributionResponseDTO);
