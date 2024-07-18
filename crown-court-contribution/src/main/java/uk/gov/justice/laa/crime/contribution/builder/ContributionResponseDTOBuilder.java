@@ -14,15 +14,9 @@ public class ContributionResponseDTOBuilder {
 
     public static ContributionResponseDTO build(final CorrespondenceRuleAndTemplateInfo request) {
 
-        log.info("id--"+ request.getId());
-        log.info("Calc contribs--"+ request.getCalcContribs());
-        log.info(" Description--"+ request.getDescription());
-        log.info("CotyCorrespondenceType--"+ request.getCotyCorrespondenceType());
-        log.info("UpliftCoteId--"+ request.getUpliftCoteId());
-        log.info("ReassessmentCoteId--"+ request.getReassessmentCoteId());
         ContributionResponseDTO.ContributionResponseDTOBuilder builder = ContributionResponseDTO.builder()
                 .id(request.getId())
-                .calcContribution(request.getCalcContribs())
+                .calcContribs(request.getCalcContribs())
                 .templateDesc(request.getDescription())
                 .correspondenceType(request.getCotyCorrespondenceType())
                 .upliftCote(request.getUpliftCoteId())

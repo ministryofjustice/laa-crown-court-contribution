@@ -168,7 +168,8 @@ public class MaatCalculateContributionService {
         String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
 
         String outcome = null;
-        if (null != calculateContributionDTO.getCrownCourtOutcomeList() && calculateContributionDTO.getCrownCourtOutcomeList().size() > 0) {
+        if (null != calculateContributionDTO.getCrownCourtOutcomeList()
+                && calculateContributionDTO.getCrownCourtOutcomeList().size() > 0) {
             log.info("getCrownCourtOutcomeList");
             ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
             log.info("apiCrownCourtOutcome--"+apiCrownCourtOutcome);
