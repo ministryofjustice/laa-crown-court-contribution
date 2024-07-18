@@ -68,17 +68,6 @@ public class MaatCourtDataService {
         return response;
     }
 
-    public BigDecimal getContributionAppealAmount(GetContributionAmountRequest request) {
-        BigDecimal response = maatAPIClient.get(
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getContributionEndpoints().getGetAppealAmountUrl(),
-                request.getCaseType(), request.getAppealType(), request.getOutcome(), request.getAssessmentResult()
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
     public CorrespondenceState findCorrespondenceState(Integer repId) {
         CorrespondenceState response = maatAPIClient.get(
                 new ParameterizedTypeReference<>() {
