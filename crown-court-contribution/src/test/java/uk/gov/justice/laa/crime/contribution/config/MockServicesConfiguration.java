@@ -20,14 +20,15 @@ public class MockServicesConfiguration {
 
         ServicesConfiguration.MaatApi.CorrespondenceStateEndpoints correspondenceStateEndpoints =
                 new ServicesConfiguration.MaatApi.CorrespondenceStateEndpoints(
-                        "/correspondence-state", "/correspondence-state/{repId}"
+                        "rep-orders/{repId}/correspondence-state"
                 );
 
         ServicesConfiguration.MaatApi.RepOrderEndpoints repOrderEndpoints =
                 new ServicesConfiguration.MaatApi.RepOrderEndpoints("/rep-orders/cc-outcome/reporder/{repId}");
 
         ServicesConfiguration.HardshipApi.HardshipEndpoints hardshipEndpoints =
-                new ServicesConfiguration.HardshipApi.HardshipEndpoints("/api/internal/v1/hardship/calculate-hardship-for-detail");
+                new ServicesConfiguration.HardshipApi.HardshipEndpoints(
+                        "/api/internal/v1/hardship/calculate-hardship-for-detail");
 
         maatApiConfiguration.setBaseUrl(host);
         servicesConfiguration.setMaatApi(maatApiConfiguration);
