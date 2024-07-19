@@ -47,6 +47,7 @@ public class CalculateContributionDTO {
     private String removeContribs;
     private LocalDate committalDate;
     private String applicationStatus;
+    private Integer totalMonths;
     private List<ApiCrownCourtOutcome> crownCourtOutcomeList;
     private BigDecimal disposableIncomeAfterCrownHardship;
     private BigDecimal disposableIncomeAfterMagHardship;
