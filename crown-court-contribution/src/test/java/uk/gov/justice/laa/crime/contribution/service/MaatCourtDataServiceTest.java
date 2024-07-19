@@ -72,27 +72,6 @@ class MaatCourtDataServiceTest {
     }
 
     @Test
-    void givenValidParams_whenGetContributionAppealAmountIsInvoked_thenResponseIsReturned() {
-        GetContributionAmountRequest expected = new GetContributionAmountRequest()
-                .withCaseType(CaseType.APPEAL_CC)
-                .withAppealType(AppealType.ACN)
-                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withAssessmentResult(AssessmentResult.PASS);
-
-        maatCourtDataService.getContributionAppealAmount(expected);
-
-        verify(maatCourtDataClient).get(
-                eq(new ParameterizedTypeReference<BigDecimal>() {
-                }),
-                anyString(),
-                any(CaseType.class),
-                any(AppealType.class),
-                any(CrownCourtAppealOutcome.class),
-                any(AssessmentResult.class)
-        );
-    }
-
-    @Test
     void givenValidRepId_whenFindCorrespondenceStateIsInvoked_thenResponseIsReturned() {
         maatCourtDataService.findCorrespondenceState(TEST_REP_ID);
         verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<CorrespondenceState>() {

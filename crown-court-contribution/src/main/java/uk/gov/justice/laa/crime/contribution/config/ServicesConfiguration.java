@@ -50,9 +50,6 @@ public class ServicesConfiguration {
             private String summaryUrl;
 
             @NotNull
-            private String getAppealAmountUrl;
-
-            @NotNull
             private String getRepOrderUrl;
 
             @NotNull
