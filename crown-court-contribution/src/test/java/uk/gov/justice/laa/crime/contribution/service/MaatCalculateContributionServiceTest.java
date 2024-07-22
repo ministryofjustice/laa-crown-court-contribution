@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
@@ -976,6 +977,8 @@ class MaatCalculateContributionServiceTest {
     void givenATemplateAndContributionsAreCreated_whenDoContribsIsInvoked_thenProcessActivityFlagIsTrue() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
 
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
+
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .template(1)
                 .build();
@@ -986,11 +989,14 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(new ApiCalculateContributionResponse()
                         .withMonthlyContributions(BigDecimal.TEN)
                 );
+
+        when(maatCourtDataService.createContribution(any()))
+                .thenReturn(Contribution.builder().build());
+
         when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any()))
                 .thenReturn(maatCalculateContributionResponse);
-        when(maatCalculateContributionService.verifyAndCreateContribs(
-                calculateContributionDTO, null, maatCalculateContributionResponse
-        )).thenReturn(new Contribution());
+
+
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
                         .totalMonths(2)
@@ -1001,7 +1007,7 @@ class MaatCalculateContributionServiceTest {
                 calculateContributionDTO,
                 contributionResponseDTO,
                 null,
-                null
+                repOrderDTO
         );
 
         assertThat(response.getProcessActivity()).isTrue();
@@ -1010,6 +1016,7 @@ class MaatCalculateContributionServiceTest {
     @Test
     void givenATemplateAndContributionsAreNotCreated_whenDoContribsIsInvoked_thenProcessActivityFlagIsNull() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
 
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .template(1)
@@ -1023,9 +1030,7 @@ class MaatCalculateContributionServiceTest {
                 );
         when(maatCalculateContributionResponseMapper.map(any(), any(), any(), any()))
                 .thenReturn(maatCalculateContributionResponse);
-        when(maatCalculateContributionService.verifyAndCreateContribs(
-                calculateContributionDTO, null, maatCalculateContributionResponse
-        )).thenReturn(null);
+
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
                         .totalMonths(2)
@@ -1036,7 +1041,7 @@ class MaatCalculateContributionServiceTest {
                 calculateContributionDTO,
                 contributionResponseDTO,
                 null,
-                null
+                repOrderDTO
         );
 
         assertThat(response.getProcessActivity()).isNull();

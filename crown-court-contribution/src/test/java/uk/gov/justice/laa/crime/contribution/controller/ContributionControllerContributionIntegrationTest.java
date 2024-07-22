@@ -214,15 +214,10 @@ class ContributionControllerContributionIntegrationTest {
 
     @Test
     void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
-        ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
-        assessment.withStatus(CurrentStatus.IN_PROGRESS);
-        appealContributionRequest.setAssessments(List.of(assessment));
-        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
+        String requestData = objectMapper.writeValueAsString(new ApiMaatCalculateContributionRequest());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

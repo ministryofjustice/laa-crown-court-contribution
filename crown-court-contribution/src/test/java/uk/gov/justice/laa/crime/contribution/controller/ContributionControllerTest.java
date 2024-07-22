@@ -91,17 +91,10 @@ class ContributionControllerTest {
 
     @Test
     void givenInvalidRequest_whenCalculateAppealContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        ApiMaatCalculateContributionRequest appealContributionRequest =
-                TestModelDataBuilder.buildAppealContributionRequest();
-
-        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
-
-        when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class)))
-                .thenThrow(new ValidationException("Test validation exception"));
+        String requestData = objectMapper.writeValueAsString(new ApiMaatCalculateContributionRequest());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

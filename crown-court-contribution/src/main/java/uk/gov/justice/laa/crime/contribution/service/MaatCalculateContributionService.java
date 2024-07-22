@@ -170,11 +170,8 @@ public class MaatCalculateContributionService {
         String outcome = null;
         if (null != calculateContributionDTO.getCrownCourtOutcomeList()
                 && calculateContributionDTO.getCrownCourtOutcomeList().size() > 0) {
-            log.info("getCrownCourtOutcomeList");
             ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
-            log.info("apiCrownCourtOutcome--"+apiCrownCourtOutcome);
             if (null !=apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
-                log.info("apiCrownCourtOutcome--"+ apiCrownCourtOutcome.getOutcome());
                 outcome = apiCrownCourtOutcome.getOutcome().getCode();
             }
         }
@@ -252,22 +249,24 @@ public class MaatCalculateContributionService {
     public Contribution verifyAndCreateContribs(final CalculateContributionDTO calculateContributionDTO,
                                                 final RepOrderDTO repOrderDTO,
                                                 final ApiMaatCalculateContributionResponse response) {
-
         log.info("start verifyAndCreateContribs");
         if ((calculateContributionDTO.getMonthlyContributions() != null
                 && response.getMonthlyContributions()
                 .compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (response.getEffectiveDate() != null && !response.getEffectiveDate().toLocalDate()
                 .equals(calculateContributionDTO.getEffectiveDate()))) {
-            return createContribs(calculateContributionDTO);
+                 ContributionDTOBuilder.build(calculateContributionDTO, response);
+                 return createContribs(calculateContributionDTO);
         } else {
             if (isCreateContributionRequired(calculateContributionDTO, repOrderDTO)) {
+                ContributionDTOBuilder.build(calculateContributionDTO, response);
                 return createContribs(calculateContributionDTO);
             }
         }
         log.info("end verifyAndCreateContribs");
         return null;
     }
+
 
     public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO) {
         final Integer contributionId = calculateContributionDTO.getContributionId();
