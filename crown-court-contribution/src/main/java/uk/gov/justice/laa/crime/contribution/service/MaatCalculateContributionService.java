@@ -169,7 +169,7 @@ public class MaatCalculateContributionService {
 
         String outcome = null;
         if (null != calculateContributionDTO.getCrownCourtOutcomeList()
-                && calculateContributionDTO.getCrownCourtOutcomeList().size() > 0) {
+                && !calculateContributionDTO.getCrownCourtOutcomeList().isEmpty()) {
             ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
             if (null !=apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
                 outcome = apiCrownCourtOutcome.getOutcome().getCode();
