@@ -74,9 +74,6 @@ class ContributionControllerContributionIntegrationTest {
     @Value("${services.maat-api.contribution-endpoints.summary-url}")
     private String summaryUrl;
 
-    @Value("${services.maat-api.contribution-endpoints.get-appeal-amount-url}")
-    private String getAppealAmountUrl;
-
     @Value("${services.maat-api.contribution-endpoints.find-url}")
     private String findContributionUrl;
 
@@ -125,21 +122,6 @@ class ContributionControllerContributionIntegrationTest {
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                                 .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getRepOrderDTO()))
-                )
-        );
-
-        var appealAmountUrl = UriComponentsBuilder.fromUriString(getAppealAmountUrl).build(
-                appealContributionRequest.getCaseType(),
-                appealContributionRequest.getAppealType().getCode(),
-                appealContributionRequest.getLastOutcome().getOutcome().getValue(),
-                appealContributionRequest.getAssessments().get(0).getResult().toString()
-        );
-
-        wiremock.stubFor(get(appealAmountUrl.getPath())
-                .willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(BigDecimal.ZERO))
                 )
         );
 
