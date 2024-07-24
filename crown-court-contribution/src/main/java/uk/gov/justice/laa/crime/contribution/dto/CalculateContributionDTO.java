@@ -8,9 +8,9 @@ import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.AppealType;
-import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

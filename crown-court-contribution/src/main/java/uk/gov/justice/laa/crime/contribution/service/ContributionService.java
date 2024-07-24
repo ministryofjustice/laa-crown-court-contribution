@@ -37,15 +37,25 @@ public class ContributionService {
     private final MaatCourtDataService maatCourtDataService;
 
     protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
-        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments()
-                .stream().filter(passportAssessmentDTO -> Constants.Y.equals(passportAssessmentDTO.getReplaced())).toList());
+        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(
+                repOrderDTO.getPassportAssessments()
+                        .stream()
+                        .filter(passportAssessmentDTO -> Constants.Y.equals(
+                                passportAssessmentDTO.getReplaced()))
+                        .toList()
+        );
         passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
         return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
     }
 
     protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
-        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(repOrderDTO.getFinancialAssessments()
-                .stream().filter(financialAssessmentDTO -> Constants.N.equals(financialAssessmentDTO.getReplaced())).toList());
+        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(
+                repOrderDTO.getFinancialAssessments()
+                        .stream()
+                        .filter(financialAssessmentDTO -> Constants.N.equals(
+                                financialAssessmentDTO.getReplaced()))
+                        .toList()
+        );
         financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
         return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
     }
@@ -73,7 +83,7 @@ public class ContributionService {
         } else {
             if (StringUtils.isBlank(request.getFullResult())) {
                 response.setMeansResult(StringUtils.isBlank(request.getInitResult()) ? Constants.NONE
-                        : Constants.INIT.concat(request.getInitResult()));
+                                                : Constants.INIT.concat(request.getInitResult()));
             } else {
                 response.setMeansResult(request.getFullResult());
             }
@@ -123,18 +133,19 @@ public class ContributionService {
             } else {
                 log.info("processedCases has value");
                 contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
-                log.info("contributionResponseDTO--->"+ contributionResponseDTO);
+                log.info("contributionResponseDTO--->" + contributionResponseDTO);
                 contributionResponse.setId(contributionResponseDTO.getId());
                 contributionResponse.setCalcContribs(contributionResponseDTO.getCalcContribs());
                 contributionResponse.setTemplateDesc(contributionResponseDTO.getTemplateDesc());
                 contributionResponse.setCorrespondenceType(contributionResponseDTO.getCorrespondenceType());
                 contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
                 contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());
-                CorrespondenceType correspondenceType = CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
+                CorrespondenceType correspondenceType =
+                        CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
                 if (correspondenceType != null) {
                     contributionResponse.setCorrespondenceTypeDesc(correspondenceType.getDescription());
                 }
-                log.info("contributionResponse--->"+ contributionResponse);
+                log.info("contributionResponse--->" + contributionResponse);
             }
         }
         log.info("FullResult --" + request.getFullResult());

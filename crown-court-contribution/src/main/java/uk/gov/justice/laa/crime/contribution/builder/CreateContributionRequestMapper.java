@@ -2,9 +2,10 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 
 import java.math.BigDecimal;
 
@@ -51,5 +52,22 @@ public class CreateContributionRequestMapper {
                 .withTransferStatus(calculateContributionDTO.getTransferStatus())
                 .withUserCreated(calculateContributionDTO.getUserCreated())
                 .withUpfrontContributions(calculateContributionDTO.getUpfrontContributions());
+    }
+
+    public CreateContributionRequest map(CalculateContributionDTO calculateContributionDTO, ContributionResult result) {
+        return new CreateContributionRequest()
+                .withRepId(calculateContributionDTO.getRepId())
+                .withApplId(calculateContributionDTO.getApplId())
+                .withContributionCap(result.contributionCap())
+                .withEffectiveDate(convertDateToDateTime(result.effectiveDate()))
+                .withMonthlyContributions(result.monthlyAmount())
+                .withUpliftApplied(result.isUplift() ? "Y" : "N")
+                .withBasedOn(result.basedOn())
+                .withCreateContributionOrder(calculateContributionDTO.getCreateContributionOrder())
+                .withCalcDate(convertDateToDateTime(calculateContributionDTO.getCalcDate()))
+                .withDateUpliftApplied(convertDateToDateTime(calculateContributionDTO.getDateUpliftApplied()))
+                .withDateUpliftRemoved(convertDateToDateTime(calculateContributionDTO.getDateUpliftRemoved()))
+                .withUserCreated(calculateContributionDTO.getUserCreated())
+                .withUpfrontContributions(result.upfrontAmount());
     }
 }
