@@ -34,7 +34,6 @@ public class AppealContributionService {
                 return AssessmentResult.PASS;
             }
         }
-
         return AssessmentResult.FAIL;
     }
 
@@ -53,7 +52,7 @@ public class AppealContributionService {
 
         Integer repId = calculateContributionDTO.getRepId();
         List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, true);
-        if (null !=currContributionList && CollectionUtils.isNotEmpty(currContributionList)) {
+        if (CollectionUtils.isNotEmpty(currContributionList)) {
             Contribution currContribution = currContributionList.get(0);
             if (currContribution.getUpfrontContributions() == null
                     || (appealContributionAmount == null
