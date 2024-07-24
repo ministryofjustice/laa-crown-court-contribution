@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
@@ -14,12 +14,8 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.enums.contribution.CorrespondenceStatus;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -28,10 +24,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MaatCourtDataService {
 
-    private static final String RESPONSE_STRING = "Response from Court Data API: {}";
     @Qualifier("maatApiClient")
     private final RestAPIClient maatAPIClient;
     private final ServicesConfiguration configuration;
+
+    private static final String RESPONSE_STRING = "Response from Court Data API: {}";
+
 
     public List<Contribution> findContribution(Integer repId, Boolean findLatestContribution) {
         List<Contribution> response = maatAPIClient.get(
@@ -68,36 +66,39 @@ public class MaatCourtDataService {
         return response;
     }
 
-    public CorrespondenceState findCorrespondenceState(Integer repId) {
-        CorrespondenceState response = maatAPIClient.get(
+    public CorrespondenceStatus findCorrespondenceState(int repId) {
+        CorrespondenceStatus response = maatAPIClient.get(
+
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getMaatApi().getCorrespondenceStateEndpoints().getFindUrl(),
+                configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
                 repId
         );
         log.info(RESPONSE_STRING, response);
         return response;
     }
 
-    public CorrespondenceState createCorrespondenceState(CorrespondenceState state) {
-        CorrespondenceState response = maatAPIClient.post(
+    public CorrespondenceStatus createCorrespondenceState(int repId, CorrespondenceStatus state) {
+        CorrespondenceStatus response = maatAPIClient.post(
                 state,
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
-                Map.of()
+                Map.of(),
+                repId
         );
         log.info(RESPONSE_STRING, response);
         return response;
     }
 
-    public CorrespondenceState updateCorrespondenceState(CorrespondenceState state) {
-        CorrespondenceState response = maatAPIClient.put(
+    public CorrespondenceStatus updateCorrespondenceState(int repId, CorrespondenceStatus state) {
+        CorrespondenceStatus response = maatAPIClient.put(
                 state,
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
-                Map.of()
+                Map.of(),
+                repId
         );
         log.info(RESPONSE_STRING, response);
         return response;

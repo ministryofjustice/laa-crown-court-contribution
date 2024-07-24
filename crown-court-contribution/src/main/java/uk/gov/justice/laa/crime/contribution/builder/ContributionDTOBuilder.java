@@ -3,9 +3,12 @@ package uk.gov.justice.laa.crime.contribution.builder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
+
+import java.time.LocalDate;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -33,6 +36,19 @@ public class ContributionDTOBuilder {
                 .disposableIncomeAfterCrownHardship(request.getDisposableIncomeAfterCrownHardship())
                 .disposableIncomeAfterMagHardship(request.getDisposableIncomeAfterMagHardship())
                 .totalAnnualDisposableIncome(request.getTotalAnnualDisposableIncome())
+                .userCreated(request.getUserCreated())
+                .calcDate(LocalDate.now())
                 .build();
+    }
+
+    public static void build(final CalculateContributionDTO contributionDTO,
+                             final ApiMaatCalculateContributionResponse response) {
+
+        contributionDTO.setContributionCap(response.getContributionCap());
+        contributionDTO.setEffectiveDate(DateUtil.parseLocalDate(response.getEffectiveDate()));
+        contributionDTO.setMonthlyContributions(response.getMonthlyContributions());
+        contributionDTO.setUpfrontContributions(response.getUpfrontContributions());
+        contributionDTO.setUpliftApplied(response.getUpliftApplied());
+        contributionDTO.setBasedOn(response.getBasedOn());
     }
 }

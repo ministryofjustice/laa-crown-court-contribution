@@ -12,13 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionDTOBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
@@ -55,11 +55,11 @@ public class ContributionController {
             )
             @Valid @RequestBody
             ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {
-
-        log.info("Received request to calculate contributions for ID {}", maatCalculateContributionRequest.getRepId());
-        calculateContributionValidator.validate(maatCalculateContributionRequest);
+        log.info("Contributions - {}", maatCalculateContributionRequest);
         CalculateContributionDTO calculateContributionDTO = preProcessRequest(maatCalculateContributionRequest);
-        return ResponseEntity.ok(maatCalculateContributionService.calculateContribution(calculateContributionDTO));
+        ApiMaatCalculateContributionResponse response = maatCalculateContributionService.calculateContribution(calculateContributionDTO);
+        log.info("calculateContribution response - {}", response);
+        return ResponseEntity.ok(response);
     }
 
     private CalculateContributionDTO preProcessRequest(ApiMaatCalculateContributionRequest maatCalculateContributionRequest) {

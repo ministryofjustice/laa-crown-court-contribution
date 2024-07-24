@@ -82,6 +82,10 @@ public class ContributionService {
 
     @Transactional
     public ContributionResponseDTO checkContribsCondition(ContributionRequestDTO request) {
+        log.info("Checking contribution conditions ");
+        log.info("Checking contribution conditions - Monthly Contribs: {}", request.getMonthlyContribs());
+        log.info("Checking contribution request " + request);
+
         ContributionResponseDTO contributionResponseDTO;
         AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
 
@@ -89,51 +93,74 @@ public class ContributionService {
         contributionResponse.setDoContribs(Constants.N);
         contributionResponse.setCalcContribs(Constants.N);
 
+        log.info("Contribution response before: {}", contributionResponse);
+
         AssessmentResponseDTO assessmentResponseDTO = getAssessmentResult(assessmentRequestDTO);
         request.setIojResult(assessmentResponseDTO.getIojResult());
         request.setMeansResult(assessmentResponseDTO.getMeansResult());
-
+        log.info("Case type: {}", request.getCaseType());
         if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY).contains(request.getCaseType())
                 || request.getEffectiveDate() != null
                 || (CaseType.APPEAL_CC.equals(request.getCaseType()) && PASS.equals(request.getIojResult()))) {
             contributionResponse.setDoContribs(Constants.Y);
         }
+        log.info("DoContribs: {}", contributionResponse.getDoContribs());
 
         if (contributionResponse.getDoContribs().equals(Constants.Y)) {
+            log.info("MeansResult --" + request.getMeansResult());
+            log.info("IojResult --" + request.getIojResult());
+            log.info("MagCourtOutcome --" + request.getMagCourtOutcome());
+            log.info("CrownCourtOutcome --" + request.getCrownCourtOutcome());
+            log.info("InitResult --" + request.getInitResult());
             CorrespondenceRuleAndTemplateInfo processedCases = getCoteInfo(request);
+            log.info("processedCases --" + processedCases);
             if (processedCases == null) {
                 contributionResponse.setDoContribs(Constants.N);
                 contributionResponse.setCalcContribs(Constants.N);
+                log.info("DoContribs --" + contributionResponse.getDoContribs());
+                log.info("CalcContribs --" + contributionResponse.getCalcContribs());
             } else {
+                log.info("processedCases has value");
                 contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
+                log.info("contributionResponseDTO--->"+ contributionResponseDTO);
                 contributionResponse.setId(contributionResponseDTO.getId());
                 contributionResponse.setCalcContribs(contributionResponseDTO.getCalcContribs());
                 contributionResponse.setTemplateDesc(contributionResponseDTO.getTemplateDesc());
+                contributionResponse.setTemplate(contributionResponseDTO.getId());
                 contributionResponse.setCorrespondenceType(contributionResponseDTO.getCorrespondenceType());
                 contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
                 contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());
-                contributionResponse.setDoContribs(contributionResponseDTO.getDoContribs());
                 CorrespondenceType correspondenceType = CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
                 if (correspondenceType != null) {
                     contributionResponse.setCorrespondenceTypeDesc(correspondenceType.getDescription());
                 }
+                log.info("contributionResponse--->"+ contributionResponse);
             }
         }
-
-        if (INEL.equals(request.getFullResult()) ||
-                (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0)) {
+        log.info("FullResult --" + request.getFullResult());
+        if (INEL.equals(request.getFullResult())) {
             contributionResponse.setDoContribs(Constants.Y);
         }
+        log.info("DoContribs after INEL check--" + contributionResponse.getDoContribs());
 
+        if ( request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0) {
+            contributionResponse.setDoContribs(Constants.Y);
+        }
+        log.info("DoContribs after MonthlyContribs check--" + contributionResponse.getDoContribs());
+        log.info("Remove Contrib--" + request.getRemoveContribs());
         if (Constants.Y.equals(request.getRemoveContribs())) {
             contributionResponse.setCalcContribs(Constants.N);
         }
+
+        log.info("Final Value for DoContribs is: {}", contributionResponse.getDoContribs());
+        log.info("Final Value for CalcContribs is: {}", contributionResponse.getCalcContribs());
 
         return contributionResponse;
     }
 
     @Transactional
     public CorrespondenceRuleAndTemplateInfo getCoteInfo(ContributionRequestDTO contributionRequestDTO) {
+        log.info("CorrespondenceRuleAndTemplateInfo: {}", contributionRequestDTO);
         return correspondenceRuleRepository.getCoteInfo(
                 contributionRequestDTO.getMeansResult(),
                 contributionRequestDTO.getIojResult(),

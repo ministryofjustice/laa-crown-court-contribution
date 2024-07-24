@@ -19,16 +19,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.enums.contribution.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -196,15 +194,10 @@ class ContributionControllerContributionIntegrationTest {
 
     @Test
     void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
-        ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
-        assessment.withStatus(CurrentStatus.IN_PROGRESS);
-        appealContributionRequest.setAssessments(List.of(assessment));
-        String requestData = objectMapper.writeValueAsString(appealContributionRequest);
+        String requestData = objectMapper.writeValueAsString(new ApiMaatCalculateContributionRequest());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

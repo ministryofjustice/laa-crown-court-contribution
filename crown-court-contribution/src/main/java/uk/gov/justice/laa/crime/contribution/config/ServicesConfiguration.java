@@ -62,9 +62,6 @@ public class ServicesConfiguration {
         public static class CorrespondenceStateEndpoints {
             @NotNull
             private String baseUrl;
-
-            @NotNull
-            private String findUrl;
         }
 
         @Data

@@ -123,6 +123,6 @@ class AppealContributionServiceTest {
                 .thenReturn(null);
         ApiMaatCalculateContributionResponse response =
                 appealContributionService.calculateAppealContribution(calculateContributionDTO);
-        assertThat(response).isNull();
+        assertThat(response.getContributionId()).isNull();
     }
 }

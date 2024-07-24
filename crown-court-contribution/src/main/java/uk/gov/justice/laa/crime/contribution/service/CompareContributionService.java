@@ -7,10 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.contribution.model.CorrespondenceState;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceStatus;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.contribution.CorrespondenceStatus;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,11 +27,18 @@ public class CompareContributionService {
 
     @Transactional
     public int compareContribution(CalculateContributionDTO calculateContributionDTO) {
+        log.info("Start  compareContribution");
         int repId = calculateContributionDTO.getRepId();
         RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, false);
-        List<Contribution> activeContribution = Optional.ofNullable(contributions).orElse(Collections.emptyList()).stream()
-                .filter(isActiveContribution(repId)).toList();
+        log.info(" compareContribution.contributions--" + contributions);
+
+        List<Contribution> activeContribution =
+                Optional.ofNullable(contributions)
+                        .orElse(Collections.emptyList()).stream()
+                        .filter(isActiveContribution(repId)).toList();
+
+        log.info(" compareContribution.activeContribution--" + activeContribution);
         if (activeContribution.isEmpty()) {
             return getResultOnNoPreviousContribution(repOrderDTO, repId);
         }
@@ -41,43 +47,53 @@ public class CompareContributionService {
 
     private int getResultOnNoPreviousContribution(RepOrderDTO repOrderDTO, int repId) {
         if (isCaseTypeAppealCC(repOrderDTO)) {
-            setCorrespondenceStatus(CorrespondenceStatus.APPEAL_CC.getStatus(), repId);
+            setCorrespondenceStatus(repId, CorrespondenceStatus.APPEAL_CC);
         }
         if (isCds15WorkAround(repOrderDTO)) {
-            setCorrespondenceStatus(CorrespondenceStatus.CDS15.getStatus(), repId);
+            setCorrespondenceStatus(repId, CorrespondenceStatus.CDS15);
         }
         return 0;
     }
 
-    private int getResultOnActiveContribution(CalculateContributionDTO calculateContributionDTO, RepOrderDTO repOrderDTO, int repId, List<Contribution> contributions) {
+    private int getResultOnActiveContribution(CalculateContributionDTO calculateContributionDTO,
+                                              RepOrderDTO repOrderDTO, int repId, List<Contribution> contributions) {
         int result = 2;
         Contribution contribution = contributions.get(0);
         if (contributionRecordsAreIdentical(calculateContributionDTO, contribution)) {
             result = getResultOnIdenticalContributions(calculateContributionDTO, repOrderDTO, repId);
         }
+        log.info("getResultOnActiveContribution.result--" + result);
         return result;
     }
 
-    private int getResultOnIdenticalContributions(CalculateContributionDTO calculateContributionDTO, RepOrderDTO repOrderDTO, int repId) {
-        CorrespondenceState status = maatCourtDataService.findCorrespondenceState(repId);
+    private int getResultOnIdenticalContributions(CalculateContributionDTO calculateContributionDTO,
+                                                  RepOrderDTO repOrderDTO, int repId) {
+        CorrespondenceStatus status = maatCourtDataService.findCorrespondenceState(repId);
+
+        if (status == null) {
+            status = CorrespondenceStatus.NONE;
+        }
+
         MagCourtOutcome magCourtOutcome = calculateContributionDTO.getMagCourtOutcome();
-        String mcooOutcome = magCourtOutcome == null ? null : magCourtOutcome.getOutcome();
-        if (magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(repOrderDTO, status, mcooOutcome)) {
-            setCorrespondenceStatus(CorrespondenceStatus.APPEAL_CC.getStatus(), repId);
+        String magsOutcome = magCourtOutcome == null ? null : magCourtOutcome.getOutcome();
+        if (magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(repOrderDTO, status, magsOutcome)) {
+            setCorrespondenceStatus(repId, CorrespondenceStatus.APPEAL_CC);
             return 1;
         }
         return getResultOnAppealToCCOrCds15WorkAroundOrReassessment(repOrderDTO, repId, status);
     }
 
-    private int getResultOnAppealToCCOrCds15WorkAroundOrReassessment(RepOrderDTO repOrderDTO, int repId, CorrespondenceState status) {
+    private int getResultOnAppealToCCOrCds15WorkAroundOrReassessment(RepOrderDTO repOrderDTO, int repId,
+                                                                     CorrespondenceStatus status) {
         if (isStatusAppealCC(status)) {
-            setCorrespondenceStatus(CorrespondenceStatus.NONE.getStatus(), repId);
+            setCorrespondenceStatus(repId, CorrespondenceStatus.NONE);
             return 2;
         }
         return getResultOnCds15EWorkAroundOrReassessment(repOrderDTO, repId, status);
     }
 
-    private int getResultOnCds15EWorkAroundOrReassessment(RepOrderDTO repOrderDTO, int repId, CorrespondenceState status) {
+    private int getResultOnCds15EWorkAroundOrReassessment(RepOrderDTO repOrderDTO, int repId,
+                                                          CorrespondenceStatus status) {
         int result = 2;
         if (isCds15WorkAround(repOrderDTO)) {
             result = getResultOnCds15WorkAround(repId, status);
@@ -85,13 +101,13 @@ public class CompareContributionService {
         return result;
     }
 
-    private int getResultOnCds15WorkAround(int repId, CorrespondenceState status) {
+    private int getResultOnCds15WorkAround(int repId, CorrespondenceStatus status) {
         int result = 2;
         if (isStatusCds15(status)) {
-            setCorrespondenceStatus(CorrespondenceStatus.NONE.getStatus(), repId);
+            setCorrespondenceStatus(repId, CorrespondenceStatus.NONE);
         } else if (isStatusReass(status)) {
             result = 1;
-            setCorrespondenceStatus(CorrespondenceStatus.CDS15.getStatus(), repId);
+            setCorrespondenceStatus(repId, CorrespondenceStatus.CDS15);
         }
         return result;
     }
@@ -104,33 +120,37 @@ public class CompareContributionService {
         return contributionService.isCds15WorkAround(repOrderDTO);
     }
 
-    private static boolean isStatusCds15(CorrespondenceState status) {
+    private static boolean isStatusCds15(CorrespondenceStatus status) {
         return CorrespondenceStatus.CDS15.getStatus().equals(status.getStatus());
     }
 
-    private static boolean isStatusAppealCC(CorrespondenceState status) {
+    private static boolean isStatusAppealCC(CorrespondenceStatus status) {
         return CorrespondenceStatus.APPEAL_CC.getStatus().equals(status.getStatus());
     }
 
-    private static boolean isStatusReass(CorrespondenceState status) {
+    private static boolean isStatusReass(CorrespondenceStatus status) {
         return CorrespondenceStatus.REASS.getStatus().equals(status.getStatus());
     }
 
-    private void setCorrespondenceStatus(String statusAppealCc, int repId) {
-        CorrespondenceState correspondenceState = CorrespondenceState.builder().status(statusAppealCc).repId(repId).build();
-        maatCourtDataService.updateCorrespondenceState(correspondenceState);
+    private void setCorrespondenceStatus(int repId, CorrespondenceStatus status) {
+        maatCourtDataService.updateCorrespondenceState(repId, status);
     }
 
-    private boolean magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(RepOrderDTO repOrderDTO, CorrespondenceState status, String mcooOutcome) {
+    private boolean magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(RepOrderDTO repOrderDTO,
+                                                                                        CorrespondenceStatus status,
+                                                                                        String mcooOutcome) {
         return contributionService.hasMessageOutcomeChanged(mcooOutcome, repOrderDTO) ||
                 (isCaseTypeAppealCC(repOrderDTO)
                         && isStatusAppealCC(status));
     }
 
-    private static boolean contributionRecordsAreIdentical(CalculateContributionDTO compareContributionDTO, Contribution contribution) {
+    private static boolean contributionRecordsAreIdentical(CalculateContributionDTO compareContributionDTO,
+                                                           Contribution contribution) {
         return contribution.getContributionCap().compareTo(compareContributionDTO.getContributionCap()) == 0 &&
-                contribution.getUpfrontContributions().compareTo(compareContributionDTO.getUpfrontContributions()) == 0 &&
-                contribution.getMonthlyContributions().compareTo(compareContributionDTO.getMonthlyContributions()) == 0 &&
+                contribution.getUpfrontContributions()
+                        .compareTo(compareContributionDTO.getUpfrontContributions()) == 0 &&
+                contribution.getMonthlyContributions()
+                        .compareTo(compareContributionDTO.getMonthlyContributions()) == 0 &&
                 contribution.getEffectiveDate().isEqual(compareContributionDTO.getEffectiveDate());
     }
 

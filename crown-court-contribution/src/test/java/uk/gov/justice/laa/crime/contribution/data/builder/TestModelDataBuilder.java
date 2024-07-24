@@ -13,7 +13,7 @@ import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRules
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
-import uk.gov.justice.laa.crime.enums.contribution.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

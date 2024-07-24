@@ -17,7 +17,7 @@ public class AssessmentRequestDTOBuilder {
                 .initResult(request.getInitResult())
                 .fullResult(request.getFullResult())
                 .hardshipResult(request.getHardshipResult())
-                .passportResult(request.getFullResult());
+                .passportResult(request.getPassportResult());
 
         return builder.build();
 

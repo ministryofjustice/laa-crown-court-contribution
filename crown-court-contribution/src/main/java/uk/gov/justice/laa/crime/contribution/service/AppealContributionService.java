@@ -15,7 +15,7 @@ import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContrib
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealContributionAmount;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.enums.contribution.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,6 +40,7 @@ public class AppealContributionService {
     }
 
     public ApiMaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO) {
+        log.info("Start AppealContributionService.calculateAppealContribution()");
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
@@ -53,12 +54,13 @@ public class AppealContributionService {
 
         Integer repId = calculateContributionDTO.getRepId();
         List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, true);
-        if (CollectionUtils.isNotEmpty(currContributionList)) {
+        if (null !=currContributionList && CollectionUtils.isNotEmpty(currContributionList)) {
             Contribution currContribution = currContributionList.get(0);
             if (currContribution.getUpfrontContributions() == null
                     || (appealContributionAmount == null
                     || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0)) {
                 CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
+                log.info("createContributionRequest--->" + createContributionRequest);
                 Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
                 log.info("Contribution data has been updated");
                 return MaatCalculateContributionResponseBuilder.build(newContribution);
@@ -66,7 +68,8 @@ public class AppealContributionService {
             log.info("Contribution data is already up to date");
             return MaatCalculateContributionResponseBuilder.build(currContribution);
         }
-        return null;
+        log.info("End AppealContributionService.calculateAppealContribution()");
+        return new ApiMaatCalculateContributionResponse();
     }
 
 }

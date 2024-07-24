@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ContributionResponseDTO {
     private Integer id;
-    private String calcContribution;
     private String correspondenceType;
     private String correspondenceTypeDesc;
     private Integer upliftCote;

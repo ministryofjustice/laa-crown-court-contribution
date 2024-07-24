@@ -65,8 +65,7 @@ services:
       get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
       contribs-parameters-url: ${services.maat-api.assessments-domain}/contribution-calc-params/{effectiveDate}
     correspondence-state-endpoints:
-      base-url: ${services.maat-api.assessments-domain}/correspondence-state
-      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
+      base-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}/correspondence-state
     rep-order-endpoints:
       find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
   hardship-api:
