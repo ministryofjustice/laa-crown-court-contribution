@@ -226,7 +226,7 @@ public class MaatCalculateContributionService {
         ContributionResult result = null;
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
         if (Constants.Y.equals(contributionResponseDTO.getCalcContribution()) ||
-                contributionResponseDTO.getTemplate() != null ||
+                contributionResponseDTO.getId() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
                         .compareTo(BigDecimal.ZERO) > 0) ||
                 Constants.INEL.equals(fullResult)) {
@@ -252,8 +252,9 @@ public class MaatCalculateContributionService {
                 .withMonthlyContributions(result.monthlyAmount())
                 .withUpfrontContributions(result.upfrontAmount())
                 .withUpliftApplied(result.isUplift() ? "Y" : "N")
-                .withContributionId(createdContribution.getId())
-                .withCalcDate(DateUtil.convertDateToDateTime(createdContribution.getCalcDate()))
+                .withContributionId(createdContribution != null ? createdContribution.getId() : null)
+                .withCalcDate(createdContribution != null ? DateUtil.convertDateToDateTime(
+                        createdContribution.getCalcDate()) : null)
                 .withBasedOn(result.basedOn());
 
         if (contributionResponseDTO.getId() != null) {
@@ -275,7 +276,7 @@ public class MaatCalculateContributionService {
                                                 final ContributionResult result) {
 
         if (result != null && (shouldCreateContribs(result, calculateContributionDTO)
-                || isCreateContributionRequired(calculateContributionDTO, repOrderDTO))) {
+                || (repOrderDTO != null && isCreateContributionRequired(calculateContributionDTO, repOrderDTO)))) {
             return createContribs(calculateContributionDTO, result);
         }
         return null;
@@ -329,7 +330,7 @@ public class MaatCalculateContributionService {
         BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, crownCourtOutcome,
                                                                             isContributionRuleApplicable
         );
-        Integer totalMonths = Constants.N.equals(
+        int totalMonths = Constants.N.equals(
                 contributionResponseDTO.getCalcContribs()) ? 0 : contributionCalcParametersDTO.getTotalMonths();
 
         ApiCalculateContributionRequest apiCalculateContributionRequest =
