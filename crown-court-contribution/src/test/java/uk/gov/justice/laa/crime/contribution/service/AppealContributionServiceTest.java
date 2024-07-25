@@ -14,8 +14,10 @@ import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,24 +51,31 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
-
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.setResult(AssessmentResult.FAIL);
         calculateContributionDTO.setAssessments(List.of(assessment));
-
+        GetContributionAmountRequest getContributionAmountRequest =
+                new GetContributionAmountRequest()
+                        .withCaseType(CaseType.APPEAL_CC)
+                        .withAppealType(AppealType.ACS)
+                        .withOutcome(CrownCourtAppealOutcome.UNSUCCESSFUL)
+                        .withAssessmentResult(AssessmentResult.FAIL);
         Contribution currContribution = Contribution.builder().build();
-        currContribution.setUpfrontContributions(BigDecimal.valueOf(250));
-
+        currContribution.setUpfrontContributions(BigDecimal.valueOf(500));
         when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
-                .thenReturn(new GetContributionAmountRequest());
+                .thenReturn(getContributionAmountRequest);
+        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class)))
+                .thenReturn(BigDecimal.valueOf(250));
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
         when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
                 .thenReturn(TestModelDataBuilder.buildContribution());
+
         ApiMaatCalculateContributionResponse response =
                 appealContributionService.calculateAppealContribution(calculateContributionDTO);
+
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.valueOf(250));
         verify(maatCourtDataService, times(1))
                 .createContribution(any(CreateContributionRequest.class));
@@ -74,7 +83,6 @@ class AppealContributionServiceTest {
 
     @Test
     void givenAssessmentPassed_whenCalculateContributionIsInvoked_thenAppealContributionDataIsUpdated() {
-
         CalculateContributionDTO calculateContributionDTO =
                 TestModelDataBuilder.getContributionDTOForCompareContributionService(
                         CaseType.APPEAL_CC.getCaseTypeString(),
@@ -84,19 +92,28 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
+        GetContributionAmountRequest getContributionAmountRequest =
+                new GetContributionAmountRequest()
+                        .withCaseType(CaseType.APPEAL_CC)
+                        .withAppealType(AppealType.ACS)
+                        .withOutcome(CrownCourtAppealOutcome.UNSUCCESSFUL)
+                        .withAssessmentResult(AssessmentResult.PASS);
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
-
         when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
-                .thenReturn(new GetContributionAmountRequest());
+                .thenReturn(getContributionAmountRequest);
+        when(maatCourtDataService.getContributionAppealAmount(any(GetContributionAmountRequest.class)))
+                .thenReturn(BigDecimal.valueOf(250));
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
         when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
                 .thenReturn(TestModelDataBuilder.buildContribution());
+
         ApiMaatCalculateContributionResponse response =
                 appealContributionService.calculateAppealContribution(calculateContributionDTO);
+
         assertThat(response.getUpfrontContributions()).isEqualTo(BigDecimal.valueOf(250));
         verify(maatCourtDataService, times(1))
                 .createContribution(any(CreateContributionRequest.class));
