@@ -358,6 +358,19 @@ public class TestModelDataBuilder {
 
     }
 
+    public static ContributionResult getContributionResult() {
+        return ContributionResult.builder()
+                .totalAnnualDisposableIncome(BigDecimal.valueOf(16000.00))
+                .monthlyAmount(BigDecimal.valueOf(250.00))
+                .upfrontAmount(BigDecimal.valueOf(250.00))
+                .contributionCap(BigDecimal.valueOf(250.00))
+                .totalMonths(5)
+                .isUplift(false)
+                .basedOn("Means")
+                .effectiveDate(LocalDate.now())
+                .build();
+    }
+
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
         return RepOrderDTO.builder()
                 .id(123)

@@ -61,7 +61,7 @@ class AppealContributionServiceTest {
                 .thenReturn(new GetContributionAmountRequest());
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
-        when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any()))
+        when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
                 .thenReturn(TestModelDataBuilder.buildContribution());
@@ -91,7 +91,7 @@ class AppealContributionServiceTest {
                 .thenReturn(new GetContributionAmountRequest());
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
-        when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any()))
+        when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
                 .thenReturn(TestModelDataBuilder.buildContribution());
