@@ -137,6 +137,7 @@ public class ContributionService {
                 contributionResponse.setId(contributionResponseDTO.getId());
                 contributionResponse.setCalcContribs(contributionResponseDTO.getCalcContribs());
                 contributionResponse.setTemplateDesc(contributionResponseDTO.getTemplateDesc());
+                contributionResponse.setTemplate(contributionResponseDTO.getId());
                 contributionResponse.setCorrespondenceType(contributionResponseDTO.getCorrespondenceType());
                 contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
                 contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());

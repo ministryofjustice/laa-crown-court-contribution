@@ -13,7 +13,6 @@ public class MockServicesConfiguration {
                         "/contributions",
                         "/contributions/{repId}",
                         "/contributions/{repId}/summary",
-                        "/contribution-appeal",
                         "/rep-orders/{repId}",
                         "/contribution-calc-params/{effectiveDate}"
                 );

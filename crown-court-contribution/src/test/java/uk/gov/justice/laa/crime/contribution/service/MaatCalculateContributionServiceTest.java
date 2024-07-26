@@ -9,32 +9,30 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
-import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
-import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
-import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
+
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.enums.*;
 
 import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.COMMITTAL_DATE;
 import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.*;
+
+import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
+import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
+import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,6 +41,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -1081,6 +1080,8 @@ class MaatCalculateContributionServiceTest {
     void givenATemplateAndContributionsAreCreated_whenDoContributionsIsInvoked_thenProcessActivityFlagIsTrue() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
 
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
+
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .id(1)
                 .build();
@@ -1114,6 +1115,7 @@ class MaatCalculateContributionServiceTest {
     @Test
     void givenATemplateAndContributionsAreNotCreated_whenDoContributionsIsInvoked_thenProcessActivityFlagIsNull() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
 
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .calcContribs("Y")
@@ -1123,7 +1125,7 @@ class MaatCalculateContributionServiceTest {
                 calculateContributionDTO,
                 contributionResponseDTO,
                 null,
-                null
+                repOrderDTO
         );
 
         assertThat(response.getProcessActivity()).isNull();

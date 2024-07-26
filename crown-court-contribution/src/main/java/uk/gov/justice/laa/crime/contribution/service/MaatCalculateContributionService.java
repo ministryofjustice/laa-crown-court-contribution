@@ -171,11 +171,8 @@ public class MaatCalculateContributionService {
         String outcome = null;
         if (null != calculateContributionDTO.getCrownCourtOutcomeList()
                 && !calculateContributionDTO.getCrownCourtOutcomeList().isEmpty()) {
-            log.info("getCrownCourtOutcomeList");
             ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
-            log.info("apiCrownCourtOutcome--" + apiCrownCourtOutcome);
-            if (null != apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
-                log.info("apiCrownCourtOutcome--" + apiCrownCourtOutcome.getOutcome());
+            if (null !=apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
                 outcome = apiCrownCourtOutcome.getOutcome().getCode();
             }
         }
@@ -281,6 +278,7 @@ public class MaatCalculateContributionService {
         }
         return null;
     }
+
 
     public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO) {
         final Integer contributionId = calculateContributionDTO.getContributionId();

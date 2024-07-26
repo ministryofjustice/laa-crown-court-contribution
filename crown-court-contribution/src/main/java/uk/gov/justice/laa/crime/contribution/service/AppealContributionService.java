@@ -13,6 +13,7 @@ import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealContributionAmount;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 
@@ -43,11 +44,11 @@ public class AppealContributionService {
 
         GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
         BigDecimal appealContributionAmount = null;
-        if(getContributionAmountRequest.getAppealType() != null
-                && getContributionAmountRequest.getCaseType() != null
-                && getContributionAmountRequest.getOutcome() != null &&
-                getContributionAmountRequest.getAssessmentResult() != null){
-             appealContributionAmount = maatCourtDataService.getContributionAppealAmount(getContributionAmountRequest);
+
+        if (getContributionAmountRequest.getOutcome() != null &&
+                getContributionAmountRequest.getAssessmentResult() != null) {
+            appealContributionAmount = AppealContributionAmount.calculate(getContributionAmountRequest.getAppealType(), getContributionAmountRequest.getOutcome(), getContributionAmountRequest.getAssessmentResult())
+                                                               .getContributionAmount();
         }
 
         Integer repId = calculateContributionDTO.getRepId();
