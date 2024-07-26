@@ -8,10 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class CreateContributionRequestMapperTest {
@@ -74,6 +76,31 @@ class CreateContributionRequestMapperTest {
         softly.assertThat(request.getDateUpliftRemoved().getYear()).isEqualTo(TestModelDataBuilder.UPLIFT_REMOVED_DATE.getYear());
         softly.assertThat(request.getDateUpliftRemoved().getMonth()).isEqualTo(TestModelDataBuilder.UPLIFT_REMOVED_DATE.getMonth());
         softly.assertThat(request.getDateUpliftRemoved().getDayOfMonth()).isEqualTo(TestModelDataBuilder.UPLIFT_REMOVED_DATE.getDayOfMonth());
+        softly.assertAll();
+    }
+
+    @Test
+    void givenAValidContributionDTOAndResult_whenMapIsInvoked_thenReturnCreateContributionRequest() {
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
+        ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
+
+        CreateContributionRequest request = mapper.map(calculateContributionDTO, contributionResult);
+
+        softly.assertThat(request.getRepId()).isEqualTo(TestModelDataBuilder.REP_ID);
+        softly.assertThat(request.getApplId()).isNull();
+        softly.assertThat(request.getContributionCap()).isEqualTo(BigDecimal.valueOf(250.00));
+        softly.assertThat(request.getEffectiveDate().getMonth()).isEqualTo(LocalDateTime.now().getMonth());
+        softly.assertThat(request.getEffectiveDate().getDayOfMonth()).isEqualTo(LocalDateTime.now().getDayOfMonth());
+        softly.assertThat(request.getEffectiveDate().getYear()).isEqualTo(LocalDateTime.now().getYear());
+        softly.assertThat(request.getMonthlyContributions()).isEqualTo(BigDecimal.valueOf(250.00));
+        softly.assertThat(request.getUpliftApplied()).isEqualTo("N");
+        softly.assertThat(request.getBasedOn()).isEqualTo("Means");
+        softly.assertThat(request.getCreateContributionOrder()).isNull();
+        softly.assertThat(request.getCalcDate()).isNull();
+        softly.assertThat(request.getDateUpliftApplied()).isNull();
+        softly.assertThat(request.getDateUpliftRemoved()).isNull();
+        softly.assertThat(request.getUserCreated()).isNull();
+        softly.assertThat(request.getUpfrontContributions()).isEqualTo(BigDecimal.valueOf(250.00));
         softly.assertAll();
     }
 

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.contribution.CorrespondenceStatus;
@@ -26,7 +27,7 @@ public class CompareContributionService {
     private final ContributionService contributionService;
 
     @Transactional
-    public int compareContribution(CalculateContributionDTO calculateContributionDTO) {
+    public int compareContribution(CalculateContributionDTO calculateContributionDTO, ContributionResult contributionResult) {
         log.info("Start  compareContribution");
         int repId = calculateContributionDTO.getRepId();
         RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
@@ -42,7 +43,7 @@ public class CompareContributionService {
         if (activeContribution.isEmpty()) {
             return getResultOnNoPreviousContribution(repOrderDTO, repId);
         }
-        return getResultOnActiveContribution(calculateContributionDTO, repOrderDTO, repId, activeContribution);
+        return getResultOnActiveContribution(calculateContributionDTO, contributionResult, repOrderDTO, repId, activeContribution);
     }
 
     private int getResultOnNoPreviousContribution(RepOrderDTO repOrderDTO, int repId) {
@@ -56,11 +57,14 @@ public class CompareContributionService {
     }
 
     private int getResultOnActiveContribution(CalculateContributionDTO calculateContributionDTO,
-                                              RepOrderDTO repOrderDTO, int repId, List<Contribution> contributions) {
-        int result = 2;
+                                              ContributionResult contributionResult, RepOrderDTO repOrderDTO, int repId,
+                                              List<Contribution> contributions) {
+        int result;
         Contribution contribution = contributions.get(0);
-        if (contributionRecordsAreIdentical(calculateContributionDTO, contribution)) {
+        if (contributionRecordsAreIdentical(contributionResult, contribution)) {
             result = getResultOnIdenticalContributions(calculateContributionDTO, repOrderDTO, repId);
+        } else {
+            result = 1;
         }
         log.info("getResultOnActiveContribution.result--" + result);
         return result;
@@ -144,14 +148,14 @@ public class CompareContributionService {
                         && isStatusAppealCC(status));
     }
 
-    private static boolean contributionRecordsAreIdentical(CalculateContributionDTO compareContributionDTO,
+    private static boolean contributionRecordsAreIdentical(ContributionResult contributionResult,
                                                            Contribution contribution) {
-        return contribution.getContributionCap().compareTo(compareContributionDTO.getContributionCap()) == 0 &&
+        return contribution.getContributionCap().compareTo(contributionResult.contributionCap()) == 0 &&
                 contribution.getUpfrontContributions()
-                        .compareTo(compareContributionDTO.getUpfrontContributions()) == 0 &&
+                        .compareTo(contributionResult.upfrontAmount()) == 0 &&
                 contribution.getMonthlyContributions()
-                        .compareTo(compareContributionDTO.getMonthlyContributions()) == 0 &&
-                contribution.getEffectiveDate().isEqual(compareContributionDTO.getEffectiveDate());
+                        .compareTo(contributionResult.monthlyAmount()) == 0 &&
+                contribution.getEffectiveDate().isEqual(contributionResult.effectiveDate());
     }
 
     private static Predicate<Contribution> isActiveContribution(int repId) {
