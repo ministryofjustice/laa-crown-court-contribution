@@ -4,15 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealContributionAmount;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
@@ -38,17 +38,22 @@ public class AppealContributionService {
         return AssessmentResult.FAIL;
     }
 
-    public ApiMaatCalculateContributionResponse calculateAppealContribution(CalculateContributionDTO calculateContributionDTO) {
+    public ApiMaatCalculateContributionResponse calculateAppealContribution(
+            CalculateContributionDTO calculateContributionDTO) {
         log.info("Start AppealContributionService.calculateAppealContribution()");
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
-        GetContributionAmountRequest getContributionAmountRequest = getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
+        GetContributionAmountRequest getContributionAmountRequest =
+                getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
         BigDecimal appealContributionAmount = null;
 
         if (getContributionAmountRequest.getOutcome() != null &&
                 getContributionAmountRequest.getAssessmentResult() != null) {
-            appealContributionAmount = AppealContributionAmount.calculate(getContributionAmountRequest.getAppealType(), getContributionAmountRequest.getOutcome(), getContributionAmountRequest.getAssessmentResult())
-                                                               .getContributionAmount();
+            appealContributionAmount = AppealContributionAmount.calculate(
+                            getContributionAmountRequest.getAppealType(), getContributionAmountRequest.getOutcome(),
+                            getContributionAmountRequest.getAssessmentResult()
+                    )
+                    .getContributionAmount();
         }
 
         Integer repId = calculateContributionDTO.getRepId();
@@ -58,7 +63,8 @@ public class AppealContributionService {
             if (currContribution.getUpfrontContributions() == null
                     || (appealContributionAmount == null
                     || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0)) {
-                CreateContributionRequest createContributionRequest = createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
+                CreateContributionRequest createContributionRequest =
+                        createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
                 log.info("createContributionRequest--->" + createContributionRequest);
                 Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
                 log.info("Contribution data has been updated");
