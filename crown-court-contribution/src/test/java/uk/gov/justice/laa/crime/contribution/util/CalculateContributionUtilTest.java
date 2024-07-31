@@ -32,7 +32,7 @@ class CalculateContributionUtilTest {
     void givenMonthlyContributionsGreater_whenCalculateDisposableContributionIsInvoked_thenMonthlyContributionsIsReturned() {
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minimumMonthlyAmount = BigDecimal.valueOf(80);
-        BigDecimal monthlyContributions = BigDecimal.valueOf(83);
+        BigDecimal monthlyContributions = BigDecimal.valueOf(83).setScale(2);
         assertThat(CalculateContributionUtil.calculateMonthlyContribution(annualDisposableIncome, BigDecimal.TEN, minimumMonthlyAmount))
                 .isEqualTo(monthlyContributions);
     }
@@ -41,7 +41,7 @@ class CalculateContributionUtilTest {
     void givenMonthlyContributionsGreater_whenCalculateUpliftedMonthlyAmountIsInvoked_thenMonthlyContributionsIsReturned() {
         BigDecimal annualDisposableIncome = BigDecimal.valueOf(10000);
         BigDecimal minUpliftedMonthlyAmount = BigDecimal.valueOf(80);
-        BigDecimal monthlyContributions = BigDecimal.valueOf(83);
+        BigDecimal monthlyContributions = BigDecimal.valueOf(83).setScale(2);
         assertThat(CalculateContributionUtil.calculateUpliftedMonthlyAmount(annualDisposableIncome, BigDecimal.TEN, minUpliftedMonthlyAmount))
                 .isEqualTo(monthlyContributions);
     }

@@ -26,7 +26,7 @@ public class CalculateContributionUtil {
     public BigDecimal calculateUpfrontContributions(final BigDecimal monthlyContributions, final BigDecimal contributionCap, final Integer upfrontTotalMonths) {
         if(checkNull(monthlyContributions, contributionCap) || upfrontTotalMonths == null)
             return null;
-        BigDecimal upfrontContribution = monthlyContributions.multiply(BigDecimal.valueOf(upfrontTotalMonths)).setScale(2, RoundingMode.FLOOR);
+        BigDecimal upfrontContribution = monthlyContributions.multiply(BigDecimal.valueOf(upfrontTotalMonths));
         if (upfrontContribution.compareTo(contributionCap) < 0) {
             return upfrontContribution;
         } else return contributionCap;
