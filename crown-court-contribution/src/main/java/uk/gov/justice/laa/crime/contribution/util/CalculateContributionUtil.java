@@ -38,7 +38,6 @@ public class CalculateContributionUtil {
         BigDecimal monthlyContributionsCalc = new BigDecimal(Math.floor((annualDisposableIncome.divide(BigDecimal.valueOf(12), RoundingMode.FLOOR)
                 .multiply(upliftedIncomePercent)
                 .divide(BigDecimal.valueOf(100), RoundingMode.FLOOR).doubleValue()))).setScale(2);
-        monthlyContributionsCalc.setScale(1, RoundingMode.FLOOR);
         if (monthlyContributionsCalc.compareTo(minUpliftedMonthlyAmount) > 0) {
             return monthlyContributionsCalc;
         }
