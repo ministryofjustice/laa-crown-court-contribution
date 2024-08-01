@@ -29,8 +29,10 @@ public class CalculateContributionDTO {
     private LocalDate effectiveDate;
     private LocalDate calcDate;
     private BigDecimal contributionCap;
-    private BigDecimal monthlyContributions;
-    private BigDecimal upfrontContributions;
+    @Builder.Default
+    private BigDecimal monthlyContributions = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal upfrontContributions = BigDecimal.ZERO;
     private String upliftApplied;
     private String basedOn;
     private TransferStatus transferStatus;

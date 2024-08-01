@@ -13,6 +13,7 @@ import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
@@ -36,8 +37,8 @@ class ContributionDTOBuilderTest {
         softly.assertThat(actualContributionDTO.getRepId()).isEqualTo(999);
         softly.assertThat(actualContributionDTO.getEffectiveDate()).isNull();
         softly.assertThat(actualContributionDTO.getContributionCap()).isNull();
-        softly.assertThat(actualContributionDTO.getMonthlyContributions()).isNull();
-        softly.assertThat(actualContributionDTO.getUpfrontContributions()).isNull();
+        softly.assertThat(actualContributionDTO.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
+        softly.assertThat(actualContributionDTO.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
         softly.assertThat(actualContributionDTO.getDateUpliftApplied()).isNull();
         softly.assertThat(actualContributionDTO.getDateUpliftRemoved()).isNull();
         softly.assertThat(actualContributionDTO.getCaseType()).isEqualTo(CaseType.APPEAL_CC);
