@@ -23,7 +23,7 @@ public class ContributionDTOBuilder {
                 .effectiveDate(DateUtil.parseLocalDate(request.getEffectiveDate()))
                 .contributionCap(request.getContributionCap())
                 .monthlyContributions(request.getMonthlyContributions() !=null ? request.getMonthlyContributions() : BigDecimal.ZERO)
-                .upfrontContributions(request.getUpfrontContributions())
+                .upfrontContributions(request.getUpfrontContributions() !=null ? request.getUpfrontContributions() : BigDecimal.ZERO)
                 .dateUpliftApplied(DateUtil.parseLocalDate(request.getDateUpliftApplied()))
                 .dateUpliftRemoved(DateUtil.parseLocalDate(request.getDateUpliftRemoved()))
                 .caseType(request.getCaseType())
