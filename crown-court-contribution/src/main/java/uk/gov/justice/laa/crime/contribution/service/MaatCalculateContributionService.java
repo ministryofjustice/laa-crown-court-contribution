@@ -262,8 +262,7 @@ public class MaatCalculateContributionService {
     }
 
     private boolean shouldCreateContribs(ContributionResult result, CalculateContributionDTO calculateContributionDTO) {
-        return (result.monthlyAmount() != null && null != calculateContributionDTO.getMonthlyContributions()
-                && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
+        return (result.monthlyAmount() != null && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (result.effectiveDate() != null && !result.effectiveDate()
                 .equals(calculateContributionDTO.getEffectiveDate()));
     }
