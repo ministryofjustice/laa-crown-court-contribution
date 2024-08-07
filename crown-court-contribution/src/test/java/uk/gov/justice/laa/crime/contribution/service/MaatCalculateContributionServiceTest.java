@@ -16,6 +16,7 @@ import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
@@ -1140,6 +1141,46 @@ class MaatCalculateContributionServiceTest {
 
         assertThat(contribution.getId())
                 .isEqualTo(TestModelDataBuilder.CONTRIBUTION_ID);
+    }
+
+    @Test
+    void givenChangeInMonthlyContributions_whenVerifyAndCreateContribsIsInvoked_thenNewContributionIsCreated() {
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
+        ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
+        Contribution contribution = TestModelDataBuilder.getContribution();
+
+        when(compareContributionService.compareContribution(any(CalculateContributionDTO.class), any(ContributionResult.class)))
+                .thenReturn(1);
+        when(contributionRequestMapper.map(any(CalculateContributionDTO.class), any(ContributionResult.class)))
+                .thenReturn(new CreateContributionRequest());
+        when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
+                .thenReturn(contribution);
+
+        Contribution contributionResponse = maatCalculateContributionService.verifyAndCreateContribs(
+                calculateContributionDTO,
+                repOrderDTO,
+                contributionResult
+        );
+
+        assertThat(contributionResponse).isEqualTo(contribution);
+        verify(maatCourtDataService).createContribution(any(CreateContributionRequest.class));
+    }
+
+    @Test
+    void givenNoChangeInMonthlyContributionsorEffectiveDate_whenVerifyAndCreateContribsIsInvoked_thenNoContributionIsCreated() {
+        CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
+        calculateContributionDTO.setMonthlyContributions(BigDecimal.valueOf(250.00));
+        ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
+
+        Contribution contributionResponse = maatCalculateContributionService.verifyAndCreateContribs(
+                calculateContributionDTO,
+                null,
+                contributionResult
+        );
+
+        assertThat(contributionResponse).isNull();
+        verifyNoInteractions(maatCourtDataService);
     }
 }
 
