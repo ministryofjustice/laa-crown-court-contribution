@@ -97,7 +97,7 @@ class CalculateContributionServiceTest {
         ApiCalculateContributionResponse response = calculateContributionService.calculateContribution(request);
 
         softly.assertThat(response.getMonthlyContributions())
-                .isEqualTo(new BigDecimal(83));
+                .isEqualTo(new BigDecimal(83).setScale(2));
         softly.assertThat(response.getUpfrontContributions())
                 .isEqualTo(contributionCap);
         softly.assertThat(Constants.N)
