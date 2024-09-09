@@ -168,11 +168,6 @@ jobs:
           path: build/libs
       - snyk/scan:
           <<: *snyk_options
-      - slack/notify:
-          channel: laa-crimeapps-ci
-          event: fail
-          template: basic_fail_1
-          branch_pattern: main
 
   build_scan_and_push_image:
     executor: build-executor
