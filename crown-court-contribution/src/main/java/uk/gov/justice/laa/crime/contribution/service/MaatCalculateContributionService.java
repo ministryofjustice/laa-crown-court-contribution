@@ -3,18 +3,27 @@ package uk.gov.justice.laa.crime.contribution.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.contribution.builder.*;
+import uk.gov.justice.laa.crime.contribution.builder.CalculateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionSummaryMapper;
+import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.*;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
@@ -47,7 +56,6 @@ public class MaatCalculateContributionService {
 
     private final CreateContributionRequestMapper createContributionRequestMapper;
     private final ContributionService contributionService;
-    private final UpdateContributionRequestMapper updateContributionRequestMapper;
     private final CalculateContributionRequestMapper calculateContributionRequestMapper;
     private final MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
 
@@ -94,8 +102,8 @@ public class MaatCalculateContributionService {
                 .filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst()
                 .map(ApiAssessment::getNewWorkReason)
                 .orElse(calculateContributionDTO.getAssessments().stream()
-                                .filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
-                                .map(ApiAssessment::getNewWorkReason).orElse(null));
+                        .filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
+                        .map(ApiAssessment::getNewWorkReason).orElse(null));
     }
 
     /**
@@ -172,7 +180,7 @@ public class MaatCalculateContributionService {
         if (null != calculateContributionDTO.getCrownCourtOutcomeList()
                 && !calculateContributionDTO.getCrownCourtOutcomeList().isEmpty()) {
             ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
-            if (null !=apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
+            if (null != apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
                 outcome = apiCrownCourtOutcome.getOutcome().getCode();
             }
         }
@@ -197,7 +205,7 @@ public class MaatCalculateContributionService {
                                 .fullResult(fullResult)
                                 .initResult(initAssessment.map(
                                                 assessment -> assessment.getResult().name())
-                                                    .orElse(null))
+                                        .orElse(null))
                                 .magCourtOutcome(msgCourtOutcome)
                                 .crownCourtOutcome(outcome)
                                 .removeContribs(calculateContributionDTO.getRemoveContribs())
@@ -216,9 +224,6 @@ public class MaatCalculateContributionService {
                                                            final RepOrderDTO repOrderDTO) {
         ApiMaatCalculateContributionResponse response;
         log.info("doContribs");
-        log.info("doContribs Monthly Contribs {} " + calculateContributionDTO.getMonthlyContributions());
-        log.info("doContribs UpFront Contribs {} " + calculateContributionDTO.getUpfrontContributions());
-
 
         ContributionResult result = null;
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
@@ -227,10 +232,8 @@ public class MaatCalculateContributionService {
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
                         .compareTo(BigDecimal.ZERO) > 0) ||
                 Constants.INEL.equals(fullResult)) {
-            log.info("doContribs Calc Contribs");
             result = calcContribs(calculateContributionDTO, contributionResponseDTO);
         } else if (calculateContributionDTO.getMonthlyContributions() != null) {
-            log.info("doContribs Set Contribs");
             result = ContributionResult.builder()
                     .monthlyAmount(BigDecimal.ZERO)
                     .contributionCap(BigDecimal.ZERO)
@@ -238,9 +241,7 @@ public class MaatCalculateContributionService {
                     .build();
         }
 
-        log.info("Calling  verifyAndCreateContribs");
         Contribution createdContribution = verifyAndCreateContribs(calculateContributionDTO, repOrderDTO, result);
-        log.info("End Calling  verifyAndCreateContribs");
 
         response = new ApiMaatCalculateContributionResponse()
                 .withContributionCap(result.contributionCap())
@@ -320,22 +321,22 @@ public class MaatCalculateContributionService {
                 contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
         boolean isContributionRuleApplicable =
                 contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
-                                                                      calculateContributionDTO.getMagCourtOutcome(),
-                                                                      crownCourtOutcome
+                        calculateContributionDTO.getMagCourtOutcome(),
+                        crownCourtOutcome
                 );
 
         BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, crownCourtOutcome,
-                                                                            isContributionRuleApplicable
+                isContributionRuleApplicable
         );
         int totalMonths = Constants.N.equals(
                 contributionResponseDTO.getCalcContribs()) ? 0 : contributionCalcParametersDTO.getTotalMonths();
 
         ApiCalculateContributionRequest apiCalculateContributionRequest =
                 calculateContributionRequestMapper.map(contributionCalcParametersDTO,
-                                                       annualDisposableIncome, isUpliftApplied(calculateContributionDTO,
-                                                                                               contributionResponseDTO
+                        annualDisposableIncome, isUpliftApplied(calculateContributionDTO,
+                                contributionResponseDTO
                         ),
-                                                       calculateContributionDTO.getContributionCap()
+                        calculateContributionDTO.getContributionCap()
                 );
 
         // Revisit the request to pass the offenceType object for Contribs Cap
@@ -343,7 +344,7 @@ public class MaatCalculateContributionService {
                 calculateContributionService.calculateContribution(apiCalculateContributionRequest);
         String effectiveDate =
                 getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
-                                                assEffectiveDate
+                        assEffectiveDate
                 );
 
         return ContributionResult.builder()
@@ -367,14 +368,14 @@ public class MaatCalculateContributionService {
                 annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO);
                 Optional<ContributionVariationDTO> contributionVariation =
                         contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(),
-                                                                          calculateContributionDTO.getMagCourtOutcome(),
-                                                                          crownCourtOutcome
+                                calculateContributionDTO.getMagCourtOutcome(),
+                                crownCourtOutcome
                         );
 
                 if (contributionVariation.isPresent()) {
                     annualDisposableIncome = annualDisposableIncome
                             .add(calculateVariationAmount(calculateContributionDTO.getRepId(),
-                                                          contributionVariation.get()
+                                    contributionVariation.get()
                             ));
                 }
             } else {
@@ -392,11 +393,10 @@ public class MaatCalculateContributionService {
                                                final ContributionVariationDTO contributionVariation) {
         ApiCalculateHardshipByDetailResponse apiCalculateHardshipByDetailResponse =
                 crimeHardshipService.calculateHardshipForDetail(new ApiCalculateHardshipByDetailRequest()
-                                                                        .withDetailType(Objects.requireNonNull(
-                                                                                        HardshipReviewDetailType.getFrom(
-                                                                                                contributionVariation.getVariation()))
-                                                                                                .toString())
-                                                                        .withRepId(repId));
+                        .withDetailType(Objects.requireNonNull(
+                                        HardshipReviewDetailType.getFrom(contributionVariation.getVariation()))
+                                .toString())
+                        .withRepId(repId));
         if ("+".equals(contributionVariation.getVariationRule())) {
             return apiCalculateHardshipByDetailResponse.getHardshipSummary();
         } else {
