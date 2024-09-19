@@ -33,7 +33,7 @@ class ContributionDTOBuilderTest {
         CalculateContributionDTO actualContributionDTO = ContributionDTOBuilder.build(contributionRequest);
 
         softly.assertThat(actualContributionDTO.getContributionId()).isNull();
-        softly.assertThat(actualContributionDTO.getApplId()).isEqualTo(999);
+        softly.assertThat(actualContributionDTO.getApplicantId()).isEqualTo(999);
         softly.assertThat(actualContributionDTO.getRepId()).isEqualTo(999);
         softly.assertThat(actualContributionDTO.getEffectiveDate()).isNull();
         softly.assertThat(actualContributionDTO.getContributionCap()).isNull();
@@ -66,7 +66,7 @@ class ContributionDTOBuilderTest {
         CalculateContributionDTO actualContributionDTO = ContributionDTOBuilder.build(contributionRequest);
 
         softly.assertThat(actualContributionDTO.getContributionId()).isNull();
-        softly.assertThat(actualContributionDTO.getApplId()).isEqualTo(999);
+        softly.assertThat(actualContributionDTO.getApplicantId()).isEqualTo(999);
         softly.assertThat(actualContributionDTO.getRepId()).isEqualTo(999);
         softly.assertThat(actualContributionDTO.getEffectiveDate()).isNull();
         softly.assertThat(actualContributionDTO.getContributionCap()).isNull();

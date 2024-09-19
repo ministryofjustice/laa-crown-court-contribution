@@ -29,7 +29,7 @@ class CreateContributionRequestMapperTest {
         CreateContributionRequest request = mapper
                 .map(TestModelDataBuilder.buildAppealContributionRequest(), new BigDecimal(500));
         softly.assertThat(request.getRepId()).isEqualTo(999);
-        softly.assertThat(request.getApplId()).isEqualTo(999);
+        softly.assertThat(request.getApplicantId()).isEqualTo(999);
         softly.assertThat(request.getContributionCap()).isZero();
         softly.assertThat(request.getEffectiveDate()).isEqualTo(TestModelDataBuilder.TEST_DATE);
         softly.assertThat(request.getMonthlyContributions()).isZero();
@@ -54,7 +54,7 @@ class CreateContributionRequestMapperTest {
         CreateContributionRequest request = mapper.map(calculateContributionDTO, appealContributionAmount);
 
         softly.assertThat(request.getRepId()).isEqualTo(123);
-        softly.assertThat(request.getApplId()).isEqualTo(123);
+        softly.assertThat(request.getApplicantId()).isEqualTo(123);
         softly.assertThat(request.getContributionCap()).isEqualTo(appealContributionAmount);
         softly.assertThat(request.getMonthlyContributions()).isNull();
         softly.assertThat(request.getUpliftApplied()).isNull();
@@ -87,7 +87,7 @@ class CreateContributionRequestMapperTest {
         CreateContributionRequest request = mapper.map(calculateContributionDTO, contributionResult);
 
         softly.assertThat(request.getRepId()).isEqualTo(TestModelDataBuilder.REP_ID);
-        softly.assertThat(request.getApplId()).isNull();
+        softly.assertThat(request.getApplicantId()).isNull();
         softly.assertThat(request.getContributionCap()).isEqualTo(BigDecimal.valueOf(250.00));
         softly.assertThat(request.getEffectiveDate().getMonth()).isEqualTo(LocalDateTime.now().getMonth());
         softly.assertThat(request.getEffectiveDate().getDayOfMonth()).isEqualTo(LocalDateTime.now().getDayOfMonth());

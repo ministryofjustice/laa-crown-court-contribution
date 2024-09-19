@@ -18,7 +18,7 @@ public class ContributionDTOBuilder {
     public static CalculateContributionDTO build(final ApiMaatCalculateContributionRequest request) {
         return CalculateContributionDTO.builder()
                 .contributionId(request.getContributionId())
-                .applId(request.getApplId())
+                .applicantId(request.getApplicantId())
                 .repId(request.getRepId())
                 .effectiveDate(DateUtil.parseLocalDate(request.getEffectiveDate()))
                 .contributionCap(request.getContributionCap())
