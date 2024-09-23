@@ -5,15 +5,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
-import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
+import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
+import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
+import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
@@ -23,7 +24,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AppealContributionServiceTest {
@@ -39,6 +45,8 @@ class AppealContributionServiceTest {
 
     @InjectMocks
     private AppealContributionService appealContributionService;
+    @Mock
+    private MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
 
     @Test
     void givenAppealContributionAmountChange_whenCalculateContributionIsInvoked_thenContributionDataIsUpdated() {
@@ -73,14 +81,14 @@ class AppealContributionServiceTest {
         when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
 
+        Contribution createdContribution = TestModelDataBuilder.buildContribution();
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
-                .thenReturn(TestModelDataBuilder.buildContribution());
+                .thenReturn(createdContribution);
 
-        ApiMaatCalculateContributionResponse response =
-                appealContributionService.calculateAppealContribution(calculateContributionDTO);
+        appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
-        assertThat(response.getUpfrontContributions())
-                .isEqualTo(BigDecimal.valueOf(250));
+        verify(maatCalculateContributionResponseMapper, times(1))
+                .map(createdContribution);
     }
 
     @Test
@@ -109,11 +117,10 @@ class AppealContributionServiceTest {
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
 
-        ApiMaatCalculateContributionResponse response =
-                appealContributionService.calculateAppealContribution(calculateContributionDTO);
+        appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
-        assertThat(response.getUpfrontContributions())
-                .isEqualTo(BigDecimal.valueOf(0));
+        verify(maatCalculateContributionResponseMapper, times(1))
+                .map(currContribution);
 
         verify(maatCourtDataService, times(0))
                 .createContribution(any(CreateContributionRequest.class));

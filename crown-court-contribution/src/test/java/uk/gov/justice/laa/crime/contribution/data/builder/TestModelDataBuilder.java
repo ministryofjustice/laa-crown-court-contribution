@@ -222,7 +222,7 @@ public class TestModelDataBuilder {
     public static Contribution buildContribution() {
         return Contribution.builder()
                 .id(9)
-                .applId(9)
+                .applicantId(9)
                 .repId(9)
                 .contributionFileId(1)
                 .effectiveDate(LocalDate.now())
@@ -252,7 +252,7 @@ public class TestModelDataBuilder {
     public static Contribution buildContributionForCompareContributionService() {
         return Contribution.builder()
                 .id(123)
-                .applId(123)
+                .applicantId(123)
                 .repId(123)
                 .replacedDate(null)
                 .calcDate(LocalDate.now())
@@ -380,7 +380,7 @@ public class TestModelDataBuilder {
     public static Contribution getContribution() {
         return Contribution.builder()
                 .id(123)
-                .applId(123)
+                .applicantId(123)
                 .repId(123)
                 .replacedDate(null)
                 .calcDate(LocalDate.now())
@@ -446,14 +446,6 @@ public class TestModelDataBuilder {
                 .upfrontTotalMonths(12)
                 .upliftedIncomePercent(BigDecimal.ONE)
                 .build();
-    }
-
-    public static ApiCalculateContributionResponse getApiCalculateContributionResponse() {
-        return new ApiCalculateContributionResponse()
-                .withBasedOn(Constants.MEANS)
-                .withMonthlyContributions(BigDecimal.TEN)
-                .withUpfrontContributions(BigDecimal.ZERO)
-                .withUpliftApplied(Constants.Y);
     }
 
     public static CalculateContributionDTO getCalculateContributionDTO() {
