@@ -149,9 +149,8 @@ public class MaatCalculateContributionService {
 
         if (CaseType.APPEAL_CC.equals(calculateContributionDTO.getCaseType())) {
             return appealContributionService.calculateAppealContribution(calculateContributionDTO);
-        } else {
-            return getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
         }
+        return getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
     }
 
     public List<ApiContributionSummary> getContributionSummaries(final int repId) {
@@ -201,13 +200,17 @@ public class MaatCalculateContributionService {
 
     public static String getCrownCourtOutcome(CalculateContributionDTO calculateContributionDTO) {
         List<ApiCrownCourtOutcome> crownCourtOutcomeList = calculateContributionDTO.getCrownCourtOutcomeList();
-        if (null != crownCourtOutcomeList && !crownCourtOutcomeList.isEmpty()) {
-            ApiCrownCourtOutcome apiCrownCourtOutcome = crownCourtOutcomeList.get(0);
-            if (null != apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
-                return apiCrownCourtOutcome.getOutcome().getCode();
-            }
+
+        if (crownCourtOutcomeList == null || crownCourtOutcomeList.isEmpty()) {
+            return null;
         }
-        return null;
+
+        ApiCrownCourtOutcome apiCrownCourtOutcome = crownCourtOutcomeList.get(0);
+        if (apiCrownCourtOutcome == null || apiCrownCourtOutcome.getOutcome() == null) {
+            return null;
+        }
+
+        return apiCrownCourtOutcome.getOutcome().getCode();
     }
 
     public ApiMaatCalculateContributionResponse performContributions(final CalculateContributionDTO calculateContributionDTO,

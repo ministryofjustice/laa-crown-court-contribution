@@ -23,10 +23,12 @@ public class MaatCalculateContributionResponseMapper {
                 .withUpfrontContributions(result.upfrontAmount())
                 .withUpliftApplied(result.isUplift() ? "Y" : "N")
                 .withBasedOn(result.basedOn());
+
         if (createdContribution != null) {
             response.setContributionId(createdContribution.getId());
             response.setCalcDate(DateUtil.convertDateToDateTime(createdContribution.getCalcDate()));
         }
+
         if (contributionResponseDTO.getId() != null) {
             response.setProcessActivity(true);
         }
