@@ -199,10 +199,10 @@ public class MaatCalculateContributionService {
         return new ApiMaatCalculateContributionResponse();
     }
 
-    private static String getCrownCourtOutcome(CalculateContributionDTO calculateContributionDTO) {
-        if (null != calculateContributionDTO.getCrownCourtOutcomeList()
-                && !calculateContributionDTO.getCrownCourtOutcomeList().isEmpty()) {
-            ApiCrownCourtOutcome apiCrownCourtOutcome = calculateContributionDTO.getCrownCourtOutcomeList().get(0);
+    public static String getCrownCourtOutcome(CalculateContributionDTO calculateContributionDTO) {
+        List<ApiCrownCourtOutcome> crownCourtOutcomeList = calculateContributionDTO.getCrownCourtOutcomeList();
+        if (null != crownCourtOutcomeList && !crownCourtOutcomeList.isEmpty()) {
+            ApiCrownCourtOutcome apiCrownCourtOutcome = crownCourtOutcomeList.get(0);
             if (null != apiCrownCourtOutcome && null != apiCrownCourtOutcome.getOutcome()) {
                 return apiCrownCourtOutcome.getOutcome().getCode();
             }

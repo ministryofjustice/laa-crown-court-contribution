@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
@@ -41,6 +42,8 @@ import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -1175,6 +1178,41 @@ class MaatCalculateContributionServiceTest {
 
         assertThat(contributionResponse).isNull();
         verifyNoInteractions(maatCourtDataService);
+    }
+
+    @Test
+    void givenEmptyCrownCourtOutcomeList_whenGetCrownCourtOutcomeIsInvoked_NullReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .crownCourtOutcomeList(Collections.emptyList())
+                .build();
+        assertThat(MaatCalculateContributionService.getCrownCourtOutcome(calculateContributionDTO)).isNull();
+    }
+
+    @Test
+    void givenNullApiCrownCourtOutcome_whenGetCrownCourtOutcomeIsInvoked_NullReturned() {
+        List<ApiCrownCourtOutcome> crownCourtOutcomeList = new ArrayList<>();
+        crownCourtOutcomeList.add(null);
+        crownCourtOutcomeList.add(new ApiCrownCourtOutcome());
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .crownCourtOutcomeList(crownCourtOutcomeList)
+                .build();
+        assertThat(MaatCalculateContributionService.getCrownCourtOutcome(calculateContributionDTO)).isNull();
+    }
+    @Test
+    void givenNullCrownCourtOutcomeEnum_whenGetCrownCourtOutcomeIsInvoked_NullReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .crownCourtOutcomeList(List.of(new ApiCrownCourtOutcome()))
+                .build();
+        assertThat(MaatCalculateContributionService.getCrownCourtOutcome(calculateContributionDTO)).isNull();
+    }
+
+    @Test
+    void givenValidCrownCourtOutcome_whenGetCrownCourtOutcomeIsInvoked_CrownOutComeReturned() {
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+                .crownCourtOutcomeList(List.of(new ApiCrownCourtOutcome().withOutcome(CrownCourtOutcome.ABANDONED)))
+                .build();
+        assertThat(MaatCalculateContributionService.getCrownCourtOutcome(calculateContributionDTO))
+                .isEqualTo(CrownCourtOutcome.ABANDONED.getCode());
     }
 }
 
