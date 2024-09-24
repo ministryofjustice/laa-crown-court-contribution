@@ -465,7 +465,7 @@ class MaatCalculateContributionServiceTest {
                 .build();
 
 
-        CalculateContributionDTO calculateContributionDTO = setupDataForCalcContribsTests();
+        CalculateContributionDTO calculateContributionDTO = setupDataForCalculateContributionsTests();
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .calcContribs(Constants.N)
                 .build();
@@ -484,7 +484,7 @@ class MaatCalculateContributionServiceTest {
                 .isEqualTo(expected);
     }
 
-    private CalculateContributionDTO setupDataForCalcContribsTests() {
+    private CalculateContributionDTO setupDataForCalculateContributionsTests() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(new ContributionCalcParametersDTO());
@@ -515,7 +515,7 @@ class MaatCalculateContributionServiceTest {
                         .upliftCote(1)
                         .build();
 
-        CalculateContributionDTO calculateContributionDTO = setupDataForCalcContribsTests();
+        CalculateContributionDTO calculateContributionDTO = setupDataForCalculateContributionsTests();
 
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
                 .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
@@ -590,7 +590,7 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenUpliftCoteNotNullAndUpliftIsRemoved_whenCalcContribsIsInvoked_validResponseIsReturned() {
+    void givenUpliftCoteNotNullAndUpliftIsRemoved_whenCalcContributionsIsInvoked_validResponseIsReturned() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 1, 9));
         calculateContributionDTO.setDateUpliftRemoved(LocalDate.of(2023, 2, 9));
@@ -1138,7 +1138,7 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenChangeInMonthlyContributions_whenVerifyAndCreateContribsIsInvoked_thenNewContributionIsCreated() {
+    void givenChangeInMonthlyContributions_whenVerifyAndCreateContributionsIsInvoked_thenNewContributionIsCreated() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getRepOrderDTO();
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
@@ -1162,7 +1162,7 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenNoChangeInMonthlyContributionsorEffectiveDate_whenVerifyAndCreateContribsIsInvoked_thenNoContributionIsCreated() {
+    void givenNoChangeInMonthlyContributionsOrEffectiveDate_whenVerifyAndCreateContributionsIsInvoked_thenNoContributionIsCreated() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
         calculateContributionDTO.setMonthlyContributions(BigDecimal.valueOf(250.00));
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
