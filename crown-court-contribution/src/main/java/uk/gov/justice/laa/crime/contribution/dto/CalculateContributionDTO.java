@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.AppealType;
-import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ import java.util.List;
 public class CalculateContributionDTO {
 
     private Integer contributionId;
-    private Integer applId;
+    private Integer applicantId;
     private Integer repId;
     private Integer contributionFileId;
     private LocalDate effectiveDate;
@@ -47,6 +47,7 @@ public class CalculateContributionDTO {
     private String removeContribs;
     private LocalDate committalDate;
     private String applicationStatus;
+    private Integer totalMonths;
     private List<ApiCrownCourtOutcome> crownCourtOutcomeList;
     private BigDecimal disposableIncomeAfterCrownHardship;
     private BigDecimal disposableIncomeAfterMagHardship;

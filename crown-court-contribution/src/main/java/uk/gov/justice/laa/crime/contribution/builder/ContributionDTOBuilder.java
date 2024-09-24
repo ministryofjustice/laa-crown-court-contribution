@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Component
@@ -17,12 +18,12 @@ public class ContributionDTOBuilder {
     public static CalculateContributionDTO build(final ApiMaatCalculateContributionRequest request) {
         return CalculateContributionDTO.builder()
                 .contributionId(request.getContributionId())
-                .applId(request.getApplId())
+                .applicantId(request.getApplicantId())
                 .repId(request.getRepId())
                 .effectiveDate(DateUtil.parseLocalDate(request.getEffectiveDate()))
                 .contributionCap(request.getContributionCap())
-                .monthlyContributions(request.getMonthlyContributions())
-                .upfrontContributions(request.getUpfrontContributions())
+                .monthlyContributions(request.getMonthlyContributions() !=null ? request.getMonthlyContributions() : BigDecimal.ZERO)
+                .upfrontContributions(request.getUpfrontContributions() !=null ? request.getUpfrontContributions() : BigDecimal.ZERO)
                 .dateUpliftApplied(DateUtil.parseLocalDate(request.getDateUpliftApplied()))
                 .dateUpliftRemoved(DateUtil.parseLocalDate(request.getDateUpliftRemoved()))
                 .caseType(request.getCaseType())

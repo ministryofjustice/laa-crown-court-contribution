@@ -5,8 +5,8 @@ import uk.gov.justice.laa.crime.common.model.contribution.*;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiAssessment;
-import uk.gov.justice.laa.crime.common.model.contribution.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
@@ -267,7 +267,7 @@ public class TestModelDataBuilder {
 
     public static ApiMaatCalculateContributionRequest buildAppealContributionRequest() {
         return new ApiMaatCalculateContributionRequest()
-                .withApplId(999)
+                .withApplicantId(999)
                 .withRepId(999)
                 .withCaseType(CaseType.APPEAL_CC)
                 .withAppealType(AppealType.ACS)
@@ -278,7 +278,7 @@ public class TestModelDataBuilder {
 
     public static ApiMaatCalculateContributionRequest buildCalculateContributionRequest() {
         return new ApiMaatCalculateContributionRequest()
-                .withApplId(999)
+                .withApplicantId(999)
                 .withRepId(999)
                 .withCaseType(CaseType.EITHER_WAY)
                 .withAppealType(AppealType.ACS)
@@ -340,7 +340,7 @@ public class TestModelDataBuilder {
                                                                                            MagCourtOutcome magCourtOutcome) {
         return CalculateContributionDTO.builder()
                 .repId(123)
-                .applId(123)
+                .applicantId(123)
                 .contributionCap(contributionCap)
                 .upfrontContributions(upfrontContributions)
                 .monthlyContributions(monthlyContributions)
@@ -356,6 +356,19 @@ public class TestModelDataBuilder {
                 .transferStatus(TransferStatus.REQUESTED)
                 .build();
 
+    }
+
+    public static ContributionResult getContributionResult() {
+        return ContributionResult.builder()
+                .totalAnnualDisposableIncome(BigDecimal.valueOf(16000.00))
+                .monthlyAmount(BigDecimal.valueOf(250.00))
+                .upfrontAmount(BigDecimal.valueOf(250.00))
+                .contributionCap(BigDecimal.valueOf(250.00))
+                .totalMonths(5)
+                .isUplift(false)
+                .basedOn("Means")
+                .effectiveDate(LocalDate.now())
+                .build();
     }
 
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
