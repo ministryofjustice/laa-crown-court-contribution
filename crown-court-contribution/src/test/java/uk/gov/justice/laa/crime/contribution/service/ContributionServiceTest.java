@@ -11,11 +11,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
+import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
@@ -35,7 +40,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.*;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FAIL;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FAILPORT;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.HARDSHIP_APPLICATION;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.INIT;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.NONE;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASSPORT;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.TEMP;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
 
@@ -332,8 +345,41 @@ class ContributionServiceTest {
         );
     }
 
-    private static Stream<Arguments> NoContributionRequest() {
+    private static Stream<Arguments> contributionRequest() {
         return Stream.of(
+                Arguments.of(
+                        new ContributionRequestDTO(PASS,
+                                PASS,
+                                CaseType.INDICTABLE,
+                                null,
+                                PASS,
+                                PASS,
+                                PASS,
+                                FAIL,
+                                "INEL",
+                                PASS,
+                                BigDecimal.ONE,
+                                CONTRIBUTION_YES,
+                                PASS
+                        )
+                ),
+                Arguments.of(
+                        new ContributionRequestDTO(
+                                PASS,
+                                PASS,
+                                CaseType.INDICTABLE,
+                                null,
+                                PASS,
+                                PASS,
+                                PASS,
+                                FAIL,
+                                FULL,
+                                PASS,
+                                BigDecimal.ONE,
+                                CONTRIBUTION_YES,
+                                PASS
+                        )
+                ),
                 Arguments.of(
                         new ContributionRequestDTO(
                                 PASS,
@@ -438,44 +484,6 @@ class ContributionServiceTest {
         );
     }
 
-    private static Stream<Arguments> contributionRequest() {
-        return Stream.of(
-                Arguments.of(
-                        new ContributionRequestDTO(PASS,
-                                PASS,
-                                CaseType.INDICTABLE,
-                                null,
-                                PASS,
-                                PASS,
-                                PASS,
-                                FAIL,
-                                "INEL",
-                                PASS,
-                                BigDecimal.ONE,
-                                CONTRIBUTION_YES,
-                                PASS
-                        )
-                ),
-                Arguments.of(
-                        new ContributionRequestDTO(
-                                PASS,
-                                PASS,
-                                CaseType.INDICTABLE,
-                                null,
-                                PASS,
-                                PASS,
-                                PASS,
-                                FAIL,
-                                FULL,
-                                PASS,
-                                BigDecimal.ONE,
-                                CONTRIBUTION_YES,
-                                PASS
-                        )
-                )
-        );
-    }
-
     @ParameterizedTest()
     @MethodSource("getAssessmentRequestForIojResult")
     void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnCorrectIojResultResponse(
@@ -519,36 +527,12 @@ class ContributionServiceTest {
     }
 
     @ParameterizedTest()
-    @MethodSource("NoContributionRequest")
-    void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnNoContribution(
+    @MethodSource("contributionRequest")
+    void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnValidContribution(
             ContributionRequestDTO request) {
 
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
-
-        contributionService.checkContributionsCondition(request);
-        verify(contributionResponseDTOMapper).map(any(), any());
-    }
-
-    @ParameterizedTest()
-    @MethodSource("contributionRequest")
-    void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnYesContribution(
-            ContributionRequestDTO request) {
-
-        when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
-
-        contributionService.checkContributionsCondition(request);
-        verify(contributionResponseDTOMapper).map(any(), any());
-    }
-
-    @ParameterizedTest()
-    @MethodSource("contributionRequest")
-    void givenAValidContributeRequestAndEmptyCorrespondence_whenCheckContribConditionIsInvoked_thenReturnYesContribution(
-            ContributionRequestDTO request) {
-
-        when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(Optional.of(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo()));
 
         contributionService.checkContributionsCondition(request);
         verify(contributionResponseDTOMapper).map(any(), any());
@@ -556,7 +540,7 @@ class ContributionServiceTest {
 
     @Test
     void givenAValidContributionRequest_whenCheckContribConditionIsInvoked_thenReturnNoContribution() {
-        ContributionRequestDTO request  = ContributionRequestDTO.builder()
+        ContributionRequestDTO request = ContributionRequestDTO.builder()
                 .caseType(CaseType.INDICTABLE)
                 .initResult("FULL")
                 .fullResult("PASS")

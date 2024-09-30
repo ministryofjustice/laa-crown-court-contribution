@@ -40,6 +40,13 @@ class ContributionRulesServiceTest {
         )).isFalse();
     }
 
+    @Test
+    void givenEitherWayCaseResolvedInMagsCourt_whenIsContributionRuleApplicableIsInvoked_thenFalseIsReturned() {
+        assertThat(contributionRulesService.isContributionRuleApplicable(
+                CaseType.EITHER_WAY, MagCourtOutcome.RESOLVED_IN_MAGS, null
+        )).isFalse();
+    }
+
     @ParameterizedTest
     @MethodSource("contributionRuleApplicable")
     void givenCaseTypeAndOutcomes_whenIsContributionRuleApplicableIsInvoked_thenValidResponseReturned(
