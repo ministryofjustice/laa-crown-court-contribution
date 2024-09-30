@@ -27,7 +27,6 @@ import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
@@ -35,7 +34,6 @@ import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.enums.HardshipReviewDetailType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 
@@ -45,7 +43,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -427,32 +424,10 @@ class MaatCalculateContributionServiceTest {
                         .withHardshipSummary(BigDecimal.TEN);
         when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
                 .thenReturn(apiCalculateHardshipByDetailResponse);
-        ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
-                .variationRule("+")
-                .variation(HardshipReviewDetailType.ACTION.toString())
-                .build();
         BigDecimal variationAmount = maatCalculateContributionService.calculateVariationAmount(
-                TestModelDataBuilder.REP_ID, contributionVariationDTO);
+                TestModelDataBuilder.REP_ID);
 
-        assertThat(variationAmount)
-                .isEqualTo(BigDecimal.TEN);
-    }
-
-    @Test
-    void givenVariationRuleAsNull_whenCalculateVariationAmountIsInvoked_thenZeroIsReturned() {
-        ApiCalculateHardshipByDetailResponse apiCalculateHardshipByDetailResponse =
-                new ApiCalculateHardshipByDetailResponse()
-                        .withHardshipSummary(BigDecimal.TEN);
-        when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
-                .thenReturn(apiCalculateHardshipByDetailResponse);
-        ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
-                .variation(HardshipReviewDetailType.FUNDING.toString())
-                .build();
-        BigDecimal variationAmount = maatCalculateContributionService.calculateVariationAmount(
-                TestModelDataBuilder.REP_ID, contributionVariationDTO);
-
-        assertThat(variationAmount)
-                .isEqualTo(BigDecimal.ZERO);
+        assertThat(variationAmount).isEqualTo(BigDecimal.TEN);
     }
 
     @Test
@@ -493,9 +468,6 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(new ContributionCalcParametersDTO());
         when(contributionRulesService.getActiveCCOutcome(any()))
                 .thenReturn(CrownCourtOutcome.SUCCESSFUL);
-        when(contributionRulesService.isContributionRuleApplicable(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(false);
         return calculateContributionDTO;
     }
 
@@ -563,11 +535,6 @@ class MaatCalculateContributionServiceTest {
         when(contributionRulesService.getActiveCCOutcome(any()))
                 .thenReturn(CrownCourtOutcome.SUCCESSFUL);
 
-        when(contributionRulesService.isContributionRuleApplicable(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        ))
-                .thenReturn(false);
-
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
                         .upliftedIncomePercent(BigDecimal.TEN)
@@ -628,10 +595,6 @@ class MaatCalculateContributionServiceTest {
 
         when(contributionRulesService.getActiveCCOutcome(any()))
                 .thenReturn(CrownCourtOutcome.SUCCESSFUL);
-
-        when(contributionRulesService.isContributionRuleApplicable(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(false);
 
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
@@ -697,10 +660,6 @@ class MaatCalculateContributionServiceTest {
         when(contributionRulesService.getActiveCCOutcome(any()))
                 .thenReturn(CrownCourtOutcome.SUCCESSFUL);
 
-        when(contributionRulesService.isContributionRuleApplicable(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.SUCCESSFUL
-        )).thenReturn(false);
-
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
                         .upliftedIncomePercent(BigDecimal.TEN)
@@ -737,8 +696,7 @@ class MaatCalculateContributionServiceTest {
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
-                false
+                CrownCourtOutcome.SUCCESSFUL
         );
 
         assertThat(result)
@@ -753,8 +711,7 @@ class MaatCalculateContributionServiceTest {
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
-                false
+                CrownCourtOutcome.SUCCESSFUL
         );
 
         assertThat(result)
@@ -768,8 +725,7 @@ class MaatCalculateContributionServiceTest {
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
-                false
+                CrownCourtOutcome.SUCCESSFUL
         );
 
         assertThat(result)
@@ -785,8 +741,7 @@ class MaatCalculateContributionServiceTest {
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
-                false
+                CrownCourtOutcome.SUCCESSFUL
         );
 
         assertThat(result).isEqualTo(BigDecimal.TEN);
@@ -801,8 +756,7 @@ class MaatCalculateContributionServiceTest {
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
-                false
+                CrownCourtOutcome.SUCCESSFUL
         );
 
         assertThat(result).isEqualTo(BigDecimal.TEN);
@@ -816,8 +770,7 @@ class MaatCalculateContributionServiceTest {
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                CrownCourtOutcome.SUCCESSFUL,
-                false
+                CrownCourtOutcome.SUCCESSFUL
         );
 
         assertThat(result).isEqualTo(BigDecimal.ZERO);
@@ -830,21 +783,15 @@ class MaatCalculateContributionServiceTest {
                 .magCourtOutcome(MagCourtOutcome.COMMITTED)
                 .caseType(CaseType.EITHER_WAY)
                 .build();
-        ContributionVariationDTO contributionVariationDTO = ContributionVariationDTO.builder()
-                .variation("SOL COSTS")
-                .variationRule("+")
-                .build();
 
-        when(contributionRulesService.getContributionVariation(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null))
-                .thenReturn(Optional.of(contributionVariationDTO));
         when(crimeHardshipService.calculateHardshipForDetail(any(ApiCalculateHardshipByDetailRequest.class)))
                 .thenReturn(new ApiCalculateHardshipByDetailResponse().withHardshipSummary(BigDecimal.ONE));
+        when(contributionRulesService.isContributionRuleApplicable(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null))
+                .thenReturn(true);
 
         BigDecimal result = maatCalculateContributionService.calculateAnnualDisposableIncome(
                 calculateContributionDTO,
-                null,
-                true
-        );
+                null);
 
         assertThat(result).isEqualTo(BigDecimal.valueOf(11));
     }
@@ -959,7 +906,7 @@ class MaatCalculateContributionServiceTest {
 
         when(maatCourtDataService.getRepOrderByRepId(null))
                 .thenReturn(repOrderDTO);
-        when(contributionService.checkContribsCondition(any()))
+        when(contributionService.checkContributionsCondition(any()))
                 .thenReturn(ContributionResponseDTO.builder().build());
 
         ApiMaatCalculateContributionResponse result = maatCalculateContributionService.calculateContribution(
@@ -990,7 +937,7 @@ class MaatCalculateContributionServiceTest {
                 .monthlyContributions(BigDecimal.TEN)
                 .build();
 
-        when(contributionService.checkContribsCondition(any()))
+        when(contributionService.checkContributionsCondition(any()))
                 .thenReturn(contributionResponseDTO);
         when(maatCourtDataService.getContributionCalcParameters(any()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
@@ -1036,7 +983,7 @@ class MaatCalculateContributionServiceTest {
                         .build();
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
 
-        when(contributionService.checkContribsCondition(any()))
+        when(contributionService.checkContributionsCondition(any()))
                 .thenReturn(contributionResponseDTO);
 
         maatCalculateContributionService.getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
@@ -1198,6 +1145,7 @@ class MaatCalculateContributionServiceTest {
                 .build();
         assertThat(MaatCalculateContributionService.getCrownCourtOutcome(calculateContributionDTO)).isNull();
     }
+
     @Test
     void givenNullCrownCourtOutcomeEnum_whenGetCrownCourtOutcomeIsInvoked_NullReturned() {
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()

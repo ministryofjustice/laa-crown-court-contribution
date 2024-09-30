@@ -1,19 +1,36 @@
 package uk.gov.justice.laa.crime.contribution.data.builder;
 
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.contribution.*;
-import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.*;
-import uk.gov.justice.laa.crime.contribution.model.*;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
+import uk.gov.justice.laa.crime.contribution.dto.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.contribution.dto.PassportAssessmentDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
-import uk.gov.justice.laa.crime.contribution.staticdata.entity.ContributionRulesEntity;
-import uk.gov.justice.laa.crime.enums.*;
-import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
-import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
+import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,6 +47,8 @@ public class TestModelDataBuilder {
     public static final String PASSPORT_RESULT_FAIL_CONTINUE = "FAIL CONTINUE";
     public static final Integer REP_ID = 1234;
     public static final Integer CORRESPONDENCE_ID = 1;
+    public static final Integer REASSESSMENT_COTE_ID = 2;
+    public static final Integer UPLIFT_COTE_ID = 3;
     public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
 
     public static final LocalDate CALC_DATE = LocalDate.of(2023, 8, 28);
@@ -57,12 +76,12 @@ public class TestModelDataBuilder {
 
             @Override
             public Integer getUpliftCoteId() {
-                return CORRESPONDENCE_ID;
+                return UPLIFT_COTE_ID;
             }
 
             @Override
             public Integer getReassessmentCoteId() {
-                return CORRESPONDENCE_ID;
+                return REASSESSMENT_COTE_ID;
             }
 
             @Override
@@ -114,20 +133,6 @@ public class TestModelDataBuilder {
                 return "";
             }
         };
-    }
-
-    public static ContributionVariationDTO getContributionVariationDTO() {
-        return ContributionVariationDTO.builder()
-                .variation("SQL COSTS")
-                .variationRule("+")
-                .build();
-    }
-
-    public static ContributionRulesEntity getContributionRules() {
-        return ContributionRulesEntity.builder()
-                .variation("SQL COSTS")
-                .variationRule("+")
-                .build();
     }
 
     public static ApiCrownCourtOutcome getApiCrownCourtOutcome(CrownCourtOutcome crownCourtOutcome) {

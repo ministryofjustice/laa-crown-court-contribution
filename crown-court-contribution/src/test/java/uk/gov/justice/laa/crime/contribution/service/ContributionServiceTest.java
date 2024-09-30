@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
@@ -59,7 +60,7 @@ class ContributionServiceTest {
     private CorrespondenceRuleRepository repository;
 
     @Mock
-    private CompareContributionService compareContributionService;
+    private ContributionResponseDTOMapper contributionResponseDTOMapper;
 
     private static Stream<Arguments> getAssessmentRequestForIojResult() {
         return Stream.of(
@@ -511,7 +512,7 @@ class ContributionServiceTest {
     @ParameterizedTest()
     @MethodSource("inValidContributionRequest")
     void givenAInvalidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnNull(ContributionRequestDTO request) {
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
+        ContributionResponseDTO response = contributionService.checkContributionsCondition(request);
 
         assertThat(response.getId())
                 .isNull();
@@ -525,20 +526,8 @@ class ContributionServiceTest {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
 
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-
-        softly.assertThat(response.getId())
-                .isEqualTo(1);
-        softly.assertThat(response.getCorrespondenceType())
-                .isEqualTo("CONTRIBUTION_NOTICE");
-        softly.assertThat(response.getCorrespondenceTypeDesc())
-                .isEqualTo("Contribution Notice");
-        softly.assertThat(response.getUpliftCote())
-                .isEqualTo(1);
-        softly.assertThat(response.getReassessmentCoteId())
-                .isEqualTo(1);
-        softly.assertThat(response.getTemplateDesc())
-                .isEqualTo("No contributions required");
+        contributionService.checkContributionsCondition(request);
+        verify(contributionResponseDTOMapper).map(any(), any());
     }
 
     @ParameterizedTest()
@@ -549,22 +538,8 @@ class ContributionServiceTest {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
 
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-
-        softly.assertThat(response.getDoContribs())
-                .isEqualTo("Y");
-        softly.assertThat(response.getId())
-                .isEqualTo(1);
-        softly.assertThat(response.getCorrespondenceType())
-                .isEqualTo("CONTRIBUTION_NOTICE");
-        softly.assertThat(response.getCorrespondenceTypeDesc())
-                .isEqualTo("Contribution Notice");
-        softly.assertThat(response.getUpliftCote())
-                .isEqualTo(1);
-        softly.assertThat(response.getReassessmentCoteId())
-                .isEqualTo(1);
-        softly.assertThat(response.getTemplateDesc())
-                .isEqualTo("No contributions required");
+        contributionService.checkContributionsCondition(request);
+        verify(contributionResponseDTOMapper).map(any(), any());
     }
 
     @ParameterizedTest()
@@ -575,14 +550,8 @@ class ContributionServiceTest {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.of(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo()));
 
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-
-        softly.assertThat(response.getDoContribs())
-                .isEqualTo("Y");
-        softly.assertThat(response.getId())
-                .isEqualTo(1);
-        softly.assertThat(response.getCorrespondenceType())
-                .isEmpty();
+        contributionService.checkContributionsCondition(request);
+        verify(contributionResponseDTOMapper).map(any(), any());
     }
 
     @Test
@@ -599,7 +568,7 @@ class ContributionServiceTest {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.empty());
 
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
+        ContributionResponseDTO response = contributionService.checkContributionsCondition(request);
 
         softly.assertThat(response.getDoContribs())
                 .isEqualTo("N");

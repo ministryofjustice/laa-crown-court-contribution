@@ -17,3 +17,5 @@ databaseChangeLog:
       file: db.changelog/changeset/08-contrib-appeal-rules-create.sql
   - include:
       file: db.changelog/changeset/09-contrib-appeal-rules-insert.sql
+  - include:
+      file: db.changelog/changeset/10-contribution-rules-table-drop.sql
