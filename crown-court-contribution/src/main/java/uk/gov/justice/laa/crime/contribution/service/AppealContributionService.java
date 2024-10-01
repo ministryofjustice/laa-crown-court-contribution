@@ -43,10 +43,14 @@ public class AppealContributionService {
             CalculateContributionDTO calculateContributionDTO) {
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
 
+        // TODO: Need to amend this mapper as we are no longer passing through lastOutcome field in DTO
+        // TODO: Also do we even need this object at all if we are only passing members of it later in method?
         GetContributionAmountRequest getContributionAmountRequest =
                 getContributionAmountRequestMapper.map(calculateContributionDTO, assessmentResult);
         BigDecimal appealContributionAmount = null;
 
+        // TODO: Replace this conditional with check for non empty list of outcomes
+        // TODO: Also change this if conditional to encompass the rest of the logic in this method
         if (getContributionAmountRequest.getOutcome() != null &&
                 getContributionAmountRequest.getAssessmentResult() != null) {
             appealContributionAmount = AppealContributionAmount.calculate(
