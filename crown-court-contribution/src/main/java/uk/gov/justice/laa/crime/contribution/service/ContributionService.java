@@ -6,15 +6,21 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
-import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOBuilder;
-import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
+import uk.gov.justice.laa.crime.contribution.common.Constants;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.contribution.dto.PassportAssessmentDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.*;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
@@ -22,7 +28,11 @@ import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
 import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
@@ -35,6 +45,7 @@ public class ContributionService {
     private static final String INEL = "INEL";
     private final CorrespondenceRuleRepository correspondenceRuleRepository;
     private final MaatCourtDataService maatCourtDataService;
+    private final ContributionResponseDTOMapper contributionResponseDTOMapper;
 
     protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
         List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(
@@ -63,7 +74,7 @@ public class ContributionService {
     public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
         AssessmentResponseDTO response = new AssessmentResponseDTO();
         response.setIojResult(ofNullable(request.getDecisionResult())
-                                      .orElse(request.getIojResult()));
+                .orElse(request.getIojResult()));
 
         if (StringUtils.isNotBlank(request.getPassportResult())) {
             if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
@@ -83,7 +94,7 @@ public class ContributionService {
         } else {
             if (StringUtils.isBlank(request.getFullResult())) {
                 response.setMeansResult(StringUtils.isBlank(request.getInitResult()) ? Constants.NONE
-                                                : Constants.INIT.concat(request.getInitResult()));
+                        : Constants.INIT.concat(request.getInitResult()));
             } else {
                 response.setMeansResult(request.getFullResult());
             }
@@ -92,87 +103,48 @@ public class ContributionService {
     }
 
     @Transactional
-    public ContributionResponseDTO checkContribsCondition(ContributionRequestDTO request) {
-        log.info("Checking contribution conditions ");
-        log.info("Checking contribution conditions - Monthly Contribs: {}", request.getMonthlyContribs());
-        log.info("Checking contribution request " + request);
+    public ContributionResponseDTO checkContributionsCondition(ContributionRequestDTO request) {
 
-        ContributionResponseDTO contributionResponseDTO;
         AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
 
-        ContributionResponseDTO contributionResponse = new ContributionResponseDTO();
-        contributionResponse.setDoContribs(Constants.N);
-        contributionResponse.setCalcContribs(Constants.N);
-
-        log.info("Contribution response before: {}", contributionResponse);
+        ContributionResponseDTO contributionResponse = ContributionResponseDTO.builder()
+                .doContribs(Constants.N)
+                .calcContribs(Constants.N)
+                .build();
 
         AssessmentResponseDTO assessmentResponseDTO = getAssessmentResult(assessmentRequestDTO);
         request.setIojResult(assessmentResponseDTO.getIojResult());
         request.setMeansResult(assessmentResponseDTO.getMeansResult());
-        log.info("Case type: {}", request.getCaseType());
+
         if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY).contains(request.getCaseType())
                 || request.getEffectiveDate() != null
                 || (CaseType.APPEAL_CC.equals(request.getCaseType()) && PASS.equals(request.getIojResult()))) {
-            contributionResponse.setDoContribs(Constants.Y);
-        }
-        log.info("DoContribs: {}", contributionResponse.getDoContribs());
 
-        if (contributionResponse.getDoContribs().equals(Constants.Y)) {
-            log.info("MeansResult --" + request.getMeansResult());
-            log.info("IojResult --" + request.getIojResult());
-            log.info("MagCourtOutcome --" + request.getMagCourtOutcome());
-            log.info("CrownCourtOutcome --" + request.getCrownCourtOutcome());
-            log.info("InitResult --" + request.getInitResult());
+            contributionResponse.setDoContribs(Constants.Y);
             CorrespondenceRuleAndTemplateInfo processedCases = getCoteInfo(request);
-            log.info("processedCases --" + processedCases);
+
             if (processedCases == null) {
                 contributionResponse.setDoContribs(Constants.N);
                 contributionResponse.setCalcContribs(Constants.N);
-                log.info("DoContribs --" + contributionResponse.getDoContribs());
-                log.info("CalcContribs --" + contributionResponse.getCalcContribs());
             } else {
-                log.info("processedCases has value");
-                contributionResponseDTO = ContributionResponseDTOBuilder.build(processedCases);
-                log.info("contributionResponseDTO--->" + contributionResponseDTO);
-                contributionResponse.setId(contributionResponseDTO.getId());
-                contributionResponse.setCalcContribs(contributionResponseDTO.getCalcContribs());
-                contributionResponse.setTemplateDesc(contributionResponseDTO.getTemplateDesc());
-                contributionResponse.setTemplate(contributionResponseDTO.getId());
-                contributionResponse.setCorrespondenceType(contributionResponseDTO.getCorrespondenceType());
-                contributionResponse.setUpliftCote(contributionResponseDTO.getUpliftCote());
-                contributionResponse.setReassessmentCoteId(contributionResponseDTO.getReassessmentCoteId());
-                CorrespondenceType correspondenceType =
-                        CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
-                if (correspondenceType != null) {
-                    contributionResponse.setCorrespondenceTypeDesc(correspondenceType.getDescription());
-                }
-                log.info("contributionResponse--->" + contributionResponse);
+                contributionResponseDTOMapper.map(processedCases, contributionResponse);
             }
         }
-        log.info("FullResult --" + request.getFullResult());
-        if (INEL.equals(request.getFullResult())) {
-            contributionResponse.setDoContribs(Constants.Y);
-        }
-        log.info("DoContribs after INEL check--" + contributionResponse.getDoContribs());
 
-        if (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0) {
+        if (INEL.equals(request.getFullResult()) ||
+                (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0)) {
             contributionResponse.setDoContribs(Constants.Y);
         }
-        log.info("DoContribs after MonthlyContribs check--" + contributionResponse.getDoContribs());
-        log.info("Remove Contrib--" + request.getRemoveContribs());
+
         if (Constants.Y.equals(request.getRemoveContribs())) {
             contributionResponse.setCalcContribs(Constants.N);
         }
-
-        log.info("Final Value for DoContribs is: {}", contributionResponse.getDoContribs());
-        log.info("Final Value for CalcContribs is: {}", contributionResponse.getCalcContribs());
 
         return contributionResponse;
     }
 
     @Transactional
     public CorrespondenceRuleAndTemplateInfo getCoteInfo(ContributionRequestDTO contributionRequestDTO) {
-        log.info("CorrespondenceRuleAndTemplateInfo: {}", contributionRequestDTO);
         return correspondenceRuleRepository.getCoteInfo(
                 contributionRequestDTO.getMeansResult(),
                 contributionRequestDTO.getIojResult(),

@@ -2,78 +2,25 @@ package uk.gov.justice.laa.crime.contribution.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
-import uk.gov.justice.laa.crime.contribution.staticdata.repository.ContributionRulesRepository;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ContributionRulesServiceTest {
     @InjectMocks
     private ContributionRulesService contributionRulesService;
-    @Mock
-    private ContributionRulesRepository contributionRulesRepository;
-
-    @Test
-    void givenEitherWayCaseType_whenGetContributionVariationIsInvoked_thenReturnCorrectResponse() {
-        when(contributionRulesRepository.findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
-                CaseType.EITHER_WAY.getCaseTypeString(), null, null))
-                .thenReturn(TestModelDataBuilder.getContributionRules());
-
-        Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
-                CaseType.EITHER_WAY, null, null);
-
-        assertThat(response.isPresent() ? response.get() : Optional.empty())
-                .isEqualTo(TestModelDataBuilder.getContributionVariationDTO());
-    }
-
-    @Test
-    void givenEitherWayCaseTypeAndValidMagCourtOutcome_whenGetContributionVariationIsInvoked_thenReturnCorrectResponse() {
-        when(contributionRulesRepository.findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
-                CaseType.EITHER_WAY.getCaseTypeString(), MagCourtOutcome.COMMITTED.getOutcome(), null))
-                .thenReturn(TestModelDataBuilder.getContributionRules());
-
-        Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
-                CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null);
-
-        assertThat(response.isPresent() ? response.get() : Optional.empty())
-                .isEqualTo(TestModelDataBuilder.getContributionVariationDTO());
-    }
-
-    @Test
-    void givenEitherWayCaseTypeAndAValidCCOutcome_whenGetContributionVariationIsInvoked_thenReturnEmptyResponse() {
-        when(contributionRulesRepository.findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
-                CaseType.EITHER_WAY.getCaseTypeString(), null, CrownCourtOutcome.PART_CONVICTED.getCode()))
-                .thenReturn(null);
-
-        Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
-                CaseType.EITHER_WAY, null, CrownCourtOutcome.PART_CONVICTED);
-
-        assertThat(response).isEmpty();
-    }
-
-    @Test
-    void givenIndictableCaseTypeWithValidOutcomes_whenGetContributionVariationIsInvoked_thenReturnEmptyResponse() {
-        when(contributionRulesRepository.findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
-                CaseType.INDICTABLE.getCaseTypeString(), MagCourtOutcome.COMMITTED.getOutcome(), CrownCourtOutcome.AQUITTED.getCode()))
-                .thenReturn(null);
-
-        Optional<ContributionVariationDTO> response = contributionRulesService.getContributionVariation(
-                CaseType.INDICTABLE, MagCourtOutcome.COMMITTED, CrownCourtOutcome.AQUITTED);
-
-        assertThat(response).isEmpty();
-    }
 
     @Test
     void givenCrownCourtSummaryWithValidOutcomes_whenGetActiveCCOutcomeIsInvoked_thenValidOutcomeIsReturned() {
@@ -94,13 +41,28 @@ class ContributionRulesServiceTest {
     }
 
     @Test
-    void givenContributionRulesAvailable_whenIsContributionRuleApplicableIsInvoked_thenTrueIsReturned() {
-        when(contributionRulesRepository.findContributionRulesEntitiesByCaseTypeAndVariationNotNullAndMagistratesCourtOutcomeAndCrownCourtOutcome(
-                CaseType.EITHER_WAY.getCaseTypeString(), MagCourtOutcome.COMMITTED.getOutcome(), null))
-                .thenReturn(TestModelDataBuilder.getContributionRules());
+    void givenEitherWayCaseResolvedInMagsCourt_whenIsContributionRuleApplicableIsInvoked_thenFalseIsReturned() {
         assertThat(contributionRulesService.isContributionRuleApplicable(
-                CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null
+                CaseType.EITHER_WAY, MagCourtOutcome.RESOLVED_IN_MAGS, null
+        )).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("contributionRuleApplicable")
+    void givenCaseTypeAndOutcomes_whenIsContributionRuleApplicableIsInvoked_thenValidResponseReturned(
+            CaseType caseType, MagCourtOutcome magCourtOutcome, CrownCourtOutcome crownCourtOutcome) {
+        assertThat(contributionRulesService.isContributionRuleApplicable(
+                caseType, magCourtOutcome, crownCourtOutcome
         )).isTrue();
     }
 
+    private static Stream<Arguments> contributionRuleApplicable() {
+        return Stream.of(
+                Arguments.of(CaseType.EITHER_WAY, null, null),
+                Arguments.of(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED_FOR_TRIAL, null),
+                Arguments.of(CaseType.EITHER_WAY, MagCourtOutcome.COMMITTED, null),
+                Arguments.of(CaseType.EITHER_WAY, MagCourtOutcome.SENT_FOR_TRIAL, null),
+                Arguments.of(CaseType.EITHER_WAY, MagCourtOutcome.APPEAL_TO_CC, null)
+        );
+    }
 }

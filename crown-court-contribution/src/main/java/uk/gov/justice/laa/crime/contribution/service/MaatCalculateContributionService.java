@@ -21,7 +21,6 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionVariationDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
@@ -38,7 +37,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -173,10 +171,10 @@ public class MaatCalculateContributionService {
         String crownCourtOutcome = getCrownCourtOutcome(calculateContributionDTO);
 
         String magCourtOutcome = (calculateContributionDTO.getMagCourtOutcome() != null) ?
-            calculateContributionDTO.getMagCourtOutcome().getOutcome() : null;
+                calculateContributionDTO.getMagCourtOutcome().getOutcome() : null;
 
         ContributionResponseDTO contributionResponseDTO =
-                contributionService.checkContribsCondition(
+                contributionService.checkContributionsCondition(
                         ContributionRequestDTO.builder()
                                 .caseType(calculateContributionDTO.getCaseType())
                                 .effectiveDate(calculateContributionDTO.getEffectiveDate())
@@ -293,15 +291,8 @@ public class MaatCalculateContributionService {
                 maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assEffectiveDate));
         CrownCourtOutcome crownCourtOutcome =
                 contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
-        boolean isContributionRuleApplicable =
-                contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
-                        calculateContributionDTO.getMagCourtOutcome(),
-                        crownCourtOutcome
-                );
 
-        BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, crownCourtOutcome,
-                isContributionRuleApplicable
-        );
+        BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, crownCourtOutcome);
         int totalMonths = Constants.N.equals(
                 contributionResponseDTO.getCalcContribs()) ? 0 : contributionCalcParametersDTO.getTotalMonths();
 
@@ -334,47 +325,32 @@ public class MaatCalculateContributionService {
     }
 
     public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,
-                                                      final CrownCourtOutcome crownCourtOutcome,
-                                                      boolean isContributionRuleApplicable) {
-        BigDecimal annualDisposableIncome = calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
-        if (annualDisposableIncome == null) {
-            if (isContributionRuleApplicable) {
-                annualDisposableIncome = getAnnualDisposableIncome(calculateContributionDTO);
-                Optional<ContributionVariationDTO> contributionVariation =
-                        contributionRulesService.getContributionVariation(calculateContributionDTO.getCaseType(),
-                                calculateContributionDTO.getMagCourtOutcome(),
-                                crownCourtOutcome
-                        );
-
-                if (contributionVariation.isPresent()) {
-                    annualDisposableIncome = annualDisposableIncome
-                            .add(calculateVariationAmount(calculateContributionDTO.getRepId(),
-                                    contributionVariation.get()
-                            ));
-                }
-            } else {
-                if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
-                    annualDisposableIncome = calculateContributionDTO.getTotalAnnualDisposableIncome();
-                } else {
-                    annualDisposableIncome = BigDecimal.ZERO;
-                }
-            }
+                                                      final CrownCourtOutcome crownCourtOutcome) {
+        if (calculateContributionDTO.getDisposableIncomeAfterCrownHardship() != null) {
+            return calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
         }
-        return annualDisposableIncome;
+
+        boolean isContributionRuleApplicable =
+                contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
+                        calculateContributionDTO.getMagCourtOutcome(),
+                        crownCourtOutcome
+                );
+        if (isContributionRuleApplicable) {
+            return getAnnualDisposableIncome(calculateContributionDTO)
+                    .add(calculateVariationAmount(calculateContributionDTO.getRepId()));
+        }
+
+        if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
+            return calculateContributionDTO.getTotalAnnualDisposableIncome();
+        }
+        return BigDecimal.ZERO;
     }
 
-    public BigDecimal calculateVariationAmount(final Integer repId,
-                                               final ContributionVariationDTO contributionVariation) {
+    public BigDecimal calculateVariationAmount(final Integer repId) {
         ApiCalculateHardshipByDetailResponse apiCalculateHardshipByDetailResponse =
                 crimeHardshipService.calculateHardshipForDetail(new ApiCalculateHardshipByDetailRequest()
-                        .withDetailType(Objects.requireNonNull(
-                                        HardshipReviewDetailType.getFrom(contributionVariation.getVariation()))
-                                .toString())
+                        .withDetailType(HardshipReviewDetailType.SOL_COSTS.toString())
                         .withRepId(repId));
-        if ("+".equals(contributionVariation.getVariationRule())) {
-            return apiCalculateHardshipByDetailResponse.getHardshipSummary();
-        } else {
-            return BigDecimal.ZERO;
-        }
+        return apiCalculateHardshipByDetailResponse.getHardshipSummary();
     }
 }

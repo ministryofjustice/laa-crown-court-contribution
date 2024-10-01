@@ -11,10 +11,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
+import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
@@ -34,7 +40,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.*;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FAIL;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FAILPORT;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.HARDSHIP_APPLICATION;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.INIT;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.NONE;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASSPORT;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.TEMP;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
 
@@ -59,7 +73,7 @@ class ContributionServiceTest {
     private CorrespondenceRuleRepository repository;
 
     @Mock
-    private CompareContributionService compareContributionService;
+    private ContributionResponseDTOMapper contributionResponseDTOMapper;
 
     private static Stream<Arguments> getAssessmentRequestForIojResult() {
         return Stream.of(
@@ -331,8 +345,41 @@ class ContributionServiceTest {
         );
     }
 
-    private static Stream<Arguments> NoContributionRequest() {
+    private static Stream<Arguments> contributionRequest() {
         return Stream.of(
+                Arguments.of(
+                        new ContributionRequestDTO(PASS,
+                                PASS,
+                                CaseType.INDICTABLE,
+                                null,
+                                PASS,
+                                PASS,
+                                PASS,
+                                FAIL,
+                                "INEL",
+                                PASS,
+                                BigDecimal.ONE,
+                                CONTRIBUTION_YES,
+                                PASS
+                        )
+                ),
+                Arguments.of(
+                        new ContributionRequestDTO(
+                                PASS,
+                                PASS,
+                                CaseType.INDICTABLE,
+                                null,
+                                PASS,
+                                PASS,
+                                PASS,
+                                FAIL,
+                                FULL,
+                                PASS,
+                                BigDecimal.ONE,
+                                CONTRIBUTION_YES,
+                                PASS
+                        )
+                ),
                 Arguments.of(
                         new ContributionRequestDTO(
                                 PASS,
@@ -437,44 +484,6 @@ class ContributionServiceTest {
         );
     }
 
-    private static Stream<Arguments> contributionRequest() {
-        return Stream.of(
-                Arguments.of(
-                        new ContributionRequestDTO(PASS,
-                                PASS,
-                                CaseType.INDICTABLE,
-                                null,
-                                PASS,
-                                PASS,
-                                PASS,
-                                FAIL,
-                                "INEL",
-                                PASS,
-                                BigDecimal.ONE,
-                                CONTRIBUTION_YES,
-                                PASS
-                        )
-                ),
-                Arguments.of(
-                        new ContributionRequestDTO(
-                                PASS,
-                                PASS,
-                                CaseType.INDICTABLE,
-                                null,
-                                PASS,
-                                PASS,
-                                PASS,
-                                FAIL,
-                                FULL,
-                                PASS,
-                                BigDecimal.ONE,
-                                CONTRIBUTION_YES,
-                                PASS
-                        )
-                )
-        );
-    }
-
     @ParameterizedTest()
     @MethodSource("getAssessmentRequestForIojResult")
     void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnCorrectIojResultResponse(
@@ -511,83 +520,27 @@ class ContributionServiceTest {
     @ParameterizedTest()
     @MethodSource("inValidContributionRequest")
     void givenAInvalidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnNull(ContributionRequestDTO request) {
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
+        ContributionResponseDTO response = contributionService.checkContributionsCondition(request);
 
         assertThat(response.getId())
                 .isNull();
     }
 
     @ParameterizedTest()
-    @MethodSource("NoContributionRequest")
-    void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnNoContribution(
+    @MethodSource("contributionRequest")
+    void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnValidContribution(
             ContributionRequestDTO request) {
 
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
 
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-
-        softly.assertThat(response.getId())
-                .isEqualTo(1);
-        softly.assertThat(response.getCorrespondenceType())
-                .isEqualTo("CONTRIBUTION_NOTICE");
-        softly.assertThat(response.getCorrespondenceTypeDesc())
-                .isEqualTo("Contribution Notice");
-        softly.assertThat(response.getUpliftCote())
-                .isEqualTo(1);
-        softly.assertThat(response.getReassessmentCoteId())
-                .isEqualTo(1);
-        softly.assertThat(response.getTemplateDesc())
-                .isEqualTo("No contributions required");
-    }
-
-    @ParameterizedTest()
-    @MethodSource("contributionRequest")
-    void givenAValidContributeRequest_whenCheckContribConditionIsInvoked_thenReturnYesContribution(
-            ContributionRequestDTO request) {
-
-        when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(Optional.of(TestModelDataBuilder.getCorrespondenceRuleAndTemplateInfo()));
-
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-
-        softly.assertThat(response.getDoContribs())
-                .isEqualTo("Y");
-        softly.assertThat(response.getId())
-                .isEqualTo(1);
-        softly.assertThat(response.getCorrespondenceType())
-                .isEqualTo("CONTRIBUTION_NOTICE");
-        softly.assertThat(response.getCorrespondenceTypeDesc())
-                .isEqualTo("Contribution Notice");
-        softly.assertThat(response.getUpliftCote())
-                .isEqualTo(1);
-        softly.assertThat(response.getReassessmentCoteId())
-                .isEqualTo(1);
-        softly.assertThat(response.getTemplateDesc())
-                .isEqualTo("No contributions required");
-    }
-
-    @ParameterizedTest()
-    @MethodSource("contributionRequest")
-    void givenAValidContributeRequestAndEmptyCorrespondence_whenCheckContribConditionIsInvoked_thenReturnYesContribution(
-            ContributionRequestDTO request) {
-
-        when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(Optional.of(TestModelDataBuilder.getEmptyCorrespondenceRuleAndTemplateInfo()));
-
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
-
-        softly.assertThat(response.getDoContribs())
-                .isEqualTo("Y");
-        softly.assertThat(response.getId())
-                .isEqualTo(1);
-        softly.assertThat(response.getCorrespondenceType())
-                .isEmpty();
+        contributionService.checkContributionsCondition(request);
+        verify(contributionResponseDTOMapper).map(any(), any());
     }
 
     @Test
     void givenAValidContributionRequest_whenCheckContribConditionIsInvoked_thenReturnNoContribution() {
-        ContributionRequestDTO request  = ContributionRequestDTO.builder()
+        ContributionRequestDTO request = ContributionRequestDTO.builder()
                 .caseType(CaseType.INDICTABLE)
                 .initResult("FULL")
                 .fullResult("PASS")
@@ -599,7 +552,7 @@ class ContributionServiceTest {
         when(repository.getCoteInfo(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.empty());
 
-        ContributionResponseDTO response = contributionService.checkContribsCondition(request);
+        ContributionResponseDTO response = contributionService.checkContributionsCondition(request);
 
         softly.assertThat(response.getDoContribs())
                 .isEqualTo("N");
