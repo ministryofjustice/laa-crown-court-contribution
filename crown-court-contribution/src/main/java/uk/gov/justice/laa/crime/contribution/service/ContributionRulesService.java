@@ -29,8 +29,8 @@ public class ContributionRulesService {
                                                 MagCourtOutcome magCourtOutcome,
                                                 CrownCourtOutcome crownCourtOutcome) {
 
-        return (CaseType.EITHER_WAY == caseType) && (crownCourtOutcome == null) &&
-                ((magCourtOutcome == null) || Set.of(MagCourtOutcome.COMMITTED_FOR_TRIAL, MagCourtOutcome.COMMITTED,
-                MagCourtOutcome.SENT_FOR_TRIAL, MagCourtOutcome.APPEAL_TO_CC).contains(magCourtOutcome));
+        return CaseType.EITHER_WAY == caseType && crownCourtOutcome == null &&
+                (magCourtOutcome == null || Set.of(MagCourtOutcome.COMMITTED_FOR_TRIAL, MagCourtOutcome.COMMITTED,
+                        MagCourtOutcome.SENT_FOR_TRIAL, MagCourtOutcome.APPEAL_TO_CC).contains(magCourtOutcome));
     }
 }
