@@ -22,11 +22,9 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
-import uk.gov.justice.laa.crime.contribution.validation.CalculateContributionValidator;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.any;
@@ -57,9 +55,6 @@ class ContributionControllerTest {
     private ContributionService contributionService;
 
     @MockBean
-    private CalculateContributionValidator calculateContributionValidator;
-
-    @MockBean
     private MaatCalculateContributionService maatCalculateContributionService;
 
     @MockBean
@@ -74,9 +69,6 @@ class ContributionControllerTest {
                 TestModelDataBuilder.buildAppealContributionRequest();
 
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
-
-        when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class)))
-                .thenReturn(Optional.empty());
 
         when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class)))
                 .thenReturn(new ApiMaatCalculateContributionResponse());
@@ -100,9 +92,6 @@ class ContributionControllerTest {
                 TestModelDataBuilder.buildAppealContributionRequest();
 
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
-
-        when(calculateContributionValidator.validate(any(ApiMaatCalculateContributionRequest.class)))
-                .thenReturn(Optional.empty());
 
         when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class)))
                 .thenThrow(new APIClientException("Test api client exception"));
