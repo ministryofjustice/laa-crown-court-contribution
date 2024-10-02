@@ -277,7 +277,6 @@ public class TestModelDataBuilder {
                 .withCaseType(CaseType.APPEAL_CC)
                 .withAppealType(AppealType.ACS)
                 .withUserCreated("TEST")
-                .withLastOutcome(buildLastOutcome())
                 .withAssessments(List.of(buildAssessment()));
     }
 
@@ -288,7 +287,6 @@ public class TestModelDataBuilder {
                 .withCaseType(CaseType.EITHER_WAY)
                 .withAppealType(AppealType.ACS)
                 .withUserCreated("TEST")
-                .withLastOutcome(buildLastOutcome())
                 .withAssessments(List.of(buildAssessment()));
     }
 
@@ -314,12 +312,6 @@ public class TestModelDataBuilder {
                 .withMinimumMonthlyAmount(new BigDecimal(100))
                 .withContributionCap(new BigDecimal(50))
                 .withUpliftApplied(false);
-    }
-
-    public static LastOutcome buildLastOutcome() {
-        return new LastOutcome()
-                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withDateSet(TEST_DATE);
     }
 
     public static ApiAssessment buildAssessment() {
@@ -352,7 +344,6 @@ public class TestModelDataBuilder {
                 .effectiveDate(effectiveDate)
                 .magCourtOutcome(magCourtOutcome)
                 .assessments(List.of(buildAssessment()))
-                .lastOutcome(buildLastOutcome())
                 .userCreated("TEST")
                 .repOrderDTO(getRepOrderDTOForCaseType(caseType))
                 .calcDate(CALC_DATE)

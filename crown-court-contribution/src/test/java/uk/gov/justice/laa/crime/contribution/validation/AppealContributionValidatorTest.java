@@ -41,18 +41,6 @@ class AppealContributionValidatorTest {
     }
 
     @Test
-    void givenIncorrectOutcomeDateSet_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
-        ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
-        LastOutcome lastOutcome = TestModelDataBuilder.buildLastOutcome();
-        lastOutcome.setDateSet(LocalDateTime.now().plusDays(1));
-        maatCalculateContributionRequest.setLastOutcome(lastOutcome);
-
-        assertThatThrownBy(() -> calculateContributionValidator.validate(maatCalculateContributionRequest))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("The dateSet for lastOutcome is invalid");
-    }
-
-    @Test
     void givenNoCompleteAssessment_whenValidateIsInvoked_thenValidationExceptionIsRaised() {
         ApiMaatCalculateContributionRequest maatCalculateContributionRequest = TestModelDataBuilder.buildCalculateContributionRequest();
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();

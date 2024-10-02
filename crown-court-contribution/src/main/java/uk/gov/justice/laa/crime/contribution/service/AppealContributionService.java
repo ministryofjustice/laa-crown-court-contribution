@@ -47,9 +47,8 @@ public class AppealContributionService {
                 .reduce((first, second) -> second)
                 .orElse(null);
 
-        BigDecimal appealContributionAmount = null;
         if (latestAppealOutcome != null) {
-            appealContributionAmount = AppealContributionAmount.calculate(
+            BigDecimal appealContributionAmount = AppealContributionAmount.calculate(
                             calculateContributionDTO.getAppealType(), latestAppealOutcome.getOutcome(),
                             assessmentResult
                     )
@@ -60,8 +59,7 @@ public class AppealContributionService {
             if (CollectionUtils.isNotEmpty(currContributionList)) {
                 Contribution currContribution = currContributionList.get(0);
                 if (currContribution.getUpfrontContributions() == null
-                        || (appealContributionAmount == null
-                        || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0)) {
+                        || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
                     CreateContributionRequest createContributionRequest =
                             createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
                     Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
