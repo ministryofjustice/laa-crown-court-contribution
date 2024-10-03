@@ -18,7 +18,9 @@ import uk.gov.justice.laa.crime.enums.CrownCourtOutcomeType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,7 +43,8 @@ public class AppealContributionService {
     public ApiMaatCalculateContributionResponse calculateAppealContribution(
             CalculateContributionDTO calculateContributionDTO) {
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
-        ApiCrownCourtOutcome latestAppealOutcome = calculateContributionDTO.getCrownCourtOutcomeList()
+        ApiCrownCourtOutcome latestAppealOutcome = Optional.ofNullable(calculateContributionDTO.getCrownCourtOutcomeList())
+                .orElse(Collections.emptyList())
                 .stream()
                 .filter(outcome -> CrownCourtOutcomeType.APPEAL.getType().equals(outcome.getOutcome().getType()))
                 .reduce((first, second) -> second)

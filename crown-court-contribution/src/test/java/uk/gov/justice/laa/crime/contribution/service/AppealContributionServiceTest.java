@@ -52,25 +52,27 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
+        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummary());
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.setResult(AssessmentResult.FAIL);
         calculateContributionDTO.setAssessments(List.of(assessment));
-
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(250));
+        Contribution createdContribution = TestModelDataBuilder.buildContribution();
 
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
-
         when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
-
-        Contribution createdContribution = TestModelDataBuilder.buildContribution();
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
                 .thenReturn(createdContribution);
 
         appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
+        verify(maatCourtDataService, times(1))
+                .findContribution(calculateContributionDTO.getRepId(), true);
+        verify(maatCourtDataService, times(1))
+                .createContribution(any(CreateContributionRequest.class));
         verify(maatCalculateContributionResponseMapper, times(1))
                 .map(createdContribution);
     }
@@ -86,6 +88,7 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
+        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummary());
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
 
@@ -94,11 +97,12 @@ class AppealContributionServiceTest {
 
         appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
-        verify(maatCalculateContributionResponseMapper, times(1))
-                .map(currContribution);
-
+        verify(maatCourtDataService, times(1))
+                .findContribution(calculateContributionDTO.getRepId(), true);
         verify(maatCourtDataService, times(0))
                 .createContribution(any(CreateContributionRequest.class));
+        verify(maatCalculateContributionResponseMapper, times(1))
+                .map(currContribution);
     }
 
     @Test
@@ -116,10 +120,11 @@ class AppealContributionServiceTest {
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
 
-        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
-                .thenReturn(null);
         ApiMaatCalculateContributionResponse response =
                 appealContributionService.calculateAppealContribution(calculateContributionDTO);
+
+        verify(maatCourtDataService, times(0))
+                .findContribution(anyInt(), anyBoolean());
         assertThat(response.getContributionId()).isNull();
     }
 }
