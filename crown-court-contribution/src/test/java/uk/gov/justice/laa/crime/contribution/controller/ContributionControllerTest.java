@@ -29,8 +29,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @DirtiesContext
@@ -43,7 +46,6 @@ class ContributionControllerTest {
     private static final String CHECK_CONTRIBUTION_RULE_ENDPOINT_URL = BASE_URL + "/check-contribution-rule";
     private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL =
             BASE_URL + "summaries/" + TestModelDataBuilder.REP_ID;
-    private static final String REQUEST_CONTRIBUTIONS_TRANSFER_ENDPOINT_URL = BASE_URL + "request-transfer";
 
     @Autowired
     private MockMvc mvc;
@@ -129,30 +131,6 @@ class ContributionControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
-
-    @Test
-    void givenValidRequest_whenRequestTransferIsInvoked_thenOkResponse() throws Exception {
-        ApiContributionTransferRequest request = new ApiContributionTransferRequest()
-                .withContributionId(1000)
-                .withUserModified("mock-u");
-
-        String body = objectMapper.writeValueAsString(request);
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, body, REQUEST_CONTRIBUTIONS_TRANSFER_ENDPOINT_URL, true))
-                .andExpect(status().isOk());
-
-        verify(contributionService).requestTransfer(any(ApiContributionTransferRequest.class));
-    }
-
-    @Test
-    void givenInValidRequest_whenRequestTransferIsInvoked_thenBadRequestResponse() throws Exception {
-        ApiContributionTransferRequest request = new ApiContributionTransferRequest()
-                .withContributionId(1000);
-
-        String body = objectMapper.writeValueAsString(request);
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, body, REQUEST_CONTRIBUTIONS_TRANSFER_ENDPOINT_URL, true))
-                .andExpect(status().isBadRequest());
-    }
-
 
     @Test
     void givenValidRequest_whenCheckContributionRuleIsInvoked_thenOkResponse() throws Exception {

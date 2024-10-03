@@ -11,8 +11,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
@@ -802,14 +800,5 @@ class ContributionServiceTest {
                 .isFalse();
     }
 
-    @Test
-    void givenContributionTransferRequest_whenTransferRequestIsInvoked_thenCourtDataAPIIsCalled() {
-        ApiContributionTransferRequest data = new ApiContributionTransferRequest()
-                .withUserModified("mock-u")
-                .withContributionId(1000);
-
-        contributionService.requestTransfer(data);
-        verify(maatCourtDataService).updateContribution(any(UpdateContributionRequest.class));
-    }
 }
 
