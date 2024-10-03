@@ -1,6 +1,12 @@
 server:
   port: 8089
 
+logging:
+  level:
+    root: ${LOG_LEVEL}
+    org.springframework.web: ${LOG_LEVEL}
+    org.springframework.security: ${LOG_LEVEL}
+
 management:
   server:
     port: 8098
