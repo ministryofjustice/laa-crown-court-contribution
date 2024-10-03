@@ -8,16 +8,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -58,12 +55,6 @@ class AppealContributionServiceTest {
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.setResult(AssessmentResult.FAIL);
         calculateContributionDTO.setAssessments(List.of(assessment));
-        GetContributionAmountRequest getContributionAmountRequest =
-                new GetContributionAmountRequest()
-                        .withCaseType(CaseType.APPEAL_CC)
-                        .withAppealType(AppealType.ACS)
-                        .withOutcome(CrownCourtAppealOutcome.UNSUCCESSFUL)
-                        .withAssessmentResult(AssessmentResult.FAIL);
 
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(250));
@@ -95,12 +86,6 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
-        GetContributionAmountRequest getContributionAmountRequest =
-                new GetContributionAmountRequest()
-                        .withCaseType(CaseType.APPEAL_CC)
-                        .withAppealType(AppealType.ACS)
-                        .withOutcome(CrownCourtAppealOutcome.UNSUCCESSFUL)
-                        .withAssessmentResult(AssessmentResult.PASS);
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
 

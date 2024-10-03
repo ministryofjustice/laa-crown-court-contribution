@@ -14,22 +14,6 @@ import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToD
 @Component
 @AllArgsConstructor
 public class CreateContributionRequestMapper {
-    public CreateContributionRequest map(ApiMaatCalculateContributionRequest appealContributionRequest, BigDecimal appealContributionAmount) {
-        return new CreateContributionRequest()
-                .withRepId(appealContributionRequest.getRepId())
-                .withApplicantId(appealContributionRequest.getApplicantId())
-                .withContributionCap(BigDecimal.ZERO)
-                .withEffectiveDate((appealContributionRequest.getLastOutcome().getDateSet() != null) ? appealContributionRequest.getLastOutcome().getDateSet() : null)
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpliftApplied("N")
-                .withBasedOn(null)
-                .withUpfrontContributions(appealContributionAmount)
-                .withUserCreated(appealContributionRequest.getUserCreated())
-                .withCorrespondenceId(null)
-                .withCreateContributionOrder("N");
-
-    }
-
     public CreateContributionRequest map(CalculateContributionDTO calculateContributionDTO, BigDecimal appealContributionAmount) {
         CreateContributionRequest createContributionRequest = map(calculateContributionDTO);
         return createContributionRequest.withUpfrontContributions(appealContributionAmount);
