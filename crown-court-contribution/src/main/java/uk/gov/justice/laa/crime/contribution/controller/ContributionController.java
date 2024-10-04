@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.contribution.controller;
 
+import io.sentry.Sentry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -77,6 +78,13 @@ public class ContributionController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<List<ApiContributionSummary>> getContributionSummaries(
             @PathVariable int repId) {
+        Sentry.captureMessage("This sentry connection");
+        try {
+            throw new RuntimeException("Test error");
+        } catch (Exception e) {
+            Sentry.captureException(e);
+        }
+        Sentry.close();
         log.info("Received request to get contribution summaries for repId {}", repId);
         return ResponseEntity.ok(maatCalculateContributionService.getContributionSummaries(repId));
     }
