@@ -8,8 +8,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.contribution.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
@@ -19,18 +17,17 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.enums.AppealType;
-import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 import uk.gov.justice.laa.crime.enums.contribution.CorrespondenceStatus;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class MaatCourtDataServiceTest {
@@ -58,15 +55,6 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.createContribution(new CreateContributionRequest());
         verify(maatCourtDataClient).post(
                 any(CreateContributionRequest.class), eq(new ParameterizedTypeReference<Contribution>() {
-                }), anyString(), anyMap()
-        );
-    }
-
-    @Test
-    void givenValidParams_whenUpdateContributionIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.updateContribution(new UpdateContributionRequest());
-        verify(maatCourtDataClient).put(
-                any(UpdateContributionRequest.class), eq(new ParameterizedTypeReference<Contribution>() {
                 }), anyString(), anyMap()
         );
     }
@@ -111,8 +99,8 @@ class MaatCourtDataServiceTest {
     void givenAValidRepId_whenGetRepOrderCCOutcomeByRepIdIsInvoked_thenReturnOutcome() {
         maatCourtDataService.getRepOrderCCOutcomeByRepId(TEST_REP_ID);
         verify(maatCourtDataClient, atLeastOnce()).get(eq(new ParameterizedTypeReference<List<RepOrderCCOutcomeDTO>>() {
-                                                       }),
-                                                       anyString(), any()
+                }),
+                anyString(), any()
         );
     }
 
@@ -121,8 +109,8 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.getContributionsSummary(TEST_REP_ID);
 
         verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<List<ContributionsSummaryDTO>>() {
-                                        }),
-                                        anyString(), anyInt()
+                }),
+                anyString(), anyInt()
         );
     }
 
@@ -131,8 +119,8 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.getContributionCalcParameters(TestModelDataBuilder.TEST_DATE.toString());
 
         verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<ContributionCalcParametersDTO>() {
-                                        }),
-                                        anyString(), anyString()
+                }),
+                anyString(), anyString()
         );
     }
 }

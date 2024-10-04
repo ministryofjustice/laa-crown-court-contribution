@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.contribution.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
@@ -30,7 +29,6 @@ public class MaatCourtDataService {
 
     private static final String RESPONSE_STRING = "Response from Court Data API: {}";
 
-
     public List<Contribution> findContribution(Integer repId, Boolean findLatestContribution) {
         List<Contribution> response = maatAPIClient.get(
                 new ParameterizedTypeReference<>() {
@@ -45,18 +43,6 @@ public class MaatCourtDataService {
     public Contribution createContribution(CreateContributionRequest createContributionRequest) {
         Contribution response = maatAPIClient.post(
                 createContributionRequest,
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
-                Map.of()
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
-    public Contribution updateContribution(UpdateContributionRequest request) {
-        Contribution response = maatAPIClient.put(
-                request,
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
