@@ -78,10 +78,13 @@ public class ContributionController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<List<ApiContributionSummary>> getContributionSummaries(
             @PathVariable int repId) {
+        log.info("Should capture sentry message");
         Sentry.captureMessage("This sentry connection");
         try {
+            log.info("Throwing sentry error");
             throw new RuntimeException("Test error");
         } catch (Exception e) {
+            log.info("Catching sentry error");
             Sentry.captureException(e);
         }
         Sentry.close();
