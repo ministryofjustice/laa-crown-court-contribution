@@ -46,8 +46,8 @@ public class AppealContributionService {
         ApiCrownCourtOutcome latestAppealOutcome = Optional.ofNullable(calculateContributionDTO.getCrownCourtOutcomeList())
                 .orElse(Collections.emptyList())
                 .stream()
-                .filter(outcome -> CrownCourtOutcomeType.APPEAL.getType().equals(outcome.getOutcome().getType()))
                 .reduce((first, second) -> second)
+                .filter(outcome -> CrownCourtOutcomeType.APPEAL.getType().equals(outcome.getOutcome().getType()))
                 .orElse(null);
 
         if (latestAppealOutcome != null) {
