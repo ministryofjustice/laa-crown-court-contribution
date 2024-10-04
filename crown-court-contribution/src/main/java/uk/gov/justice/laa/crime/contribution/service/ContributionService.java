@@ -6,8 +6,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.UpdateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
@@ -25,7 +23,6 @@ import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
-import uk.gov.justice.laa.crime.enums.contribution.TransferStatus;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -190,11 +187,4 @@ public class ContributionService {
                 && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
     }
 
-    public void requestTransfer(final ApiContributionTransferRequest transferRequest) {
-        UpdateContributionRequest updateRequest = new UpdateContributionRequest()
-                .withId(transferRequest.getContributionId())
-                .withTransferStatus(TransferStatus.REQUESTED)
-                .withUserModified(transferRequest.getUserModified());
-        maatCourtDataService.updateContribution(updateRequest);
-    }
 }
