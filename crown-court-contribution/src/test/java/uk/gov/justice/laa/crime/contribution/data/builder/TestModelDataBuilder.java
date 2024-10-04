@@ -139,6 +139,11 @@ public class TestModelDataBuilder {
     }
 
     public static List<ApiCrownCourtOutcome> getApiCrownCourtSummary() {
+        return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.UNSUCCESSFUL),
+                getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED));
+    }
+
+    public static List<ApiCrownCourtOutcome> getApiCrownCourtSummaryAppeal() {
         return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED),
                 getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED),
                 getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));

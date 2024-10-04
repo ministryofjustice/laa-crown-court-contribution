@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
@@ -52,7 +53,8 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
-        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummary());
+
+        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummaryAppeal());
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.setResult(AssessmentResult.FAIL);
         calculateContributionDTO.setAssessments(List.of(assessment));
@@ -78,7 +80,7 @@ class AppealContributionServiceTest {
     }
 
     @Test
-    void givenAppealContributionAmountIsUnchanged_whenCalculateContributionIsInvoked_thenContributionDataIsReturned() {
+    void givenLatestOutcomeNotAppeal_whenCalculateAppealContributionIsInvoked_thenNullIsReturned() {
         CalculateContributionDTO calculateContributionDTO =
                 TestModelDataBuilder.getContributionDTOForCompareContributionService(
                         CaseType.APPEAL_CC.getCaseTypeString(),
@@ -89,6 +91,30 @@ class AppealContributionServiceTest {
                         null
                 );
         calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummary());
+        ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
+        assessment.setResult(AssessmentResult.FAIL);
+        calculateContributionDTO.setAssessments(List.of(assessment));
+
+        ApiMaatCalculateContributionResponse response =
+                appealContributionService.calculateAppealContribution(calculateContributionDTO);
+
+        verify(maatCourtDataService, times(0))
+                .findContribution(anyInt(), anyBoolean());
+        assertThat(response.getContributionId()).isNull();
+    }
+
+    @Test
+    void givenAppealContributionAmountIsUnchanged_whenCalculateContributionIsInvoked_thenContributionDataIsReturned() {
+        CalculateContributionDTO calculateContributionDTO =
+                TestModelDataBuilder.getContributionDTOForCompareContributionService(
+                        CaseType.APPEAL_CC.getCaseTypeString(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummaryAppeal());
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
 
