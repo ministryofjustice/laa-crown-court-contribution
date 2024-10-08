@@ -10,7 +10,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiContributionTransferRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
@@ -150,9 +149,10 @@ class ContributionControllerTest {
 
     @Test
     void givenInValidRequest_whenCheckContributionRuleIsInvoked_thenBadRequestResponse() throws Exception {
-        ApiContributionTransferRequest request = new ApiContributionTransferRequest()
-                .withContributionId(1000);
-        String body = objectMapper.writeValueAsString(request);
+        ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
+                TestModelDataBuilder.buildCheckContributionRuleRequest();
+        apiMaatCheckContributionRuleRequest.setCaseType(null);
+        String body = objectMapper.writeValueAsString(apiMaatCheckContributionRuleRequest);
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, body, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
                 .andExpect(status().isBadRequest());
     }
