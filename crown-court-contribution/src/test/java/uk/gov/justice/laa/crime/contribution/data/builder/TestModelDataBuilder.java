@@ -8,7 +8,6 @@ import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributi
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
@@ -25,7 +24,6 @@ import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTem
 import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
@@ -141,6 +139,11 @@ public class TestModelDataBuilder {
     }
 
     public static List<ApiCrownCourtOutcome> getApiCrownCourtSummary() {
+        return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.UNSUCCESSFUL),
+                getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED));
+    }
+
+    public static List<ApiCrownCourtOutcome> getApiCrownCourtSummaryAppeal() {
         return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED),
                 getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED),
                 getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));
@@ -277,7 +280,6 @@ public class TestModelDataBuilder {
                 .withCaseType(CaseType.APPEAL_CC)
                 .withAppealType(AppealType.ACS)
                 .withUserCreated("TEST")
-                .withLastOutcome(buildLastOutcome())
                 .withAssessments(List.of(buildAssessment()));
     }
 
@@ -288,7 +290,6 @@ public class TestModelDataBuilder {
                 .withCaseType(CaseType.EITHER_WAY)
                 .withAppealType(AppealType.ACS)
                 .withUserCreated("TEST")
-                .withLastOutcome(buildLastOutcome())
                 .withAssessments(List.of(buildAssessment()));
     }
 
@@ -314,12 +315,6 @@ public class TestModelDataBuilder {
                 .withMinimumMonthlyAmount(new BigDecimal(100))
                 .withContributionCap(new BigDecimal(50))
                 .withUpliftApplied(false);
-    }
-
-    public static LastOutcome buildLastOutcome() {
-        return new LastOutcome()
-                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
-                .withDateSet(TEST_DATE);
     }
 
     public static ApiAssessment buildAssessment() {
@@ -352,7 +347,6 @@ public class TestModelDataBuilder {
                 .effectiveDate(effectiveDate)
                 .magCourtOutcome(magCourtOutcome)
                 .assessments(List.of(buildAssessment()))
-                .lastOutcome(buildLastOutcome())
                 .userCreated("TEST")
                 .repOrderDTO(getRepOrderDTOForCaseType(caseType))
                 .calcDate(CALC_DATE)

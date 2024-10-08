@@ -29,7 +29,6 @@ public class ContributionDTOBuilder {
                 .caseType(request.getCaseType())
                 .assessments(request.getAssessments())
                 .appealType(request.getAppealType())
-                .lastOutcome(request.getLastOutcome())
                 .removeContribs(request.getRemoveContributions())
                 .committalDate(DateUtil.parseLocalDate(request.getCommittalDate()))
                 .magCourtOutcome(request.getMagCourtOutcome())

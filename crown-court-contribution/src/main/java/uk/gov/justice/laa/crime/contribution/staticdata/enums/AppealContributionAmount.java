@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 
 import java.math.BigDecimal;
 
@@ -18,21 +18,21 @@ public enum AppealContributionAmount {
 
     private final BigDecimal contributionAmount;
 
-    public static AppealContributionAmount calculate(AppealType appealType, CrownCourtAppealOutcome appealOutcome, AssessmentResult assessmentResult) {
+    public static AppealContributionAmount calculate(AppealType appealType, CrownCourtOutcome appealOutcome, AssessmentResult assessmentResult) {
         if (AssessmentResult.PASS.equals(assessmentResult)) {
             return NO_CONTRIBUTION;
         }
 
-        if (CrownCourtAppealOutcome.SUCCESSFUL.equals(appealOutcome)) {
+        if (CrownCourtOutcome.SUCCESSFUL.equals(appealOutcome)) {
             return NO_CONTRIBUTION;
         }
 
-        if ((AppealType.ACS.equals(appealType) && CrownCourtAppealOutcome.PART_SUCCESS.equals(appealOutcome))
-                || (AppealType.ASE.equals(appealType) && CrownCourtAppealOutcome.UNSUCCESSFUL.equals(appealOutcome))) {
+        if ((AppealType.ACS.equals(appealType) && CrownCourtOutcome.PART_SUCCESS.equals(appealOutcome))
+                || (AppealType.ASE.equals(appealType) && CrownCourtOutcome.UNSUCCESSFUL.equals(appealOutcome))) {
             return PART_CONTRIBUTION;
         }
 
-        if (CrownCourtAppealOutcome.UNSUCCESSFUL.equals(appealOutcome)) {
+        if (CrownCourtOutcome.UNSUCCESSFUL.equals(appealOutcome)) {
             return FULL_CONTRIBUTION;
         }
 

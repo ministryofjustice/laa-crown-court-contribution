@@ -24,7 +24,7 @@ class ContributionRulesServiceTest {
 
     @Test
     void givenCrownCourtSummaryWithValidOutcomes_whenGetActiveCCOutcomeIsInvoked_thenValidOutcomeIsReturned() {
-        assertThat(contributionRulesService.getActiveCCOutcome(TestModelDataBuilder.getApiCrownCourtSummary()))
+        assertThat(contributionRulesService.getActiveCCOutcome(TestModelDataBuilder.getApiCrownCourtSummaryAppeal()))
                 .isEqualTo(CrownCourtOutcome.ABANDONED);
     }
 

@@ -24,26 +24,6 @@ class CreateContributionRequestMapperTest {
     private final CreateContributionRequestMapper mapper = new CreateContributionRequestMapper();
 
     @Test
-    void givenAValidAppealContributionRequest_whenMapIsInvoked_thenReturnCreateContributionRequest() {
-
-        CreateContributionRequest request = mapper
-                .map(TestModelDataBuilder.buildAppealContributionRequest(), new BigDecimal(500));
-        softly.assertThat(request.getRepId()).isEqualTo(999);
-        softly.assertThat(request.getApplicantId()).isEqualTo(999);
-        softly.assertThat(request.getContributionCap()).isZero();
-        softly.assertThat(request.getEffectiveDate()).isEqualTo(TestModelDataBuilder.TEST_DATE);
-        softly.assertThat(request.getMonthlyContributions()).isZero();
-        softly.assertThat(request.getUpliftApplied()).isEqualTo("N");
-        softly.assertThat(request.getBasedOn()).isNull();
-        softly.assertThat(request.getUpfrontContributions()).isEqualTo(new BigDecimal(500));
-        softly.assertThat(request.getUserCreated()).isEqualTo("TEST");
-        softly.assertThat(request.getCorrespondenceId()).isNull();
-        softly.assertThat(request.getCreateContributionOrder()).isEqualTo("N");
-        softly.assertAll();
-
-    }
-
-    @Test
     void givenAValidContributionDTO_whenMapIsInvoked_thenReturnCreateContributionRequest() {
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCompareContributionService(CaseType.COMMITAL.getCaseTypeString(),

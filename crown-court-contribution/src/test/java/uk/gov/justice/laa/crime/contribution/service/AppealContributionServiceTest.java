@@ -8,17 +8,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.maat_api.GetContributionAmountRequest;
 import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMapper;
-import uk.gov.justice.laa.crime.contribution.builder.GetContributionAmountRequestMapper;
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -36,9 +32,6 @@ class AppealContributionServiceTest {
 
     @Mock
     private MaatCourtDataService maatCourtDataService;
-
-    @Mock
-    private GetContributionAmountRequestMapper getContributionAmountRequestMapper;
 
     @Mock
     private CreateContributionRequestMapper createContributionRequestMapper;
@@ -59,36 +52,54 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
+
+        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummaryAppeal());
         ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
         assessment.setResult(AssessmentResult.FAIL);
         calculateContributionDTO.setAssessments(List.of(assessment));
-        GetContributionAmountRequest getContributionAmountRequest =
-                new GetContributionAmountRequest()
-                        .withCaseType(CaseType.APPEAL_CC)
-                        .withAppealType(AppealType.ACS)
-                        .withOutcome(CrownCourtAppealOutcome.UNSUCCESSFUL)
-                        .withAssessmentResult(AssessmentResult.FAIL);
-
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(250));
-
-        when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
-                .thenReturn(getContributionAmountRequest);
+        Contribution createdContribution = TestModelDataBuilder.buildContribution();
 
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
-
         when(createContributionRequestMapper.map(any(CalculateContributionDTO.class), any(BigDecimal.class)))
                 .thenReturn(new CreateContributionRequest());
-
-        Contribution createdContribution = TestModelDataBuilder.buildContribution();
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))
                 .thenReturn(createdContribution);
 
         appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
+        verify(maatCourtDataService, times(1))
+                .findContribution(calculateContributionDTO.getRepId(), true);
+        verify(maatCourtDataService, times(1))
+                .createContribution(any(CreateContributionRequest.class));
         verify(maatCalculateContributionResponseMapper, times(1))
                 .map(createdContribution);
+    }
+
+    @Test
+    void givenLatestOutcomeNotAppeal_whenCalculateAppealContributionIsInvoked_thenNullIsReturned() {
+        CalculateContributionDTO calculateContributionDTO =
+                TestModelDataBuilder.getContributionDTOForCompareContributionService(
+                        CaseType.APPEAL_CC.getCaseTypeString(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummary());
+        ApiAssessment assessment = TestModelDataBuilder.buildAssessment();
+        assessment.setResult(AssessmentResult.FAIL);
+        calculateContributionDTO.setAssessments(List.of(assessment));
+
+        ApiMaatCalculateContributionResponse response =
+                appealContributionService.calculateAppealContribution(calculateContributionDTO);
+
+        verify(maatCourtDataService, times(0))
+                .findContribution(anyInt(), anyBoolean());
+        assertThat(response.getContributionId()).isNull();
     }
 
     @Test
@@ -102,28 +113,21 @@ class AppealContributionServiceTest {
                         null,
                         null
                 );
-        GetContributionAmountRequest getContributionAmountRequest =
-                new GetContributionAmountRequest()
-                        .withCaseType(CaseType.APPEAL_CC)
-                        .withAppealType(AppealType.ACS)
-                        .withOutcome(CrownCourtAppealOutcome.UNSUCCESSFUL)
-                        .withAssessmentResult(AssessmentResult.PASS);
+        calculateContributionDTO.setCrownCourtOutcomeList(TestModelDataBuilder.getApiCrownCourtSummaryAppeal());
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
-
-        when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
-                .thenReturn(getContributionAmountRequest);
 
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(currContribution));
 
         appealContributionService.calculateAppealContribution(calculateContributionDTO);
 
-        verify(maatCalculateContributionResponseMapper, times(1))
-                .map(currContribution);
-
+        verify(maatCourtDataService, times(1))
+                .findContribution(calculateContributionDTO.getRepId(), true);
         verify(maatCourtDataService, times(0))
                 .createContribution(any(CreateContributionRequest.class));
+        verify(maatCalculateContributionResponseMapper, times(1))
+                .map(currContribution);
     }
 
     @Test
@@ -141,12 +145,11 @@ class AppealContributionServiceTest {
         Contribution currContribution = Contribution.builder().build();
         currContribution.setUpfrontContributions(BigDecimal.valueOf(0));
 
-        when(getContributionAmountRequestMapper.map(any(CalculateContributionDTO.class), any(AssessmentResult.class)))
-                .thenReturn(new GetContributionAmountRequest());
-        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
-                .thenReturn(null);
         ApiMaatCalculateContributionResponse response =
                 appealContributionService.calculateAppealContribution(calculateContributionDTO);
+
+        verify(maatCourtDataService, times(0))
+                .findContribution(anyInt(), anyBoolean());
         assertThat(response.getContributionId()).isNull();
     }
 }

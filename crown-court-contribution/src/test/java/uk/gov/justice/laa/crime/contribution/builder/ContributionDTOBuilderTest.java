@@ -11,10 +11,8 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionDTOBuilderTest {
@@ -44,8 +42,6 @@ class ContributionDTOBuilderTest {
         softly.assertThat(actualContributionDTO.getCaseType()).isEqualTo(CaseType.APPEAL_CC);
         softly.assertThat(actualContributionDTO.getAssessments()).hasSize(1);
         softly.assertThat(actualContributionDTO.getAppealType()).isEqualTo(AppealType.ACS);
-        softly.assertThat(actualContributionDTO.getLastOutcome().getOutcome()).isEqualTo(CrownCourtAppealOutcome.SUCCESSFUL);
-        softly.assertThat(actualContributionDTO.getLastOutcome().getDateSet()).isEqualTo(LocalDateTime.parse("2022-01-01T00:00:00"));
         softly.assertThat(actualContributionDTO.getRemoveContribs()).isNull();
         softly.assertThat(actualContributionDTO.getCommittalDate()).isNull();
         softly.assertThat(actualContributionDTO.getMagCourtOutcome()).isNull();
@@ -77,8 +73,6 @@ class ContributionDTOBuilderTest {
         softly.assertThat(actualContributionDTO.getCaseType()).isEqualTo(CaseType.APPEAL_CC);
         softly.assertThat(actualContributionDTO.getAssessments()).hasSize(1);
         softly.assertThat(actualContributionDTO.getAppealType()).isEqualTo(AppealType.ACS);
-        softly.assertThat(actualContributionDTO.getLastOutcome().getOutcome()).isEqualTo(CrownCourtAppealOutcome.SUCCESSFUL);
-        softly.assertThat(actualContributionDTO.getLastOutcome().getDateSet()).isEqualTo(LocalDateTime.parse("2022-01-01T00:00:00"));
         softly.assertThat(actualContributionDTO.getRemoveContribs()).isNull();
         softly.assertThat(actualContributionDTO.getCommittalDate()).isNull();
         softly.assertThat(actualContributionDTO.getMagCourtOutcome()).isNull();

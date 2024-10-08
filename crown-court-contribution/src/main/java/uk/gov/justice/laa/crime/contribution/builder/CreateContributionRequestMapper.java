@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
@@ -14,22 +13,6 @@ import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToD
 @Component
 @AllArgsConstructor
 public class CreateContributionRequestMapper {
-    public CreateContributionRequest map(ApiMaatCalculateContributionRequest appealContributionRequest, BigDecimal appealContributionAmount) {
-        return new CreateContributionRequest()
-                .withRepId(appealContributionRequest.getRepId())
-                .withApplicantId(appealContributionRequest.getApplicantId())
-                .withContributionCap(BigDecimal.ZERO)
-                .withEffectiveDate((appealContributionRequest.getLastOutcome().getDateSet() != null) ? appealContributionRequest.getLastOutcome().getDateSet() : null)
-                .withMonthlyContributions(BigDecimal.ZERO)
-                .withUpliftApplied("N")
-                .withBasedOn(null)
-                .withUpfrontContributions(appealContributionAmount)
-                .withUserCreated(appealContributionRequest.getUserCreated())
-                .withCorrespondenceId(null)
-                .withCreateContributionOrder("N");
-
-    }
-
     public CreateContributionRequest map(CalculateContributionDTO calculateContributionDTO, BigDecimal appealContributionAmount) {
         CreateContributionRequest createContributionRequest = map(calculateContributionDTO);
         return createContributionRequest.withUpfrontContributions(appealContributionAmount);
