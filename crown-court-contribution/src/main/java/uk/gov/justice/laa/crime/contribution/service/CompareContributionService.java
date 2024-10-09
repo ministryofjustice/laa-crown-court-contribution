@@ -48,10 +48,8 @@ public class CompareContributionService {
 
     private int getResultOnNoPreviousContribution(RepOrderDTO repOrderDTO, int repId) {
         if (isCaseTypeAppealCC(repOrderDTO)) {
-            setCorrespondenceStatus(repId, CorrespondenceStatus.APPEAL_CC);
         }
         if (isCds15WorkAround(repOrderDTO)) {
-            setCorrespondenceStatus(repId, CorrespondenceStatus.CDS15);
         }
         return 0;
     }
@@ -81,7 +79,6 @@ public class CompareContributionService {
         MagCourtOutcome magCourtOutcome = calculateContributionDTO.getMagCourtOutcome();
         String magsOutcome = magCourtOutcome == null ? null : magCourtOutcome.getOutcome();
         if (magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(repOrderDTO, status, magsOutcome)) {
-            setCorrespondenceStatus(repId, CorrespondenceStatus.APPEAL_CC);
             return 1;
         }
         return getResultOnAppealToCCOrCds15WorkAroundOrReassessment(repOrderDTO, repId, status);
@@ -90,7 +87,6 @@ public class CompareContributionService {
     private int getResultOnAppealToCCOrCds15WorkAroundOrReassessment(RepOrderDTO repOrderDTO, int repId,
                                                                      CorrespondenceStatus status) {
         if (isStatusAppealCC(status)) {
-            setCorrespondenceStatus(repId, CorrespondenceStatus.NONE);
             return 2;
         }
         return getResultOnCds15EWorkAroundOrReassessment(repOrderDTO, repId, status);
@@ -108,10 +104,8 @@ public class CompareContributionService {
     private int getResultOnCds15WorkAround(int repId, CorrespondenceStatus status) {
         int result = 2;
         if (isStatusCds15(status)) {
-            setCorrespondenceStatus(repId, CorrespondenceStatus.NONE);
         } else if (isStatusReass(status)) {
             result = 1;
-            setCorrespondenceStatus(repId, CorrespondenceStatus.CDS15);
         }
         return result;
     }
@@ -134,10 +128,6 @@ public class CompareContributionService {
 
     private static boolean isStatusReass(CorrespondenceStatus status) {
         return CorrespondenceStatus.REASS.getStatus().equals(status.getStatus());
-    }
-
-    private void setCorrespondenceStatus(int repId, CorrespondenceStatus status) {
-        maatCourtDataService.updateCorrespondenceState(repId, status);
     }
 
     private boolean magCourtOutcomeHasChangedOrCaseTypeAndCorrespondenceStatusIsApealCC(RepOrderDTO repOrderDTO,
