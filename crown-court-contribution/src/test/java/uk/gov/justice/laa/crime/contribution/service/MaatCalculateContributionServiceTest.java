@@ -117,7 +117,7 @@ class MaatCalculateContributionServiceTest {
 
     @Test
     void givenValidContributionAndCompareResultIsLessThanTwo_whenCreateContributionsIsInvoked_thenContributionIsReturn() {
-        when(compareContributionService.compareContribution(
+        when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
         ).thenReturn(1);
 
@@ -132,7 +132,7 @@ class MaatCalculateContributionServiceTest {
 
     @Test
     void givenValidContributionAndCompareResultIsGreaterThanTwo_whenCreateContributionsIsInvoked_thenNullIsReturn() {
-        when(compareContributionService.compareContribution(
+        when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
         ).thenReturn(3);
         Contribution result = maatCalculateContributionService.createContributions(
@@ -1045,7 +1045,7 @@ class MaatCalculateContributionServiceTest {
                         .withMonthlyContributions(BigDecimal.TEN)
                 );
 
-        when(compareContributionService.compareContribution(
+        when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
         ).thenReturn(2);
 
@@ -1094,7 +1094,7 @@ class MaatCalculateContributionServiceTest {
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
         Contribution contribution = TestModelDataBuilder.getContribution();
 
-        when(compareContributionService.compareContribution(any(CalculateContributionDTO.class), any(ContributionResult.class)))
+        when(compareContributionService.shouldCreateContribution(any(CalculateContributionDTO.class), any(ContributionResult.class)))
                 .thenReturn(1);
         when(contributionRequestMapper.map(any(CalculateContributionDTO.class), any(ContributionResult.class)))
                 .thenReturn(new CreateContributionRequest());

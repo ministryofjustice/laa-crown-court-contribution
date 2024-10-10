@@ -47,7 +47,7 @@ class CompareContributionServiceTest {
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isZero();
         verify(maatCourtDataService, times(1))
@@ -71,7 +71,7 @@ class CompareContributionServiceTest {
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isZero();
         verify(maatCourtDataService, times(1))
@@ -105,7 +105,7 @@ class CompareContributionServiceTest {
                 .effectiveDate(LocalDate.now())
                 .build();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isOne();
         verify(maatCourtDataService, times(0))
@@ -132,7 +132,7 @@ class CompareContributionServiceTest {
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isOne();
         verify(maatCourtDataService, times(1))
@@ -161,7 +161,7 @@ class CompareContributionServiceTest {
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isOne();
         verify(maatCourtDataService, times(1))
@@ -190,7 +190,7 @@ class CompareContributionServiceTest {
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isEqualTo(2);
         verify(maatCourtDataService, times(1))
@@ -221,7 +221,7 @@ class CompareContributionServiceTest {
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isEqualTo(2);
         verify(maatCourtDataService, times(1))
@@ -252,7 +252,7 @@ class CompareContributionServiceTest {
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
 
-        int result = compareContributionService.compareContribution(calculateContributionDTO, contributionResult);
+        int result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isOne();
         verify(maatCourtDataService, times(1))

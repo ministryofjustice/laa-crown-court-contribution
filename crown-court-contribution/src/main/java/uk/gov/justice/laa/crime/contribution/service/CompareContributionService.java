@@ -9,7 +9,6 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,54 +25,32 @@ public class CompareContributionService {
     private final ContributionService contributionService;
 
     @Transactional
-    public int compareContribution(CalculateContributionDTO calculateContributionDTO, ContributionResult contributionResult) {
-        log.info("Start  compareContribution");
+    public boolean shouldCreateContribution(CalculateContributionDTO calculateContributionDTO, ContributionResult contributionResult) {
         int repId = calculateContributionDTO.getRepId();
         RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
-        List<Contribution> contributions = maatCourtDataService.findContribution(repId, false);
-        log.info(" compareContribution.contributions--" + contributions);
+        String magsCourtOutcome = calculateContributionDTO.getMagCourtOutcome() == null ? null
+                : calculateContributionDTO.getMagCourtOutcome().getOutcome();
 
+        List<Contribution> contributions = maatCourtDataService.findContribution(repId, false);
+        log.debug("shouldCreateContribution.contributions--" + contributions);
         List<Contribution> activeContribution =
                 Optional.ofNullable(contributions)
                         .orElse(Collections.emptyList()).stream()
                         .filter(isActiveContribution(repId)).toList();
 
-        log.info(" compareContribution.activeContribution--" + activeContribution);
-        if (activeContribution.isEmpty()) {
-            return 0; // Set create flag to true
+
+        if (!activeContribution.isEmpty()
+                && areContributionRecordsIdentical(contributionResult, contributions.get(0))
+                && !(contributionService.hasMessageOutcomeChanged(magsCourtOutcome, repOrderDTO)
+                    || CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType()))) {
+            log.info("Contributions should not be created");
+            return false;
         }
-        return getResultOnActiveContribution(calculateContributionDTO, contributionResult, repOrderDTO, repId, activeContribution);
+        log.info("Contributions should be created");
+        return true;
     }
 
-    private int getResultOnActiveContribution(CalculateContributionDTO calculateContributionDTO,
-                                              ContributionResult contributionResult, RepOrderDTO repOrderDTO, int repId,
-                                              List<Contribution> contributions) {
-        int result;
-        Contribution contribution = contributions.get(0);
-        if (contributionRecordsAreIdentical(contributionResult, contribution)) {
-            result = getResultOnIdenticalContributions(calculateContributionDTO, repOrderDTO, repId);
-        } else {
-            result = 1; // Set create flag to true
-        }
-        log.info("getResultOnActiveContribution.result--" + result);
-        return result;
-    }
-
-    private int getResultOnIdenticalContributions(CalculateContributionDTO calculateContributionDTO,
-                                                  RepOrderDTO repOrderDTO, int repId) {
-        MagCourtOutcome magCourtOutcome = calculateContributionDTO.getMagCourtOutcome();
-        String magsOutcome = magCourtOutcome == null ? null : magCourtOutcome.getOutcome();
-        if (contributionService.hasMessageOutcomeChanged(magsOutcome, repOrderDTO) || isCaseTypeAppealCC(repOrderDTO)) { // Do we also need to check case type appeal && status appeal???
-            return 1; // Set create flag to true
-        }
-        return 2; // Set create flag to false
-    }
-
-    private static boolean isCaseTypeAppealCC(RepOrderDTO repOrderDTO) {
-        return CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType());
-    }
-
-    private static boolean contributionRecordsAreIdentical(ContributionResult contributionResult,
+    private static boolean areContributionRecordsIdentical(ContributionResult contributionResult,
                                                            Contribution contribution) {
         return contribution.getContributionCap().compareTo(contributionResult.contributionCap()) == 0 &&
                 contribution.getUpfrontContributions()
