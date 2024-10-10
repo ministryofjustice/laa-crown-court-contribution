@@ -30,9 +30,6 @@ public class ServicesConfiguration {
         private ContributionEndpoints contributionEndpoints;
 
         @NotNull
-        private CorrespondenceStateEndpoints correspondenceStateEndpoints;
-
-        @NotNull
         private RepOrderEndpoints repOrderEndpoints;
 
         @Data
@@ -54,14 +51,6 @@ public class ServicesConfiguration {
 
             @NotNull
             private String contribsParametersUrl;
-        }
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class CorrespondenceStateEndpoints {
-            @NotNull
-            private String baseUrl;
         }
 
         @Data

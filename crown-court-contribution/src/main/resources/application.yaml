@@ -70,8 +70,6 @@ services:
       summary-url: ${services.maat-api.assessments-domain}/contributions/{repId}/summary
       get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
       contribs-parameters-url: ${services.maat-api.assessments-domain}/contribution-calc-params/{effectiveDate}
-    correspondence-state-endpoints:
-      base-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}/correspondence-state
     rep-order-endpoints:
       find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
   hardship-api:

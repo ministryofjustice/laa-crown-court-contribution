@@ -13,7 +13,6 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.enums.contribution.CorrespondenceStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -47,44 +46,6 @@ public class MaatCourtDataService {
                 },
                 configuration.getMaatApi().getContributionEndpoints().getBaseUrl(),
                 Map.of()
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
-    public CorrespondenceStatus findCorrespondenceState(int repId) {
-        CorrespondenceStatus response = maatAPIClient.get(
-
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
-                repId
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
-    public CorrespondenceStatus createCorrespondenceState(int repId, CorrespondenceStatus state) {
-        CorrespondenceStatus response = maatAPIClient.post(
-                state,
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
-                Map.of(),
-                repId
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
-    public CorrespondenceStatus updateCorrespondenceState(int repId, CorrespondenceStatus state) {
-        CorrespondenceStatus response = maatAPIClient.put(
-                state,
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getCorrespondenceStateEndpoints().getBaseUrl(),
-                Map.of(),
-                repId
         );
         log.info(RESPONSE_STRING, response);
         return response;

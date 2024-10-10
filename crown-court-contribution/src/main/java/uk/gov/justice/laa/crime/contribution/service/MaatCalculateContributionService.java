@@ -275,7 +275,7 @@ public class MaatCalculateContributionService {
     public Contribution createContributions(final CalculateContributionDTO calculateContributionDTO,
                                             ContributionResult result) {
         log.info("Inactivate existing Contribution and create a new Contribution");
-        if (compareContributionService.compareContribution(calculateContributionDTO, result) < 2) {
+        if (compareContributionService.shouldCreateContribution(calculateContributionDTO, result)) {
             CreateContributionRequest createContributionRequest =
                     createContributionRequestMapper.map(calculateContributionDTO, result);
             return maatCourtDataService.createContribution(createContributionRequest);
