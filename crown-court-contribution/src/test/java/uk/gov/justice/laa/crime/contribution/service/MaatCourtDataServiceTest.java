@@ -17,7 +17,6 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-import uk.gov.justice.laa.crime.enums.contribution.CorrespondenceStatus;
 
 import java.util.List;
 
@@ -56,35 +55,6 @@ class MaatCourtDataServiceTest {
         verify(maatCourtDataClient).post(
                 any(CreateContributionRequest.class), eq(new ParameterizedTypeReference<Contribution>() {
                 }), anyString(), anyMap()
-        );
-    }
-
-    @Test
-    void givenValidRepId_whenFindCorrespondenceStateIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.findCorrespondenceState(TEST_REP_ID);
-        verify(maatCourtDataClient).get(eq(new ParameterizedTypeReference<CorrespondenceStatus>() {
-        }), anyString(), anyInt());
-    }
-
-    @Test
-    void givenValidParams_whenCreateCorrespondenceStateIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.createCorrespondenceState(TEST_REP_ID, CorrespondenceStatus.APPEAL_CC);
-        verify(maatCourtDataClient).post(
-                any(CorrespondenceStatus.class), eq(new ParameterizedTypeReference<CorrespondenceStatus>() {
-                }), anyString(), anyMap(), anyInt()
-        );
-    }
-
-    @Test
-    void givenValidParams_whenUpdateCorrespondenceStateIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.updateCorrespondenceState(TEST_REP_ID, CorrespondenceStatus.NONE);
-        verify(maatCourtDataClient).put(
-                any(CorrespondenceStatus.class),
-                eq(new ParameterizedTypeReference<CorrespondenceStatus>() {
-                }),
-                anyString(),
-                anyMap(),
-                anyInt()
         );
     }
 
