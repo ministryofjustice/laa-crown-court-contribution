@@ -122,6 +122,8 @@ class MaatCalculateContributionServiceTest {
         ).thenReturn(true);
         when(maatCourtDataService.createContribution(any()))
                 .thenReturn(TestModelDataBuilder.getContribution());
+        when(contributionRequestMapper.map(any(CalculateContributionDTO.class), any(ContributionResult.class)))
+                .thenReturn(new CreateContributionRequest());
 
         Contribution result = maatCalculateContributionService.createContributions(new CalculateContributionDTO(),
                 ContributionResult.builder().build()
