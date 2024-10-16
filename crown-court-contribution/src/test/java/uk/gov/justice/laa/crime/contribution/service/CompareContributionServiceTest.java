@@ -11,14 +11,12 @@ import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.enums.contribution.CorrespondenceStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,11 +43,11 @@ class CompareContributionServiceTest {
                         null
                 );
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
-        Contribution InactiveContribution = TestModelDataBuilder.buildContributionForCompareContributionService();
-        InactiveContribution.setActive("N");
+        Contribution inactiveContribution = TestModelDataBuilder.buildContributionForCompareContributionService();
+        inactiveContribution.setActive("N");
 
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
-                .thenReturn(List.of(InactiveContribution));
+                .thenReturn(List.of(inactiveContribution));
 
         boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
