@@ -116,7 +116,7 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenValidContributionAndShouldCreateIsTrue_whenCreateContributionsIsInvoked_thenContributionIsReturn() {
+    void givenValidContributionAndShouldCreateContributionIsTrue_whenCreateContributionsIsInvoked_thenContributionIsReturned() {
         when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
         ).thenReturn(true);
@@ -135,7 +135,7 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenValidContributionAndShouldCreateIsFalse_whenCreateContributionsIsInvoked_thenNullIsReturn() {
+    void givenValidContributionAndShouldCreateContributionIsFalse_whenCreateContributionsIsInvoked_thenNullIsReturned() {
         when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
         ).thenReturn(false);
