@@ -116,28 +116,35 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenValidContributionAndCompareResultIsLessThanTwo_whenCreateContributionsIsInvoked_thenContributionIsReturn() {
-        when(compareContributionService.compareContribution(
+    void givenValidContributionAndShouldCreateContributionIsTrue_whenCreateContributionsIsInvoked_thenContributionIsReturned() {
+        when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
-        ).thenReturn(1);
-
+        ).thenReturn(true);
         when(maatCourtDataService.createContribution(any()))
                 .thenReturn(TestModelDataBuilder.getContribution());
+        when(contributionRequestMapper.map(any(CalculateContributionDTO.class), any(ContributionResult.class)))
+                .thenReturn(new CreateContributionRequest());
 
         Contribution result = maatCalculateContributionService.createContributions(new CalculateContributionDTO(),
                 ContributionResult.builder().build()
         );
+
+        verify(maatCourtDataService, times(1))
+                .createContribution(any(CreateContributionRequest.class));
         assertThat(result).isNotNull();
     }
 
     @Test
-    void givenValidContributionAndCompareResultIsGreaterThanTwo_whenCreateContributionsIsInvoked_thenNullIsReturn() {
-        when(compareContributionService.compareContribution(
+    void givenValidContributionAndShouldCreateContributionIsFalse_whenCreateContributionsIsInvoked_thenNullIsReturned() {
+        when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
-        ).thenReturn(3);
+        ).thenReturn(false);
+
         Contribution result = maatCalculateContributionService.createContributions(
                 new CalculateContributionDTO(), ContributionResult.builder().build()
         );
+
+        verifyNoInteractions(maatCourtDataService);
         assertThat(result).isNull();
     }
 
@@ -1045,9 +1052,9 @@ class MaatCalculateContributionServiceTest {
                         .withMonthlyContributions(BigDecimal.TEN)
                 );
 
-        when(compareContributionService.compareContribution(
+        when(compareContributionService.shouldCreateContribution(
                 any(CalculateContributionDTO.class), any(ContributionResult.class))
-        ).thenReturn(2);
+        ).thenReturn(false);
 
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
                 .thenReturn(ContributionCalcParametersDTO.builder()
@@ -1094,8 +1101,8 @@ class MaatCalculateContributionServiceTest {
         ContributionResult contributionResult = TestModelDataBuilder.getContributionResult();
         Contribution contribution = TestModelDataBuilder.getContribution();
 
-        when(compareContributionService.compareContribution(any(CalculateContributionDTO.class), any(ContributionResult.class)))
-                .thenReturn(1);
+        when(compareContributionService.shouldCreateContribution(any(CalculateContributionDTO.class), any(ContributionResult.class)))
+                .thenReturn(true);
         when(contributionRequestMapper.map(any(CalculateContributionDTO.class), any(ContributionResult.class)))
                 .thenReturn(new CreateContributionRequest());
         when(maatCourtDataService.createContribution(any(CreateContributionRequest.class)))

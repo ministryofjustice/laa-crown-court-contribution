@@ -17,11 +17,6 @@ public class MockServicesConfiguration {
                         "/contribution-calc-params/{effectiveDate}"
                 );
 
-        ServicesConfiguration.MaatApi.CorrespondenceStateEndpoints correspondenceStateEndpoints =
-                new ServicesConfiguration.MaatApi.CorrespondenceStateEndpoints(
-                        "rep-orders/{repId}/correspondence-state"
-                );
-
         ServicesConfiguration.MaatApi.RepOrderEndpoints repOrderEndpoints =
                 new ServicesConfiguration.MaatApi.RepOrderEndpoints("/rep-orders/cc-outcome/reporder/{repId}");
 
@@ -32,7 +27,6 @@ public class MockServicesConfiguration {
         maatApiConfiguration.setBaseUrl(host);
         servicesConfiguration.setMaatApi(maatApiConfiguration);
         maatApiConfiguration.setContributionEndpoints(contributionEndpoints);
-        maatApiConfiguration.setCorrespondenceStateEndpoints(correspondenceStateEndpoints);
         maatApiConfiguration.setRepOrderEndpoints(repOrderEndpoints);
 
         hardshipApiConfiguration.setBaseUrl(host);
