@@ -23,6 +23,7 @@ public class CrimeHardshipService {
     private static final String RESPONSE_STRING = "Response from Calculate Hardship API: {}";
 
     public ApiCalculateHardshipByDetailResponse calculateHardshipForDetail(ApiCalculateHardshipByDetailRequest calcHardshipRequest) {
+        log.debug("Request to calculate hardship for detail: {}", calcHardshipRequest);
         ApiCalculateHardshipByDetailResponse response = hardshipApiClient.post(
                 calcHardshipRequest,
                 new ParameterizedTypeReference<>() {
@@ -30,7 +31,7 @@ public class CrimeHardshipService {
                 configuration.getHardshipApi().getHardshipEndpoints().getCalculateHardshipForDetailUrl(),
                 Map.of()
         );
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 }
