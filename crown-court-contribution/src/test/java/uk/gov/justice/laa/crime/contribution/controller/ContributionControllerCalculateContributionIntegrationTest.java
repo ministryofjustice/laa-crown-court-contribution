@@ -4,7 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,13 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
 import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -104,7 +107,7 @@ class ContributionControllerCalculateContributionIntegrationTest {
         ApiCalculateContributionRequest apiCalculateContributionRequest = TestModelDataBuilder.buildApiCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
-        MvcResult result = mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, ENDPOINT_URL)).andExpect(status().isOk())
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, ENDPOINT_URL)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
     }
@@ -117,7 +120,7 @@ class ContributionControllerCalculateContributionIntegrationTest {
                 .withUpliftedIncomePercent(BigDecimal.TEN);
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
-        MvcResult result = mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, ENDPOINT_URL)).andExpect(status().isOk())
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, ENDPOINT_URL)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
     }

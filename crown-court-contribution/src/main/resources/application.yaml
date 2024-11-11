@@ -60,22 +60,32 @@ spring:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
 
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 5s
+        retry-exceptions:
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+          - org.springframework.web.reactive.function.client.WebClientResponseException.BadGateway
+          - org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable
+          - org.springframework.web.reactive.function.client.WebClientResponseException.InternalServerError
+          - org.springframework.web.reactive.function.client.WebClientResponseException.GatewayTimeout
+
+    instances:
+      crimeHardshipService:
+        base-config: default
+      maatCourtDataService:
+        base-config: default
+
 services:
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
-    assessments-domain: ${services.maat-api.base-url}/api/internal/v1/assessment
-    contribution-endpoints:
-      base-url: ${services.maat-api.assessments-domain}/contributions
-      find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
-      summary-url: ${services.maat-api.assessments-domain}/contributions/{repId}/summary
-      get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
-      contribs-parameters-url: ${services.maat-api.assessments-domain}/contribution-calc-params/{effectiveDate}
-    rep-order-endpoints:
-      find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
+    registrationId: maat-api
   hardship-api:
     base-url: ${HARDSHIP_API_BASE_URL}
-    hardship-endpoints:
-      calculate-hardship-for-detail-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/calculate-hardship-for-detail
+    registrationId: hardship
 
 springdoc:
   packagesToScan: uk.gov.justice.laa.crime.contribution
@@ -94,8 +104,3 @@ sentry:
   send-default-pii: true
   attach-stacktrace: true
   sample-rate: ${SENTRY_SAMPLE_RATE}
-
-retry-config:
-  max-retries: 3
-  min-back-off-period: 5
-  jitter-value: 0.75
