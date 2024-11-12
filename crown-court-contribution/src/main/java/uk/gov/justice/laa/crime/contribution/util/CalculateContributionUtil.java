@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.util;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -9,18 +10,25 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @UtilityClass
+@Slf4j
 public class CalculateContributionUtil {
 
     public BigDecimal calculateMonthlyContribution(final BigDecimal annualDisposableIncome, final BigDecimal disposableIncomePercent, final BigDecimal minimumMonthlyAmount) {
+        log.info("annualDisposableIncome-->" + annualDisposableIncome);
+        log.info("disposableIncomePercent-->" + disposableIncomePercent);
+        log.info("minimumMonthlyAmount-->" + minimumMonthlyAmount);
         if(checkNull(annualDisposableIncome, disposableIncomePercent, minimumMonthlyAmount))
             return null;
         BigDecimal monthlyContributionsCalc = BigDecimal.valueOf(Math.floor((annualDisposableIncome.divide(BigDecimal.valueOf(12), MathContext.DECIMAL128)
                 .multiply(disposableIncomePercent)
                 .divide(BigDecimal.valueOf(100), MathContext.DECIMAL128)).doubleValue())).setScale(2);
+        log.info("monthlyContributionsCalc-->" + monthlyContributionsCalc);
         BigDecimal monthlyContribution = (monthlyContributionsCalc.compareTo(BigDecimal.ZERO) > 0) ? monthlyContributionsCalc : BigDecimal.ZERO;
+        log.info("monthlyContribution-->" + monthlyContribution);
         if (monthlyContribution.compareTo(minimumMonthlyAmount) < 0) {
             return BigDecimal.ZERO;
         }
+        log.info(" return monthlyContribution-->" + monthlyContribution);
         return monthlyContribution;
     }
 
