@@ -216,12 +216,17 @@ public class MaatCalculateContributionService {
                                                                      final String fullResult,
                                                                      final RepOrderDTO repOrderDTO) {
         ContributionResult result;
+        if (Constants.INEL.equals(fullResult)) {
+            calculateContributionDTO.setMonthlyContributions(BigDecimal.ZERO);
+            calculateContributionDTO.setUpfrontContributions(BigDecimal.ZERO);
+        }
+
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
-        if (Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
+        //No need to calculate contributions for INEL
+        if ((Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
                 contributionResponseDTO.getId() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
-                        .compareTo(BigDecimal.ZERO) > 0) ||
-                Constants.INEL.equals(fullResult)) {
+                        .compareTo(BigDecimal.ZERO) > 0)) && !Constants.INEL.equals(fullResult)) {
             result = calculateContributions(calculateContributionDTO, contributionResponseDTO);
         } else {
             result = ContributionResult.builder()
