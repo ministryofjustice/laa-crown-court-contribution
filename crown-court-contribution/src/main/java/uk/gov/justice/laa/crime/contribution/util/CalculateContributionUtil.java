@@ -19,9 +19,6 @@ public class CalculateContributionUtil {
         log.info("minimumMonthlyAmount-->" + minimumMonthlyAmount);
         if(checkNull(annualDisposableIncome, disposableIncomePercent, minimumMonthlyAmount))
             return null;
-        /*BigDecimal monthlyContributionsCalc = BigDecimal.valueOf(Math.floor((annualDisposableIncome.divide(BigDecimal.valueOf(12), MathContext.DECIMAL128)
-                .multiply(disposableIncomePercent)
-                .divide(BigDecimal.valueOf(100), MathContext.DECIMAL128)).doubleValue())).setScale(2);*/
         BigDecimal calcDisposableIncomePercent = disposableIncomePercent.divide(BigDecimal.valueOf(100), MathContext.DECIMAL128);
         BigDecimal monthlyContributionsCalc = BigDecimal.valueOf(Math.floor((annualDisposableIncome.divide(BigDecimal.valueOf(12), MathContext.DECIMAL128)
                 .multiply(calcDisposableIncomePercent)).doubleValue())).setScale(2);
