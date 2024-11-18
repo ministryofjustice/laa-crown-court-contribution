@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.contribution.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
@@ -340,7 +339,7 @@ public class MaatCalculateContributionService {
                 .build();
     }
 
-    private static @NotNull ApiCalculateContributionResponse getApiCalculateContributionResponse() {
+    private static ApiCalculateContributionResponse getApiCalculateContributionResponse() {
         ApiCalculateContributionResponse apiCalculateContributionResponse;
         apiCalculateContributionResponse = new ApiCalculateContributionResponse();
         apiCalculateContributionResponse.setUpfrontContributions(BigDecimal.ZERO);
