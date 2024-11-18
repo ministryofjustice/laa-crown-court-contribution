@@ -312,6 +312,7 @@ public class MaatCalculateContributionService {
         ApiCalculateContributionResponse apiCalculateContributionResponse = null;
         //if (Constants.INEL.equals(fullResult) && !apiCalculateContributionRequest.getUpliftApplied()) {
         if (Constants.INEL.equals(fullResult)) {
+            log.info("INEL - No need to calculate contributions");
             apiCalculateContributionResponse = new ApiCalculateContributionResponse();
             apiCalculateContributionResponse.setUpfrontContributions(BigDecimal.ZERO);
             apiCalculateContributionResponse.setMonthlyContributions(BigDecimal.ZERO);
