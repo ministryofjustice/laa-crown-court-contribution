@@ -14,22 +14,16 @@ import java.util.Objects;
 public class CalculateContributionUtil {
 
     public BigDecimal calculateMonthlyContribution(final BigDecimal annualDisposableIncome, final BigDecimal disposableIncomePercent, final BigDecimal minimumMonthlyAmount) {
-        log.info("annualDisposableIncome-->" + annualDisposableIncome);
-        log.info("disposableIncomePercent-->" + disposableIncomePercent);
-        log.info("minimumMonthlyAmount-->" + minimumMonthlyAmount);
         if(checkNull(annualDisposableIncome, disposableIncomePercent, minimumMonthlyAmount))
             return null;
         BigDecimal calcDisposableIncomePercent = disposableIncomePercent.divide(BigDecimal.valueOf(100), MathContext.DECIMAL128);
         BigDecimal monthlyContributionsCalc = BigDecimal.valueOf(Math.floor((annualDisposableIncome.divide(BigDecimal.valueOf(12), MathContext.DECIMAL128)
                 .multiply(calcDisposableIncomePercent)).doubleValue())).setScale(2);
         
-        log.info("monthlyContributionsCalc-->" + monthlyContributionsCalc);
         BigDecimal monthlyContribution = (monthlyContributionsCalc.compareTo(BigDecimal.ZERO) > 0) ? monthlyContributionsCalc : BigDecimal.ZERO;
-        log.info("monthlyContribution-->" + monthlyContribution);
         if (monthlyContribution.compareTo(minimumMonthlyAmount) < 0) {
             return BigDecimal.ZERO;
         }
-        log.info(" return monthlyContribution-->" + monthlyContribution);
         return monthlyContribution;
     }
 

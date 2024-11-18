@@ -224,17 +224,14 @@ public class MaatCalculateContributionService {
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
                         .compareTo(BigDecimal.ZERO) > 0) ||
                 Constants.INEL.equals(fullResult)) {
-            log.info("Call calculateContributions");
             result = calculateContributions(calculateContributionDTO, contributionResponseDTO);
         } else {
-            log.info("ContributionResult Builder");
             result = ContributionResult.builder()
                     .monthlyAmount(BigDecimal.ZERO)
                     .contributionCap(BigDecimal.ZERO)
                     .upfrontAmount(BigDecimal.ZERO)
                     .build();
         }
-        log.info("Call verifyAndCreateContributions");
 
         Contribution createdContribution = verifyAndCreateContributions(calculateContributionDTO, repOrderDTO, result);
 
@@ -291,8 +288,8 @@ public class MaatCalculateContributionService {
 
     public ContributionResult calculateContributions(final CalculateContributionDTO calculateContributionDTO,
                                                      final ContributionResponseDTO contributionResponseDTO) {
-        log.debug("Calculate Contributions - calculateContributionDTO Input : " + calculateContributionDTO);
-        log.debug("Calculate Contributions - contributionResponseDTO Input: " + contributionResponseDTO);
+        log.debug("Request to Calculate Contributions - calculateContributionDTO : {}", calculateContributionDTO);
+        log.debug("Request to Calculate Contributions - contributionResponseDTO : {}", contributionResponseDTO);
 
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO =

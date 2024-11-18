@@ -41,7 +41,7 @@ public class MaatCourtDataService {
     }
 
     public Contribution createContribution(CreateContributionRequest createContributionRequest) {
-        log.info("Request to create contribution: {}", createContributionRequest);
+        log.debug("Request to create contribution: {}", createContributionRequest);
         Contribution response = maatAPIClient.post(
                 createContributionRequest,
                 new ParameterizedTypeReference<>() {
