@@ -216,10 +216,6 @@ public class MaatCalculateContributionService {
                                                                      final String fullResult,
                                                                      final RepOrderDTO repOrderDTO) {
         ContributionResult result;
-        if (Constants.INEL.equals(fullResult)) {
-            calculateContributionDTO.setMonthlyContributions(BigDecimal.ZERO);
-            calculateContributionDTO.setUpfrontContributions(BigDecimal.ZERO);
-        }
 
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
         //No need to calculate contributions for INEL
@@ -309,9 +305,25 @@ public class MaatCalculateContributionService {
                         calculateContributionDTO.getContributionCap()
                 );
 
-        // Revisit the request to pass the offenceType object for Contribs Cap
-        ApiCalculateContributionResponse apiCalculateContributionResponse =
-                calculateContributionService.calculateContribution(apiCalculateContributionRequest);
+        Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream()
+                .filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
+        String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
+
+        ApiCalculateContributionResponse apiCalculateContributionResponse = null;
+        //if (Constants.INEL.equals(fullResult) && !apiCalculateContributionRequest.getUpliftApplied()) {
+        if (Constants.INEL.equals(fullResult)) {
+            apiCalculateContributionResponse = new ApiCalculateContributionResponse();
+            apiCalculateContributionResponse.setUpfrontContributions(BigDecimal.ZERO);
+            apiCalculateContributionResponse.setMonthlyContributions(BigDecimal.ZERO);
+            apiCalculateContributionResponse.setUpliftApplied(Constants.N);
+            apiCalculateContributionResponse.setBasedOn(null);
+            totalMonths = 0;
+        } else {
+            // Revisit the request to pass the offenceType object for Contribs Cap
+            apiCalculateContributionResponse =
+                    calculateContributionService.calculateContribution(apiCalculateContributionRequest);
+        }
+
         String effectiveDate =
                 getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
                         assEffectiveDate
