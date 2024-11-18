@@ -128,10 +128,11 @@ public class ContributionService {
             }
         }
 
-        if (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0) {
+        if (INEL.equals(request.getFullResult()) ||
+                (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0)) {
+            contributionResponse.setDoContribs(Constants.Y);
             log.debug("contributionResponse calc contribs: " + contributionResponse.getCalcContribs());
             log.debug("contributionResponse do contribs: " + contributionResponse.getDoContribs());
-            contributionResponse.setDoContribs(Constants.Y);
         }
 
         if (Constants.Y.equals(request.getRemoveContribs())) {
