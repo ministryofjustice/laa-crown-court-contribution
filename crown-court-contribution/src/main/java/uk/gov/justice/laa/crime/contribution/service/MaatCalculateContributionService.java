@@ -287,7 +287,12 @@ public class MaatCalculateContributionService {
 
     public ContributionResult calculateContributions(final CalculateContributionDTO calculateContributionDTO,
                                                      final ContributionResponseDTO contributionResponseDTO) {
+        log.info("calculateContributionDTO : " + calculateContributionDTO);
+        log.info("contributionResponseDTO : " + contributionResponseDTO);
+
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
+        log.info("assEffectiveDate : " + assEffectiveDate);
+
         ContributionCalcParametersDTO contributionCalcParametersDTO =
                 maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assEffectiveDate));
         CrownCourtOutcome crownCourtOutcome =
@@ -304,10 +309,15 @@ public class MaatCalculateContributionService {
                         ),
                         calculateContributionDTO.getContributionCap()
                 );
+        log.info("apiCalculateContributionRequest : " + apiCalculateContributionRequest);
+
 
         Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream()
                 .filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
         String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
+
+        log.info("fullResult : " + fullResult);
+
 
         ApiCalculateContributionResponse apiCalculateContributionResponse = null;
         //if (Constants.INEL.equals(fullResult) && !apiCalculateContributionRequest.getUpliftApplied()) {
@@ -320,6 +330,8 @@ public class MaatCalculateContributionService {
             apiCalculateContributionResponse.setBasedOn(null);
             totalMonths = 0;
         } else {
+            log.info("ELSE BLOCK NOT INEL - calculate contributions");
+
             // Revisit the request to pass the offenceType object for Contribs Cap
             apiCalculateContributionResponse =
                     calculateContributionService.calculateContribution(apiCalculateContributionRequest);
@@ -329,6 +341,8 @@ public class MaatCalculateContributionService {
                 getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
                         assEffectiveDate
                 );
+        log.info("effectiveDate : " + effectiveDate);
+
 
         return ContributionResult.builder()
                 .totalMonths(totalMonths)
