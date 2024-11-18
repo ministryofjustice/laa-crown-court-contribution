@@ -469,6 +469,38 @@ class MaatCalculateContributionServiceTest {
                 .isEqualTo(expected);
     }
 
+
+    @Test
+    void givenCalcContributionsWithResultTypeINEL_whenCalcContributionsIsInvoked_validResponseIsReturned() {
+
+        ContributionResult expected = ContributionResult.builder()
+                .totalAnnualDisposableIncome(BigDecimal.ZERO)
+                .upfrontAmount(BigDecimal.ZERO)
+                .monthlyAmount(BigDecimal.ZERO)
+                .isUplift(false)
+                .effectiveDate(COMMITTAL_DATE)
+                .upfrontAmount(BigDecimal.ZERO)
+                .totalMonths(0)
+                .basedOn(null)
+                .build();
+
+        CalculateContributionDTO calculateContributionDTO = setupDataForCalculateContributionsTests();
+        calculateContributionDTO.getAssessments().get(0).setResult(AssessmentResult.INEL);
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .calcContribs(Constants.N)
+                .build();
+        when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
+                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+        when(calculateContributionService.calculateContribution(any()))
+                .thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
+        ContributionResult result = maatCalculateContributionService.calculateContributions(
+                calculateContributionDTO, contributionResponseDTO
+        );
+
+        assertThat(result)
+                .isEqualTo(expected);
+    }
+
     private CalculateContributionDTO setupDataForCalculateContributionsTests() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         when(maatCourtDataService.getContributionCalcParameters(anyString()))

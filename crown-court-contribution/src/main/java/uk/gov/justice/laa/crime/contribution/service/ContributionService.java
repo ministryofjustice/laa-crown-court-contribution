@@ -131,16 +131,11 @@ public class ContributionService {
         if (INEL.equals(request.getFullResult()) ||
                 (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0)) {
             contributionResponse.setDoContribs(Constants.Y);
-            log.info("contributionResponse calc contribs: " + contributionResponse.getCalcContribs());
-            log.info("contributionResponse do contribs: " + contributionResponse.getDoContribs());
         }
 
         if (Constants.Y.equals(request.getRemoveContribs())) {
             contributionResponse.setCalcContribs(Constants.N);
         }
-
-        log.info("*** contributionResponse calc contribs: " + contributionResponse.getCalcContribs());
-        log.info("*** contributionResponse do contribs: " + contributionResponse.getDoContribs());
         return contributionResponse;
     }
 
