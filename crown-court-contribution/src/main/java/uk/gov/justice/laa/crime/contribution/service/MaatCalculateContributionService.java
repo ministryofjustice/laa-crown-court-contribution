@@ -220,7 +220,7 @@ public class MaatCalculateContributionService {
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
         //No need to calculate contributions for INEL
         log.info("contributionResponseDTO.getCalcContribs() : " + contributionResponseDTO.getCalcContribs());
-        log.info("calculateContributionDTO.getId() : " + calculateContributionDTO.getId());
+        log.info("contributionResponseDTO.getId() : " + contributionResponseDTO.getId());
         log.info("calculateContributionDTO.getMonthlyContributions() : " + calculateContributionDTO.getMonthlyContributions());
 
         if (Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
