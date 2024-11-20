@@ -339,7 +339,7 @@ public class MaatCalculateContributionService {
                 .build();
     }
 
-    private static ApiCalculateContributionResponse getApiCalculateContributionResponse() {
+    public ApiCalculateContributionResponse getApiCalculateContributionResponse() {
         ApiCalculateContributionResponse apiCalculateContributionResponse;
         apiCalculateContributionResponse = new ApiCalculateContributionResponse();
         apiCalculateContributionResponse.setUpfrontContributions(BigDecimal.ZERO);

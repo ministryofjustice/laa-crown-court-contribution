@@ -511,6 +511,45 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
+    void givenCalcContributionsWithResultTypeINELAndBasedOnMeans_whenCalcContributionsIsInvoked_validResponseIsReturned() {
+
+        ContributionResult expected = ContributionResult.builder()
+                .totalAnnualDisposableIncome(BigDecimal.ZERO)
+                .upfrontAmount(BigDecimal.ZERO)
+                .monthlyAmount(BigDecimal.ZERO)
+                .isUplift(false)
+                .effectiveDate(COMMITTAL_DATE)
+                .upfrontAmount(BigDecimal.ZERO)
+                .totalMonths(0)
+                .basedOn("Means")
+                .build();
+
+        CalculateContributionDTO calculateContributionDTO = setupDataForCalculateContributionsTests();
+        calculateContributionDTO.getAssessments().get(0).setResult(AssessmentResult.INEL);
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .calcContribs(Constants.N)
+                .build();
+        when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
+                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+        when(calculateContributionService.calculateContribution(any()))
+                .thenReturn(TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
+        ContributionResult result = maatCalculateContributionService.calculateContributions(
+                calculateContributionDTO, contributionResponseDTO
+        );
+        assertThat(result)
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void givenCalculateContributionDTO_whenGetApiCalculateContributionResponseIsInvoked_thenApiCalculateContributionResponseIsReturned() {
+        ApiCalculateContributionResponse actual = maatCalculateContributionService.getApiCalculateContributionResponse();
+        assertThat(actual.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
+        assertThat(actual.getUpliftApplied()).isEqualTo(Constants.N);
+        assertThat(actual.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
+        assertThat(actual.getBasedOn()).isNull();
+    }
+
+    @Test
     void givenUpliftCoteNotNullAndCalcContributionsAsN_whenCalcContributionsIsInvoked_validResponseIsReturned() {
 
         ContributionResult expectedResult =
