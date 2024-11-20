@@ -11,11 +11,16 @@ import reactor.core.publisher.Mono;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.client.MaatCourtDataApiClient;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
+import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
+import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
+import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,71 +38,81 @@ class MaatCourtDataServiceTest {
 
     @Test
     void givenValidRepId_whenFindContributionIsInvoked_thenResponseIsReturned() {
+        List<Contribution> expected = List.of(TestModelDataBuilder.getContribution());
         when(maatCourtDataClient.find(TEST_REP_ID, true))
-                .thenReturn(Mono.empty());
-        maatCourtDataService.findContribution(TEST_REP_ID, true);
-        verify(maatCourtDataClient, times(1)).find(TEST_REP_ID, true);
+                .thenReturn(Mono.just(expected));
+        List<Contribution> actual = maatCourtDataService.findContribution(TEST_REP_ID, true);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void givenNoContributionsAvailable_whenFindContributionIsInvoked_thenResponseIsReturned() {
         when(maatCourtDataClient.find(TEST_REP_ID, true))
                 .thenReturn(Mono.error(DATA_NOT_FOUND));
-        maatCourtDataService.findContribution(TEST_REP_ID, true);
-        verify(maatCourtDataClient, times(1)).find(TEST_REP_ID, true);
+        var response = maatCourtDataService.findContribution(TEST_REP_ID, true);
+        assertThat(response).isNull();
     }
 
     @Test
     void givenValidParams_whenCreateContributionIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.createContribution(new CreateContributionRequest());
-        verify(maatCourtDataClient, times(1)).create(any(CreateContributionRequest.class));
+        Contribution expected = TestModelDataBuilder.getContribution();
+        CreateContributionRequest createContributionRequest = new CreateContributionRequest();
+        when(maatCourtDataClient.create(createContributionRequest))
+                .thenReturn(expected);
+        Contribution actual = maatCourtDataService.createContribution(createContributionRequest);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void givenValidRepId_whenGetRepOrderByRepIdIsInvoked_thenResponseIsReturned() {
-        maatCourtDataService.getRepOrderByRepId(TEST_REP_ID);
-        verify(maatCourtDataClient, times(1)).getRepOrderByRepId(TEST_REP_ID);
+        when(maatCourtDataClient.getRepOrderByRepId(TEST_REP_ID))
+                .thenReturn(TestModelDataBuilder.getRepOrderDTO());
+        RepOrderDTO repOrderDTO = maatCourtDataService.getRepOrderByRepId(TEST_REP_ID);
+        assertThat(repOrderDTO).isEqualTo(TestModelDataBuilder.getRepOrderDTO());
     }
 
     @Test
     void givenAValidRepId_whenGetRepOrderCCOutcomeByRepIdIsInvoked_thenReturnOutcome() {
+        List<RepOrderCCOutcomeDTO> expected = List.of(TestModelDataBuilder
+                .getRepOrderCCOutcomeDTO(1, CrownCourtOutcome.ABANDONED.getCode()));
         when(maatCourtDataClient.getRepOrderCCOutcomeByRepId(TEST_REP_ID))
-                .thenReturn(Mono.empty());
-        maatCourtDataService.getRepOrderCCOutcomeByRepId(TEST_REP_ID);
-        verify(maatCourtDataClient, atLeastOnce()).getRepOrderCCOutcomeByRepId(TEST_REP_ID);
+                .thenReturn(Mono.just(expected));
+        List<RepOrderCCOutcomeDTO> actual = maatCourtDataService.getRepOrderCCOutcomeByRepId(TEST_REP_ID);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void givenNoCCOutcome_whenGetRepOrderCCOutcomeByRepIdIsInvoked_thenResponseIsReturned() {
         when(maatCourtDataClient.getRepOrderCCOutcomeByRepId(TEST_REP_ID))
                 .thenReturn(Mono.error(DATA_NOT_FOUND));
-        maatCourtDataService.getRepOrderCCOutcomeByRepId(TEST_REP_ID);
-        verify(maatCourtDataClient, atLeastOnce()).getRepOrderCCOutcomeByRepId(TEST_REP_ID);
+        var response = maatCourtDataService.getRepOrderCCOutcomeByRepId(TEST_REP_ID);
+        assertThat(response).isNull();
     }
 
     @Test
     void givenAValidRepId_whenGetContributionsSummaryIsInvoked_thenContributionsSummariesAreReturned() {
+        List<ContributionsSummaryDTO> expected = List.of(TestModelDataBuilder.getContributionSummaryDTO());
         when(maatCourtDataClient.getContributionsSummary(TEST_REP_ID))
-                .thenReturn(Mono.empty());
-        maatCourtDataService.getContributionsSummary(TEST_REP_ID);
-        verify(maatCourtDataClient, times(1)).getContributionsSummary(TEST_REP_ID);
+                .thenReturn(Mono.just(expected));
+        List<ContributionsSummaryDTO> actual = maatCourtDataService.getContributionsSummary(TEST_REP_ID);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void givenNoContributions_whenGetContributionsSummaryIsInvoked_thenResponseIsReturned() {
         when(maatCourtDataClient.getContributionsSummary(TEST_REP_ID))
                 .thenReturn(Mono.error(DATA_NOT_FOUND));
-        maatCourtDataService.getContributionsSummary(TEST_REP_ID);
-        verify(maatCourtDataClient, times(1)).getContributionsSummary(TEST_REP_ID);
+        var response = maatCourtDataService.getContributionsSummary(TEST_REP_ID);
+        assertThat(response).isNull();
     }
 
     @Test
     void givenAValidEffectiveDate_whenGetContributionCalcParametersIsInvoked_thenContributionCalcParametersAreReturned() {
         String effectiveDate = TestModelDataBuilder.TEST_DATE.toString();
         when(maatCourtDataClient.getContributionCalcParameters(effectiveDate))
-                .thenReturn(Mono.empty());
-        maatCourtDataService.getContributionCalcParameters(effectiveDate);
-        verify(maatCourtDataClient).getContributionCalcParameters(effectiveDate);
+                .thenReturn(Mono.just(TestModelDataBuilder.getContributionCalcParametersDTO()));
+        ContributionCalcParametersDTO actual = maatCourtDataService.getContributionCalcParameters(effectiveDate);
+        assertThat(actual).isEqualTo(TestModelDataBuilder.getContributionCalcParametersDTO());
     }
 
     @Test
@@ -105,7 +120,7 @@ class MaatCourtDataServiceTest {
         String effectiveDate = TestModelDataBuilder.TEST_DATE.toString();
         when(maatCourtDataClient.getContributionCalcParameters(effectiveDate))
                 .thenReturn(Mono.error(DATA_NOT_FOUND));
-        maatCourtDataService.getContributionCalcParameters(effectiveDate);
-        verify(maatCourtDataClient).getContributionCalcParameters(effectiveDate);
+        ContributionCalcParametersDTO response = maatCourtDataService.getContributionCalcParameters(effectiveDate);
+        assertThat(response).isNull();
     }
 }

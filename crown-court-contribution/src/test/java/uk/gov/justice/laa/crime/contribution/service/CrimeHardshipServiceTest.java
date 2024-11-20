@@ -6,13 +6,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
 import uk.gov.justice.laa.crime.contribution.client.HardshipApiClient;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 
+import java.math.BigDecimal;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,9 +28,13 @@ class CrimeHardshipServiceTest {
 
     @Test
     void givenAValidCalcHardshipForDetailRequest_whenCalculateHardshipForDetailIsInvoked_thenReturnEvidenceFeeResponse() {
-        crimeHardshipService.calculateHardshipForDetail(TestModelDataBuilder.getApiCalculateHardshipByDetailRequest());
-        verify(hardshipAPIClient, times(1)).calculateHardshipForDetail(any());
-
+        ApiCalculateHardshipByDetailRequest request = TestModelDataBuilder.getApiCalculateHardshipByDetailRequest();
+        ApiCalculateHardshipByDetailResponse response = new ApiCalculateHardshipByDetailResponse()
+                .withHardshipSummary(BigDecimal.ONE);
+        when(hardshipAPIClient.calculateHardshipForDetail(request))
+                .thenReturn(response);
+        assertThat(crimeHardshipService.calculateHardshipForDetail(request))
+                .isEqualTo(response);
     }
 
     @Test
