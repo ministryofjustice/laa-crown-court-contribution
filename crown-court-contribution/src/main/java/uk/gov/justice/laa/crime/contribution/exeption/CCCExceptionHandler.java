@@ -14,13 +14,15 @@ import uk.gov.justice.laa.crime.contribution.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 
+import java.io.IOException;
+
 @Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class CCCExceptionHandler {
 
     private final TraceIdHandler traceIdHandler;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<ErrorDTO> onRuntimeException(WebClientResponseException exception) {
@@ -28,7 +30,7 @@ public class CCCExceptionHandler {
         try {
             ErrorDTO errorDTO = mapper.readValue(exception.getResponseBodyAsString(), ErrorDTO.class);
             errorMessage = errorDTO.getMessage();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             log.warn("Unable to read the ErrorDTO from WebClientResponseException", ex);
             errorMessage = exception.getMessage();
         }
