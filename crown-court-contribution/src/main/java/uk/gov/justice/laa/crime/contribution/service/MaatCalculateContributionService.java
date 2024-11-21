@@ -218,17 +218,24 @@ public class MaatCalculateContributionService {
         ContributionResult result;
 
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
-        if (Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
+        if ((Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
                 contributionResponseDTO.getId() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
-                        .compareTo(BigDecimal.ZERO) > 0) ||
-                Constants.INEL.equals(fullResult)) {
+                        .compareTo(BigDecimal.ZERO) > 0)) &&
+                !Constants.INEL.equals(fullResult)) {
             result = calculateContributions(calculateContributionDTO, contributionResponseDTO);
         } else {
+            LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
+            String effectiveDate =
+                    getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
+                            assEffectiveDate
+                    );
             result = ContributionResult.builder()
                     .monthlyAmount(BigDecimal.ZERO)
                     .contributionCap(BigDecimal.ZERO)
                     .upfrontAmount(BigDecimal.ZERO)
+                    .totalMonths(0)
+                    .effectiveDate(DateUtil.parse(effectiveDate))
                     .build();
         }
 
@@ -308,20 +315,9 @@ public class MaatCalculateContributionService {
                         calculateContributionDTO.getContributionCap()
                 );
 
-        Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream()
-                .filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
-        String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
-
-        ApiCalculateContributionResponse apiCalculateContributionResponse = null;
-        if (Constants.INEL.equals(fullResult)) {
-            apiCalculateContributionResponse = getApiCalculateContributionResponse();
-            totalMonths = 0;
-        } else {
-            // Revisit the request to pass the offenceType object for Contribs Cap
-            apiCalculateContributionResponse =
-                    calculateContributionService.calculateContribution(apiCalculateContributionRequest);
-        }
-
+        // Revisit the request to pass the offenceType object for Contribs Cap
+        ApiCalculateContributionResponse apiCalculateContributionResponse =
+                calculateContributionService.calculateContribution(apiCalculateContributionRequest);
         String effectiveDate =
                 getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
                         assEffectiveDate
@@ -337,16 +333,6 @@ public class MaatCalculateContributionService {
                 .effectiveDate(DateUtil.parse(effectiveDate))
                 .contributionCap(calculateContributionDTO.getContributionCap())
                 .build();
-    }
-
-    public ApiCalculateContributionResponse getApiCalculateContributionResponse() {
-        ApiCalculateContributionResponse apiCalculateContributionResponse;
-        apiCalculateContributionResponse = new ApiCalculateContributionResponse();
-        apiCalculateContributionResponse.setUpfrontContributions(BigDecimal.ZERO);
-        apiCalculateContributionResponse.setMonthlyContributions(BigDecimal.ZERO);
-        apiCalculateContributionResponse.setUpliftApplied(Constants.N);
-        apiCalculateContributionResponse.setBasedOn(null);
-        return apiCalculateContributionResponse;
     }
 
     public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,
