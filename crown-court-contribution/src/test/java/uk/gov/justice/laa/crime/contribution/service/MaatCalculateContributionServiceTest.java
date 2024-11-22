@@ -24,18 +24,10 @@ import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMa
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
+import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
-import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,18 +37,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.COMMITTAL_DATE;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.FULL;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.HARDSHIP;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.INIT;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.PASSPORT;
+import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.*;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
@@ -539,16 +523,7 @@ class MaatCalculateContributionServiceTest {
         assertThat(result)
                 .isEqualTo(expected);
     }
-
-    /*@Test
-    void givenCalculateContributionDTO_whenGetApiCalculateContributionResponseIsInvoked_thenApiCalculateContributionResponseIsReturned() {
-        ApiCalculateContributionResponse actual = maatCalculateContributionService.getApiCalculateContributionResponse();
-        assertThat(actual.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
-        assertThat(actual.getUpliftApplied()).isEqualTo(Constants.N);
-        assertThat(actual.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
-        assertThat(actual.getBasedOn()).isNull();
-    }*/
-
+    
     @Test
     void givenUpliftCoteNotNullAndCalcContributionsAsN_whenCalcContributionsIsInvoked_validResponseIsReturned() {
 
