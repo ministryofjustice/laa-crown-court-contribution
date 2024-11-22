@@ -8,8 +8,6 @@ import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 
 import java.math.BigDecimal;
 
-import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
-
 @Component
 @AllArgsConstructor
 public class CreateContributionRequestMapper {
@@ -23,15 +21,15 @@ public class CreateContributionRequestMapper {
                 .withRepId(calculateContributionDTO.getRepId())
                 .withApplicantId(calculateContributionDTO.getApplicantId())
                 .withContributionCap(calculateContributionDTO.getContributionCap())
-                .withEffectiveDate(convertDateToDateTime(calculateContributionDTO.getEffectiveDate()))
+                .withEffectiveDate(calculateContributionDTO.getEffectiveDate())
                 .withMonthlyContributions(calculateContributionDTO.getMonthlyContributions())
                 .withUpliftApplied(calculateContributionDTO.getUpliftApplied())
                 .withBasedOn(calculateContributionDTO.getBasedOn())
                 .withCreateContributionOrder(calculateContributionDTO.getCreateContributionOrder())
-                .withCalcDate(convertDateToDateTime(calculateContributionDTO.getCalcDate()))
+                .withCalcDate(calculateContributionDTO.getCalcDate())
                 .withContributionFileId(calculateContributionDTO.getContributionFileId())
-                .withDateUpliftApplied(convertDateToDateTime(calculateContributionDTO.getDateUpliftApplied()))
-                .withDateUpliftRemoved(convertDateToDateTime(calculateContributionDTO.getDateUpliftRemoved()))
+                .withDateUpliftApplied(calculateContributionDTO.getDateUpliftApplied())
+                .withDateUpliftRemoved(calculateContributionDTO.getDateUpliftRemoved())
                 .withTransferStatus(calculateContributionDTO.getTransferStatus())
                 .withUserCreated(calculateContributionDTO.getUserCreated())
                 .withUpfrontContributions(calculateContributionDTO.getUpfrontContributions());
@@ -42,14 +40,14 @@ public class CreateContributionRequestMapper {
                 .withRepId(calculateContributionDTO.getRepId())
                 .withApplicantId(calculateContributionDTO.getApplicantId())
                 .withContributionCap(result.contributionCap())
-                .withEffectiveDate(convertDateToDateTime(result.effectiveDate()))
+                .withEffectiveDate(result.effectiveDate())
                 .withMonthlyContributions(result.monthlyAmount())
                 .withUpliftApplied(result.isUplift() ? "Y" : "N")
                 .withBasedOn(result.basedOn())
                 .withCreateContributionOrder(calculateContributionDTO.getCreateContributionOrder())
-                .withCalcDate(convertDateToDateTime(calculateContributionDTO.getCalcDate()))
-                .withDateUpliftApplied(convertDateToDateTime(calculateContributionDTO.getDateUpliftApplied()))
-                .withDateUpliftRemoved(convertDateToDateTime(calculateContributionDTO.getDateUpliftRemoved()))
+                .withCalcDate(calculateContributionDTO.getCalcDate())
+                .withDateUpliftApplied(calculateContributionDTO.getDateUpliftApplied())
+                .withDateUpliftRemoved(calculateContributionDTO.getDateUpliftRemoved())
                 .withUserCreated(calculateContributionDTO.getUserCreated())
                 .withUpfrontContributions(result.upfrontAmount());
     }

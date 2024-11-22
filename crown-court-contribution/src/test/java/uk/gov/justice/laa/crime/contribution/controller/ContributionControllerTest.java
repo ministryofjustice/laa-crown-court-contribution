@@ -10,17 +10,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
-import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.service.ContributionRulesService;
 import uk.gov.justice.laa.crime.contribution.service.ContributionService;
 import uk.gov.justice.laa.crime.contribution.service.MaatCalculateContributionService;
+import uk.gov.justice.laa.crime.contribution.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.buildRequestGivenContent;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @DirtiesContext
 @AutoConfigureMockMvc(addFilters = false)
@@ -93,7 +93,7 @@ class ContributionControllerTest {
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
         when(maatCalculateContributionService.calculateContribution(any(CalculateContributionDTO.class)))
-                .thenThrow(new APIClientException("Test api client exception"));
+                .thenThrow(WebClientRequestException.class);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isInternalServerError())
@@ -113,7 +113,7 @@ class ContributionControllerTest {
     @Test
     void givenClientApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
         when(maatCalculateContributionService.getContributionSummaries(anyInt()))
-                .thenThrow(new APIClientException("Test api client exception"));
+                .thenThrow(WebClientRequestException.class);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL, false))
                 .andExpect(status().isInternalServerError())

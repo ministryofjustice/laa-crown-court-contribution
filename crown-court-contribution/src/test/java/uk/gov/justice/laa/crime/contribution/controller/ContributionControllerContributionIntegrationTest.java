@@ -4,28 +4,31 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.*;
+import com.github.tomakehurst.wiremock.common.Json;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.contribution.CrownCourtContributionApplication;
-import uk.gov.justice.laa.crime.contribution.config.CrownCourtContributionTestConfiguration;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+import uk.gov.justice.laa.crime.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 
 import java.math.BigDecimal;
@@ -33,17 +36,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_IMPLEMENTED;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getApiCrownCourtOutcome;
-import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.buildRequestGivenContent;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Import(CrownCourtContributionTestConfiguration.class)
 @SpringBootTest(classes = CrownCourtContributionApplication.class, webEnvironment = DEFINED_PORT)
 @AutoConfigureObservability
 @AutoConfigureWireMock(port = 9999)
@@ -65,18 +71,6 @@ class ContributionControllerContributionIntegrationTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Value("${services.maat-api.contribution-endpoints.get-rep-order-url}")
-    private String getRepOrderUrl;
-
-    @Value("${services.maat-api.contribution-endpoints.summary-url}")
-    private String summaryUrl;
-
-    @Value("${services.maat-api.contribution-endpoints.find-url}")
-    private String findContributionUrl;
-
-    @Value("${services.maat-api.contribution-endpoints.base-url}")
-    private String baseContributionUrl;
 
     @AfterEach
     void after() {
@@ -112,10 +106,9 @@ class ContributionControllerContributionIntegrationTest {
     private void setupAppealStubbing(ApiMaatCalculateContributionRequest appealContributionRequest,
                                      Contribution contribution) throws JsonProcessingException {
 
-        var repOrderUrl = UriComponentsBuilder.fromUriString(getRepOrderUrl)
-                .build(appealContributionRequest.getRepId());
+        var repOrderUrl = "/rep-orders/" + appealContributionRequest.getRepId();
 
-        wiremock.stubFor(get(repOrderUrl.getPath())
+        wiremock.stubFor(get(urlEqualTo(repOrderUrl))
                 .willReturn(
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
@@ -123,10 +116,9 @@ class ContributionControllerContributionIntegrationTest {
                 )
         );
 
-        var findContributionUrl = UriComponentsBuilder.fromUriString(this.findContributionUrl)
-                .build(appealContributionRequest.getRepId());
+        var findContributionUrl = "/contributions/" + appealContributionRequest.getRepId();
 
-        wiremock.stubFor(get(urlPathEqualTo(findContributionUrl.getPath()))
+        wiremock.stubFor(get(urlPathMatching(findContributionUrl))
                 .willReturn(
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
@@ -178,9 +170,9 @@ class ContributionControllerContributionIntegrationTest {
                         .build()
         );
 
-        var createContributionUrl = UriComponentsBuilder.fromUriString(this.baseContributionUrl).build();
+        var createContributionUrl = "/contributions";
 
-        wiremock.stubFor(post(urlPathEqualTo(createContributionUrl.getPath()))
+        wiremock.stubFor(post(urlEqualTo(createContributionUrl))
                 .willReturn(
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
@@ -205,45 +197,49 @@ class ContributionControllerContributionIntegrationTest {
         ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
-        var repOrderUrl = UriComponentsBuilder.fromUriString(getRepOrderUrl)
-                .build(appealContributionRequest.getRepId());
-
-
-        wiremock.stubFor(get(repOrderUrl.getPath())
+        var repOrderUrl = "/rep-orders/" + appealContributionRequest.getRepId();
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(HttpStatus.NOT_IMPLEMENTED.name())
+                .build();
+        wiremock.stubFor(get(urlEqualTo(repOrderUrl))
                 .willReturn(
                         WireMock.aResponse()
                                 .withStatus(NOT_IMPLEMENTED.code())
+                                .withBody(Json.write(errorDTO))
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                 )
         );
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().is5xxServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenMaatApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        var summariesUrl = UriComponentsBuilder.fromUriString(summaryUrl)
-                .build(TestModelDataBuilder.REP_ID);
-        wiremock.stubFor(get(summariesUrl.getPath())
+        var summariesUrl = "/contributions/" + TestModelDataBuilder.REP_ID + "/summary";
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(HttpStatus.NOT_IMPLEMENTED.name())
+                .build();
+        wiremock.stubFor(get(urlEqualTo(summariesUrl))
                 .willReturn(
                         WireMock.aResponse()
                                 .withStatus(NOT_IMPLEMENTED.code())
+                                .withBody(Json.write(errorDTO))
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                 )
         );
         mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().is5xxServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenApiMaatCalculateContributionRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
         List<ContributionsSummaryDTO> contributionsSummaryDTOList = List.of(TestModelDataBuilder.getContributionSummaryDTO());
-        var summariesUrl = UriComponentsBuilder.fromUriString(summaryUrl)
-                .build(TestModelDataBuilder.REP_ID);
-        wiremock.stubFor(get(urlPathEqualTo(summariesUrl.getPath()))
+        var summariesUrl = "/contributions/" + TestModelDataBuilder.REP_ID + "/summary";
+
+        wiremock.stubFor(get(urlEqualTo(summariesUrl))
                 .willReturn(
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))

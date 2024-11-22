@@ -53,24 +53,7 @@ contribution:
 services:
   maat-api:
     base-url: http://localhost:9999
-    assessments-domain: ${services.maat-api.base-url}/api/internal/v1/assessment
-    contribution-endpoints:
-      base-url: ${services.maat-api.assessments-domain}/contributions
-      find-url: ${services.maat-api.contribution-endpoints.base-url}/{repId}
-      summary-url: ${services.maat-api.assessments-domain}/contributions/{repId}/summary
-      get-rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
-      contribs-parameters-url: ${services.maat-api.assessments-domain}/contribution-calc-params/{effectiveDate}
-    correspondence-state-endpoints:
-      base-url: ${services.maat-api.assessments-domain}/correspondence-state
-      find-url: ${services.maat-api.assessments-domain.contribution-endpoints.base-url}/{repId}
-    rep-order-endpoints:
-      find-outcome-url: ${services.maat-api.assessments-domain}/rep-orders/cc-outcome/reporder/{repId}
+    registrationId: maat-api
   hardship-api:
     base-url: http://localhost:9999
-    hardship-endpoints:
-      calculate-hardship-for-detail-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/calculate-hardship-for-detail
-
-retry-config:
-  max-retries: 2
-  min-back-off-period: 3
-  jitter-value: 0.5
+    registrationId: hardship

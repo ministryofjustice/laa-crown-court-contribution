@@ -27,39 +27,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private ContributionEndpoints contributionEndpoints;
-
-        @NotNull
-        private RepOrderEndpoints repOrderEndpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class ContributionEndpoints {
-
-            @NotNull
-            private String baseUrl;
-
-            @NotNull
-            private String findUrl;
-
-            @NotNull
-            private String summaryUrl;
-
-            @NotNull
-            private String getRepOrderUrl;
-
-            @NotNull
-            private String contribsParametersUrl;
-        }
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class RepOrderEndpoints {
-            @NotNull
-            private String findOutcomeUrl;
-        }
+        private String registrationId;
     }
 
     @Data
@@ -70,14 +38,6 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private HardshipEndpoints hardshipEndpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class HardshipEndpoints {
-            @NotNull
-            private String calculateHardshipForDetailUrl;
-        }
+        private String registrationId;
     }
 }

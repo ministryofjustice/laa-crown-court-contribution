@@ -10,8 +10,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
-import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import uk.gov.justice.laa.crime.contribution.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.contribution.util.RequestBuilderUtils.buildRequestGivenContent;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @DirtiesContext
 @AutoConfigureMockMvc(addFilters = false)
@@ -70,7 +70,7 @@ class CalculateContributionControllerTest {
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
         when(calculateContributionService.calculateContribution(any(ApiCalculateContributionRequest.class)))
-                .thenThrow(new APIClientException("Test api client exception"));
+                .thenThrow(WebClientRequestException.class);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, ENDPOINT_URL, false))
                 .andExpect(status().isInternalServerError())
