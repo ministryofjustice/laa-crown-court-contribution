@@ -351,7 +351,6 @@ public class MaatCalculateContributionService {
                 crimeHardshipService.calculateHardshipForDetail(new ApiCalculateHardshipByDetailRequest()
                         .withDetailType(HardshipReviewDetailType.SOL_COSTS.toString())
                         .withRepId(repId));
-        BigDecimal hardshipSummary = apiCalculateHardshipByDetailResponse.getHardshipSummary();
-        return hardshipSummary != null ? hardshipSummary : BigDecimal.ZERO;
+        return apiCalculateHardshipByDetailResponse.getHardshipSummary();
     }
 }
