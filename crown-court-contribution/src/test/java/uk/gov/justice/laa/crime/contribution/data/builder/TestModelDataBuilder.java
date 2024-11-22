@@ -456,6 +456,7 @@ public class TestModelDataBuilder {
                         .withAssessmentDate(TestModelDataBuilder.TEST_DATE)))
                 .effectiveDate(LocalDate.now())
                 .monthlyContributions(BigDecimal.ZERO)
+                .contributionCap(BigDecimal.ZERO)
                 .build();
     }
 }

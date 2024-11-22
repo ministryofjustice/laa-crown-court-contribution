@@ -216,18 +216,27 @@ public class MaatCalculateContributionService {
                                                                      final String fullResult,
                                                                      final RepOrderDTO repOrderDTO) {
         ContributionResult result;
+
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
-        if (Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
+        if ((Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
                 contributionResponseDTO.getId() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
-                        .compareTo(BigDecimal.ZERO) > 0) ||
-                Constants.INEL.equals(fullResult)) {
+                        .compareTo(BigDecimal.ZERO) > 0)) &&
+                !Constants.INEL.equals(fullResult)) {
             result = calculateContributions(calculateContributionDTO, contributionResponseDTO);
         } else {
+            LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
+            String effectiveDate =
+                    getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
+                            assEffectiveDate
+                    );
             result = ContributionResult.builder()
                     .monthlyAmount(BigDecimal.ZERO)
                     .contributionCap(BigDecimal.ZERO)
                     .upfrontAmount(BigDecimal.ZERO)
+                    .totalMonths(0)
+                    .effectiveDate(DateUtil.parse(effectiveDate))
+                    .contributionCap(calculateContributionDTO.getContributionCap())
                     .build();
         }
 
@@ -286,6 +295,9 @@ public class MaatCalculateContributionService {
 
     public ContributionResult calculateContributions(final CalculateContributionDTO calculateContributionDTO,
                                                      final ContributionResponseDTO contributionResponseDTO) {
+        log.debug("Request to Calculate Contributions - calculateContributionDTO : {}", calculateContributionDTO);
+        log.debug("Request to Calculate Contributions - contributionResponseDTO : {}", contributionResponseDTO);
+
         LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO =
                 maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assEffectiveDate));
