@@ -1071,6 +1071,7 @@ class MaatCalculateContributionServiceTest {
                 .contributionCap(BigDecimal.ZERO)
                 .upfrontAmount(BigDecimal.ZERO)
                 .effectiveDate(LocalDate.now())
+                .contributionCap(BigDecimal.ZERO)
                 .build();
         verify(maatCalculateContributionResponseMapper, times(1))
                 .map(contributionResult, null, contributionResponseDTO);
