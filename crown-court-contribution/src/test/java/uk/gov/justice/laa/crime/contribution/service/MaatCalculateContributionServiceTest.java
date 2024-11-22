@@ -24,18 +24,10 @@ import uk.gov.justice.laa.crime.contribution.builder.CreateContributionRequestMa
 import uk.gov.justice.laa.crime.contribution.builder.MaatCalculateContributionResponseMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
-import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
+import uk.gov.justice.laa.crime.contribution.dto.*;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
-import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
-import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,18 +37,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.COMMITTAL_DATE;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.FULL;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.HARDSHIP;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.INIT;
-import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.PASSPORT;
+import static uk.gov.justice.laa.crime.enums.contribution.AssessmentType.*;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
@@ -469,6 +453,38 @@ class MaatCalculateContributionServiceTest {
                 .isEqualTo(expected);
     }
 
+
+    @Test
+    void givenCalcContributionsWithResultTypeINEL_whenCalcContributionsIsInvoked_validResponseIsReturned() {
+
+        ContributionResult expected = ContributionResult.builder()
+                .totalAnnualDisposableIncome(BigDecimal.ZERO)
+                .upfrontAmount(BigDecimal.ZERO)
+                .monthlyAmount(BigDecimal.ZERO)
+                .isUplift(false)
+                .effectiveDate(COMMITTAL_DATE)
+                .upfrontAmount(BigDecimal.ZERO)
+                .totalMonths(0)
+                .basedOn(null)
+                .build();
+
+        CalculateContributionDTO calculateContributionDTO = setupDataForCalculateContributionsTests();
+        calculateContributionDTO.getAssessments().get(0).setResult(AssessmentResult.INEL);
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .calcContribs(Constants.N)
+                .build();
+        when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
+                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+        when(calculateContributionService.calculateContribution(any()))
+                .thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
+        ContributionResult result = maatCalculateContributionService.calculateContributions(
+                calculateContributionDTO, contributionResponseDTO
+        );
+
+        assertThat(result)
+                .isEqualTo(expected);
+    }
+
     private CalculateContributionDTO setupDataForCalculateContributionsTests() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
@@ -478,6 +494,36 @@ class MaatCalculateContributionServiceTest {
         return calculateContributionDTO;
     }
 
+    @Test
+    void givenCalcContributionsWithResultTypeINELAndBasedOnMeans_whenCalcContributionsIsInvoked_validResponseIsReturned() {
+
+        ContributionResult expected = ContributionResult.builder()
+                .totalAnnualDisposableIncome(BigDecimal.ZERO)
+                .upfrontAmount(BigDecimal.ZERO)
+                .monthlyAmount(BigDecimal.ZERO)
+                .isUplift(false)
+                .effectiveDate(COMMITTAL_DATE)
+                .upfrontAmount(BigDecimal.ZERO)
+                .totalMonths(0)
+                .basedOn("Means")
+                .build();
+
+        CalculateContributionDTO calculateContributionDTO = setupDataForCalculateContributionsTests();
+        calculateContributionDTO.getAssessments().get(0).setResult(AssessmentResult.INEL);
+        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
+                .calcContribs(Constants.N)
+                .build();
+        when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
+                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+        when(calculateContributionService.calculateContribution(any()))
+                .thenReturn(TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
+        ContributionResult result = maatCalculateContributionService.calculateContributions(
+                calculateContributionDTO, contributionResponseDTO
+        );
+        assertThat(result)
+                .isEqualTo(expected);
+    }
+    
     @Test
     void givenUpliftCoteNotNullAndCalcContributionsAsN_whenCalcContributionsIsInvoked_validResponseIsReturned() {
 
@@ -999,6 +1045,8 @@ class MaatCalculateContributionServiceTest {
                 .monthlyAmount(BigDecimal.ZERO)
                 .contributionCap(BigDecimal.ZERO)
                 .upfrontAmount(BigDecimal.ZERO)
+                .effectiveDate(LocalDate.now())
+                .contributionCap(BigDecimal.ZERO)
                 .build();
         verify(maatCalculateContributionResponseMapper, times(1))
                 .map(contributionResult, null, contributionResponseDTO);
