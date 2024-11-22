@@ -236,6 +236,7 @@ public class MaatCalculateContributionService {
                     .upfrontAmount(BigDecimal.ZERO)
                     .totalMonths(0)
                     .effectiveDate(DateUtil.parse(effectiveDate))
+                    .contributionCap(calculateContributionDTO.getContributionCap())
                     .build();
         }
 
