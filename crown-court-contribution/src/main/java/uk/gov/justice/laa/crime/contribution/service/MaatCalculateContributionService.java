@@ -148,8 +148,10 @@ public class MaatCalculateContributionService {
         calculateContributionDTO.setRepOrderDTO(repOrderDTO);
 
         if (CaseType.APPEAL_CC.equals(calculateContributionDTO.getCaseType())) {
+            log.info("--- Case type is APPEAL_CC, so calculating appeal contributions ---");
             return appealContributionService.calculateAppealContribution(calculateContributionDTO);
         }
+        log.info("--- Case type is not APPEAL_CC, so calculating normal contributions ---");
         return getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
     }
 
@@ -171,10 +173,13 @@ public class MaatCalculateContributionService {
         String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
 
         String crownCourtOutcome = getCrownCourtOutcome(calculateContributionDTO);
+        log.info("--- Calculated crownCourtOutcome: {}", crownCourtOutcome);
 
         String magCourtOutcome = (calculateContributionDTO.getMagCourtOutcome() != null) ?
                 calculateContributionDTO.getMagCourtOutcome().getOutcome() : null;
+        log.info("--- Calculated magCourtOutcome: {}", magCourtOutcome);
 
+        log.info("--- About to calculate ContributionResponseDTO");
         ContributionResponseDTO contributionResponseDTO =
                 contributionService.checkContributionsCondition(
                         ContributionRequestDTO.builder()
@@ -192,7 +197,9 @@ public class MaatCalculateContributionService {
                                 .build()
                 );
 
+        log.info("--- Checking if doContribs is true");
         if (Constants.Y.equals(contributionResponseDTO.getDoContribs())) {
+            log.info("--- doContribs is true, calling performCalculations");
             return performContributions(calculateContributionDTO, contributionResponseDTO, fullResult, repOrderDTO);
         }
         return new ApiMaatCalculateContributionResponse();
@@ -220,14 +227,20 @@ public class MaatCalculateContributionService {
         ContributionResult result;
 
         //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
+        log.info("--- repOrderDTO: {}", repOrderDTO);
+        log.info("--- CalculateContributionDTO : {}", calculateContributionDTO);
+        log.info("--- ContributionResponseDTO: {}", contributionResponseDTO);
         if ((Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
                 contributionResponseDTO.getId() != null ||
                 (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
                         .compareTo(BigDecimal.ZERO) > 0)) &&
                 !Constants.INEL.equals(fullResult)) {
+            log.info("--- Calling calculateContributions when not INEL and id or monthly contribs exist");
             result = calculateContributions(calculateContributionDTO, contributionResponseDTO);
         } else {
             LocalDate assessmentEffectiveDate = getEffectiveDate(calculateContributionDTO);
+            log.info("--- Calling calculateContributions when either INEL or id / monthly contribs do not exist");
+            LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
             String effectiveDate =
                     getEffectiveDateByNewWorkReason(calculateContributionDTO, BigDecimal.ZERO,
                             assessmentEffectiveDate
@@ -242,26 +255,46 @@ public class MaatCalculateContributionService {
                     .build();
         }
 
+        log.info("--- ContributionResult: {}", result);
+
+        log.info("--- Calling verifyAndCreateContributions");
         Contribution createdContribution = verifyAndCreateContributions(calculateContributionDTO, repOrderDTO, result);
 
         return maatCalculateContributionResponseMapper.map(result, createdContribution, contributionResponseDTO);
     }
 
     private boolean shouldCreateContributions(ContributionResult result, CalculateContributionDTO calculateContributionDTO) {
-        return (result.monthlyAmount() != null && calculateContributionDTO.getMonthlyContributions() != null
-            && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
-                || (result.effectiveDate() != null && !result.effectiveDate()
-                .equals(calculateContributionDTO.getEffectiveDate()));
+        log.info("Starting shouldCreateContributions");
+        log.info("ContributionResult: {}", result);
+        log.info("CalculateContributionDTO: {}", calculateContributionDTO);
+        boolean shouldCreate = (result.monthlyAmount() != null && calculateContributionDTO.getMonthlyContributions() != null && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0) // TODO: Might need to modify this.
+                || (result.effectiveDate() != null && !result.effectiveDate().equals(calculateContributionDTO.getEffectiveDate()));
+
+        log.info("Finished: should create contributions - {}", shouldCreate);
+        return shouldCreate;
     }
 
     public Contribution verifyAndCreateContributions(final CalculateContributionDTO calculateContributionDTO,
                                                      final RepOrderDTO repOrderDTO,
                                                      final ContributionResult result) {
 
-        if (result != null && (shouldCreateContributions(result, calculateContributionDTO)
-                || (repOrderDTO != null && isCreateContributionRequired(calculateContributionDTO, repOrderDTO)))) {
-            return createContributions(calculateContributionDTO, result);
+//        log.info("Verifying whether to create contributions...");
+
+        if (result != null) {
+            boolean shouldCreateContributionsResult = shouldCreateContributions(result, calculateContributionDTO);
+            boolean isCreateContributionRequiredResult = repOrderDTO != null && isCreateContributionRequired(calculateContributionDTO, repOrderDTO);
+
+            if (shouldCreateContributionsResult || (repOrderDTO != null && isCreateContributionRequiredResult)) {
+                log.info("--- Verified that contributions should be created");
+                log.info("--- shouldCreateContributionsResult: {}", shouldCreateContributionsResult);
+                log.info("--- isCreateContributionRequiredResult: {}", isCreateContributionRequiredResult);
+                log.info("--- Calling createContributions");
+
+                return createContributions(calculateContributionDTO, result);
+            }
         }
+        
+        log.info("--- Verified that contributions should not be created, returning");
         return null;
     }
 
@@ -278,30 +311,46 @@ public class MaatCalculateContributionService {
     public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
                                                 final RepOrderDTO repOrderDTO) {
 
-        return (contributionService.hasApplicationStatusChanged(
-                repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
-                || contributionService.hasCCOutcomeChanged(repOrderDTO.getId())
-                || contributionService.isCds15WorkAround(repOrderDTO));
+        boolean hasApplicationStatusChanged = contributionService.hasApplicationStatusChanged(
+            repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus());
+        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(repOrderDTO.getId());
+        boolean isCds15Workaround = contributionService.isCds15WorkAround(repOrderDTO);
+
+        log.info("--- in isCreateContributionRequired ---");
+        log.info("--- hasApplicationStatusChanged: {}", hasApplicationStatusChanged);
+        log.info("--- hasCCOutcomeChanged: {}", hasCCOutcomeChanged);
+        log.info("--- isCds15Workaround: {}", isCds15Workaround);
+
+        return (hasApplicationStatusChanged
+                || hasCCOutcomeChanged
+                || isCds15Workaround);
     }
 
     public Contribution createContributions(final CalculateContributionDTO calculateContributionDTO,
                                             ContributionResult result) {
         log.info("Inactivate existing Contribution and create a new Contribution");
+
+        log.info("--- Calling compareContributionService.shouldCreateContribution");
         if (compareContributionService.shouldCreateContribution(calculateContributionDTO, result)) {
             CreateContributionRequest createContributionRequest =
                     createContributionRequestMapper.map(calculateContributionDTO, result);
+
+            log.info("--- Calling MAAT API to create the contribution, flow finished.");
             return maatCourtDataService.createContribution(createContributionRequest);
         } else {
+            log.info("--- Returning without creating contribution");
+
             return null;
         }
     }
 
     public ContributionResult calculateContributions(final CalculateContributionDTO calculateContributionDTO,
                                                      final ContributionResponseDTO contributionResponseDTO) {
-        log.debug("Request to Calculate Contributions - calculateContributionDTO : {}", calculateContributionDTO);
+//        log.debug("Request to Calculate Contributions - calculateContributionDTO : {}", calculateContributionDTO);
         log.debug("Request to Calculate Contributions - contributionResponseDTO : {}", contributionResponseDTO);
 
         LocalDate assessmentEffectiveDate = getEffectiveDate(calculateContributionDTO);
+        log.info("--- effectiveDate: {}", assessmentEffectiveDate);
         ContributionCalcParametersDTO contributionCalcParametersDTO =
                 maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assessmentEffectiveDate));
         CrownCourtOutcome crownCourtOutcome =
