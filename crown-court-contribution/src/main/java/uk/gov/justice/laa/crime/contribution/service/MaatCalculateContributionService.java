@@ -191,6 +191,7 @@ public class MaatCalculateContributionService {
                 );
 
         if (Constants.Y.equals(contributionResponseDTO.getDoContribs())) {
+            log.info("About to perform contributions...");
             return performContributions(calculateContributionDTO, contributionResponseDTO, fullResult, repOrderDTO);
         }
         return new ApiMaatCalculateContributionResponse();
@@ -246,19 +247,27 @@ public class MaatCalculateContributionService {
     }
 
     private boolean shouldCreateContributions(ContributionResult result, CalculateContributionDTO calculateContributionDTO) {
-        return (result.monthlyAmount() != null && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
-                || (result.effectiveDate() != null && !result.effectiveDate()
-                .equals(calculateContributionDTO.getEffectiveDate()));
+        log.info("Starting shouldCreateContributions");
+        log.info("ContributionResult: {}", result);
+        log.info("CalculateContributionDTO: {}", calculateContributionDTO);
+        boolean shouldCreate = (result.monthlyAmount() != null && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0) // TODO: Might need to modify this.
+                || (result.effectiveDate() != null && !result.effectiveDate().equals(calculateContributionDTO.getEffectiveDate()));
+
+        log.info("Finished: should create contributions - {}", shouldCreate);
+        return shouldCreate;
     }
 
     public Contribution verifyAndCreateContributions(final CalculateContributionDTO calculateContributionDTO,
                                                      final RepOrderDTO repOrderDTO,
                                                      final ContributionResult result) {
 
+        log.info("Verifying whether to create contributions...");
         if (result != null && (shouldCreateContributions(result, calculateContributionDTO)
                 || (repOrderDTO != null && isCreateContributionRequired(calculateContributionDTO, repOrderDTO)))) {
+            log.info("Verified, now creating contributions...");
             return createContributions(calculateContributionDTO, result);
         }
+        log.info("Not creating contributions...");
         return null;
     }
 

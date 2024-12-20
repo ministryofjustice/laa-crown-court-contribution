@@ -26,6 +26,8 @@ public class CompareContributionService {
 
     @Transactional
     public boolean shouldCreateContribution(CalculateContributionDTO calculateContributionDTO, ContributionResult contributionResult) {
+        log.info("CompareContributionService: shouldCreateContribution starting...");
+
         int repId = calculateContributionDTO.getRepId();
         RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
         String magsCourtOutcome = calculateContributionDTO.getMagCourtOutcome() == null ? null
