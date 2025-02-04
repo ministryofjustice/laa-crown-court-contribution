@@ -81,7 +81,8 @@ public class MaatCalculateContributionService {
         if (NewWorkReason.FMA == newWorkReason) {
             return assEffectiveDate.toString();
         } else if (NewWorkReason.PAI == newWorkReason) {
-            if (calculateContributionDTO.getMonthlyContributions().compareTo(monthlyContributions) <= 0) {
+            if (calculateContributionDTO.getMonthlyContributions() != null
+                && calculateContributionDTO.getMonthlyContributions().compareTo(monthlyContributions) <= 0) {
                 return calculateContributionDTO.getEffectiveDate().toString();
             } else {
                 return assEffectiveDate.toString();
@@ -246,7 +247,8 @@ public class MaatCalculateContributionService {
     }
 
     private boolean shouldCreateContributions(ContributionResult result, CalculateContributionDTO calculateContributionDTO) {
-        return (result.monthlyAmount() != null && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
+        return (result.monthlyAmount() != null && calculateContributionDTO.getMonthlyContributions() != null
+            && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
                 || (result.effectiveDate() != null && !result.effectiveDate()
                 .equals(calculateContributionDTO.getEffectiveDate()));
     }

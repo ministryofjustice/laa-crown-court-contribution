@@ -22,8 +22,15 @@ public class ContributionDTOBuilder {
                 .repId(request.getRepId())
                 .effectiveDate(DateUtil.parseLocalDate(request.getEffectiveDate()))
                 .contributionCap(request.getContributionCap())
-                .monthlyContributions(request.getMonthlyContributions() !=null ? request.getMonthlyContributions() : BigDecimal.ZERO)
-                .upfrontContributions(request.getUpfrontContributions() !=null ? request.getUpfrontContributions() : BigDecimal.ZERO)
+
+                // Do not default to zero if getMonthlyContributions() returns null, as the nullness
+                // of this field is used to determine if the CalculateContributionDTO instance
+                // represents a real contribution (where monthly contributions is not null) or an
+                // initialised but empty object (where monthly contributions is null and therefore
+                // represents no actual contribution).
+                .monthlyContributions(request.getMonthlyContributions())
+
+                .upfrontContributions(request.getUpfrontContributions() != null ? request.getUpfrontContributions() : BigDecimal.ZERO)
                 .dateUpliftApplied(DateUtil.parseLocalDate(request.getDateUpliftApplied()))
                 .dateUpliftRemoved(DateUtil.parseLocalDate(request.getDateUpliftRemoved()))
                 .caseType(request.getCaseType())
