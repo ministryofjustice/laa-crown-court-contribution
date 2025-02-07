@@ -76,24 +76,25 @@ public class MaatCalculateContributionService {
 
     public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
                                                          final BigDecimal monthlyContributions,
-                                                         final LocalDate assEffectiveDate) {
+                                                         final LocalDate assessmentEffectiveDate) {
         NewWorkReason newWorkReason = getNewWorkReason(calculateContributionDTO);
+
         if (NewWorkReason.FMA == newWorkReason) {
-            return assEffectiveDate.toString();
-        } else if (NewWorkReason.PAI == newWorkReason) {
+            return assessmentEffectiveDate.toString();
+        }
+
+        if (NewWorkReason.PAI == newWorkReason) {
             if (calculateContributionDTO.getMonthlyContributions() != null
+                && monthlyContributions != null
                 && calculateContributionDTO.getMonthlyContributions().compareTo(monthlyContributions) <= 0) {
                 return calculateContributionDTO.getEffectiveDate().toString();
-            } else {
-                return assEffectiveDate.toString();
             }
-        } else {
-            if (calculateContributionDTO.getEffectiveDate() == null) {
-                return assEffectiveDate.toString();
-            } else {
-                return calculateContributionDTO.getEffectiveDate().toString();
-            }
+
+            return assessmentEffectiveDate.toString();
         }
+
+        return calculateContributionDTO.getEffectiveDate() != null
+            ? calculateContributionDTO.getEffectiveDate().toString() : assessmentEffectiveDate.toString();
     }
 
     public static NewWorkReason getNewWorkReason(final CalculateContributionDTO calculateContributionDTO) {
