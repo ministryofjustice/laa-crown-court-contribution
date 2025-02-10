@@ -75,20 +75,20 @@ public class MaatCalculateContributionService {
     }
 
     public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
-                                                         final BigDecimal monthlyContributions,
-                                                         final LocalDate assEffectiveDate) {
+                                                         final BigDecimal newMonthlyContributions,
+                                                         final LocalDate assessmentEffectiveDate) {
         NewWorkReason newWorkReason = getNewWorkReason(calculateContributionDTO);
         if (NewWorkReason.FMA == newWorkReason) {
-            return assEffectiveDate.toString();
+            return assessmentEffectiveDate.toString();
         } else if (NewWorkReason.PAI == newWorkReason) {
-            if (calculateContributionDTO.getMonthlyContributions().compareTo(monthlyContributions) <= 0) {
+            if (newMonthlyContributions.compareTo(calculateContributionDTO.getMonthlyContributions()) <= 0) {
                 return calculateContributionDTO.getEffectiveDate().toString();
             } else {
-                return assEffectiveDate.toString();
+                return assessmentEffectiveDate.toString();
             }
         } else {
             if (calculateContributionDTO.getEffectiveDate() == null) {
-                return assEffectiveDate.toString();
+                return assessmentEffectiveDate.toString();
             } else {
                 return calculateContributionDTO.getEffectiveDate().toString();
             }
@@ -225,10 +225,10 @@ public class MaatCalculateContributionService {
                 !Constants.INEL.equals(fullResult)) {
             result = calculateContributions(calculateContributionDTO, contributionResponseDTO);
         } else {
-            LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
+            LocalDate assessmentEffectiveDate = getEffectiveDate(calculateContributionDTO);
             String effectiveDate =
-                    getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
-                            assEffectiveDate
+                    getEffectiveDateByNewWorkReason(calculateContributionDTO, BigDecimal.ZERO,
+                            assessmentEffectiveDate
                     );
             result = ContributionResult.builder()
                     .monthlyAmount(BigDecimal.ZERO)
@@ -298,9 +298,9 @@ public class MaatCalculateContributionService {
         log.debug("Request to Calculate Contributions - calculateContributionDTO : {}", calculateContributionDTO);
         log.debug("Request to Calculate Contributions - contributionResponseDTO : {}", contributionResponseDTO);
 
-        LocalDate assEffectiveDate = getEffectiveDate(calculateContributionDTO);
+        LocalDate assessmentEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO =
-                maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assEffectiveDate));
+                maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assessmentEffectiveDate));
         CrownCourtOutcome crownCourtOutcome =
                 contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
 
@@ -320,8 +320,8 @@ public class MaatCalculateContributionService {
         ApiCalculateContributionResponse apiCalculateContributionResponse =
                 calculateContributionService.calculateContribution(apiCalculateContributionRequest);
         String effectiveDate =
-                getEffectiveDateByNewWorkReason(calculateContributionDTO, calculateContributionDTO.getContributionCap(),
-                        assEffectiveDate
+                getEffectiveDateByNewWorkReason(calculateContributionDTO, apiCalculateContributionResponse.getMonthlyContributions(),
+                        assessmentEffectiveDate
                 );
 
         return ContributionResult.builder()
