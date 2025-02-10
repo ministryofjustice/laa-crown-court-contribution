@@ -388,17 +388,43 @@ class MaatCalculateContributionServiceTest {
     }
 
     @Test
-    void givenNewWorkReasonAsPAIAndMonthlyContributionsIsNull_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenContributionEffectiveDateIsReturned() {
+    void givenNewWorkReasonAsPAIAndCurrentMonthlyContributionsIsNull_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentEffectiveDateIsReturned() {
         LocalDate assessmentDate = LocalDate.now();
+
+        BigDecimal newContributions = BigDecimal.TEN;
+
         CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
             .assessments(List.of(new ApiAssessment()
                 .withAssessmentType(PASSPORT)
                 .withNewWorkReason(NewWorkReason.PAI)))
+            .monthlyContributions(null)
             .effectiveDate(null)
             .build();
 
         String actual = MaatCalculateContributionService.getEffectiveDateByNewWorkReason(
-            calculateContributionDTO, BigDecimal.TEN, assessmentDate
+            calculateContributionDTO, newContributions, assessmentDate
+        );
+
+        assertThat(actual)
+            .isEqualTo(assessmentDate.toString());
+    }
+
+    @Test
+    void givenNewWorkReasonAsPAIAndNewMonthlyContributionsIsNull_whenGetEffectiveDateByNewWorkReasonIsInvoked_thenAssessmentEffectiveDateIsReturned() {
+        LocalDate assessmentDate = LocalDate.now();
+
+        BigDecimal currentContributions = BigDecimal.TEN;
+
+        CalculateContributionDTO calculateContributionDTO = CalculateContributionDTO.builder()
+            .assessments(List.of(new ApiAssessment()
+                .withAssessmentType(PASSPORT)
+                .withNewWorkReason(NewWorkReason.PAI)))
+            .monthlyContributions(currentContributions)
+            .effectiveDate(null)
+            .build();
+
+        String actual = MaatCalculateContributionService.getEffectiveDateByNewWorkReason(
+            calculateContributionDTO, null, assessmentDate
         );
 
         assertThat(actual)
