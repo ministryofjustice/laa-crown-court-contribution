@@ -35,7 +35,7 @@ class ContributionDTOBuilderTest {
         softly.assertThat(actualContributionDTO.getRepId()).isEqualTo(999);
         softly.assertThat(actualContributionDTO.getEffectiveDate()).isNull();
         softly.assertThat(actualContributionDTO.getContributionCap()).isNull();
-        softly.assertThat(actualContributionDTO.getMonthlyContributions()).isEqualTo(BigDecimal.ZERO);
+        softly.assertThat(actualContributionDTO.getMonthlyContributions()).isNull();
         softly.assertThat(actualContributionDTO.getUpfrontContributions()).isEqualTo(BigDecimal.ZERO);
         softly.assertThat(actualContributionDTO.getDateUpliftApplied()).isNull();
         softly.assertThat(actualContributionDTO.getDateUpliftRemoved()).isNull();
