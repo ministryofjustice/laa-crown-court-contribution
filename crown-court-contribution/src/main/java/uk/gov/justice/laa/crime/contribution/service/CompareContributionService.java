@@ -46,7 +46,7 @@ public class CompareContributionService {
         boolean messageOutcomeChanged = false;
 
         if (!activeContribution.isEmpty()) {
-            contributionRecordsIdentical = areContributionRecordsIdentical(contributionResult, contributions.get(0));
+            contributionRecordsIdentical = areContributionRecordsIdentical(contributionResult, activeContribution.get(0));
             messageOutcomeChanged = contributionService.hasMessageOutcomeChanged(magsCourtOutcome, repOrderDTO);
 
             log.info("--- contributionRecordsIdentical--" + contributionRecordsIdentical);
