@@ -273,6 +273,22 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static Contribution buildInactiveContributionForCompareContributionService() {
+        return Contribution.builder()
+            .id(124)
+            .applicantId(123)
+            .repId(123)
+            .replacedDate(LocalDate.now().minusDays(1))
+            .calcDate(LocalDate.now().minusDays(1))
+            .contributionCap(BigDecimal.valueOf(250))
+            .monthlyContributions(BigDecimal.valueOf(300))
+            .upfrontContributions(BigDecimal.valueOf(250))
+            .effectiveDate(LocalDate.now())
+            .userCreated("test")
+            .active("N")
+            .build();
+    }
+
     public static ApiMaatCalculateContributionRequest buildAppealContributionRequest() {
         return new ApiMaatCalculateContributionRequest()
                 .withApplicantId(999)
