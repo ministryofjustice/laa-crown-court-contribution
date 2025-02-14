@@ -57,6 +57,39 @@ class CompareContributionServiceTest {
     @Test
     void givenActiveNotIdenticalContribution_whenShouldCreateContributionIsInvoked_thenReturnTrue() {
         CalculateContributionDTO calculateContributionDTO =
+            TestModelDataBuilder.getContributionDTOForCompareContributionService(
+                CaseType.COMMITAL.getCaseTypeString(),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                LocalDate.now(),
+                MagCourtOutcome.APPEAL_TO_CC
+            );
+        ContributionResult contributionResult = ContributionResult.builder()
+            .totalAnnualDisposableIncome(BigDecimal.valueOf(16000.00))
+            .monthlyAmount(BigDecimal.valueOf(300.00))
+            .upfrontAmount(BigDecimal.valueOf(250.00))
+            .contributionCap(BigDecimal.valueOf(250.00))
+            .totalMonths(5)
+            .isUplift(false)
+            .basedOn("Means")
+            .effectiveDate(LocalDate.now())
+            .build();
+
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
+            .thenReturn(List.of(
+                    TestModelDataBuilder.buildContributionForCompareContributionService()
+                )
+            );
+
+        boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void givenMultipleContributionsExistAndActiveContributionIsNotIdentical_whenShouldCreateContributionIsInvoked_thenReturnTrue() {
+        CalculateContributionDTO calculateContributionDTO =
                 TestModelDataBuilder.getContributionDTOForCompareContributionService(
                         CaseType.COMMITAL.getCaseTypeString(),
                         BigDecimal.valueOf(250),
@@ -78,13 +111,48 @@ class CompareContributionServiceTest {
 
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
-                                TestModelDataBuilder.buildContributionForCompareContributionService()
-                        )
+                        TestModelDataBuilder.buildInactiveContributionForCompareContributionService(),
+                        TestModelDataBuilder.buildContributionForCompareContributionService()
+                    )
                 );
 
         boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isTrue();
+    }
+
+    @Test
+    void givenMultipleContributionsExistAndActiveContributionIsIdentical_whenShouldCreateContributionIsInvoked_thenReturnFalse() {
+        CalculateContributionDTO calculateContributionDTO =
+            TestModelDataBuilder.getContributionDTOForCompareContributionService(
+                CaseType.COMMITAL.getCaseTypeString(),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                LocalDate.now(),
+                MagCourtOutcome.APPEAL_TO_CC
+            );
+        ContributionResult contributionResult = ContributionResult.builder()
+            .totalAnnualDisposableIncome(BigDecimal.valueOf(16000.00))
+            .monthlyAmount(BigDecimal.valueOf(250.00))
+            .upfrontAmount(BigDecimal.valueOf(250.00))
+            .contributionCap(BigDecimal.valueOf(250.00))
+            .totalMonths(5)
+            .isUplift(false)
+            .basedOn("Means")
+            .effectiveDate(LocalDate.now())
+            .build();
+
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
+            .thenReturn(List.of(
+                    TestModelDataBuilder.buildInactiveContributionForCompareContributionService(),
+                    TestModelDataBuilder.buildContributionForCompareContributionService()
+                )
+            );
+
+        boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
+
+        assertThat(result).isFalse();
     }
 
     @Test
