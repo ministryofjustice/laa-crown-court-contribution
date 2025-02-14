@@ -33,14 +33,14 @@ public class CompareContributionService {
 
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, false);
         log.debug("shouldCreateContribution.contributions--" + contributions);
-        List<Contribution> activeContribution =
-                Optional.ofNullable(contributions)
-                        .orElse(Collections.emptyList()).stream()
-                        .filter(isActiveContribution(repId)).toList();
+        Optional<Contribution> activeContribution =
+            Optional.ofNullable(contributions)
+                .orElse(Collections.emptyList()).stream()
+                .filter(isActiveContribution(repId))
+                .findFirst();
 
-
-        if (!activeContribution.isEmpty()
-                && areContributionRecordsIdentical(contributionResult, contributions.get(0))
+        if (activeContribution.isPresent()
+                && areContributionRecordsIdentical(contributionResult, activeContribution.get())
                 && !(contributionService.hasMessageOutcomeChanged(magsCourtOutcome, repOrderDTO)
                     || CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType()))) {
             log.info("Contributions should not be created");
