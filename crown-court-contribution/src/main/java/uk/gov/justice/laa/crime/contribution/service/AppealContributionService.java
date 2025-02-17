@@ -42,6 +42,8 @@ public class AppealContributionService {
 
     public ApiMaatCalculateContributionResponse calculateAppealContribution(
             CalculateContributionDTO calculateContributionDTO) {
+        log.info("--- calculate appeal contribution ---");
+
         AssessmentResult assessmentResult = determineAssessmentResult(calculateContributionDTO.getAssessments());
         ApiCrownCourtOutcome latestAppealOutcome = Optional.ofNullable(calculateContributionDTO.getCrownCourtOutcomeList())
                 .orElse(Collections.emptyList())
@@ -50,6 +52,8 @@ public class AppealContributionService {
                 .filter(outcome -> CrownCourtOutcomeType.APPEAL.getType().equals(outcome.getOutcome().getType()))
                 .orElse(null);
 
+        log.info("--- Latest appeal outcome: {}", latestAppealOutcome);
+
         if (latestAppealOutcome != null) {
             BigDecimal appealContributionAmount = AppealContributionAmount.calculate(
                             calculateContributionDTO.getAppealType(), latestAppealOutcome.getOutcome(),
@@ -57,12 +61,20 @@ public class AppealContributionService {
                     )
                     .getContributionAmount();
 
+            log.info("--- Appeal contribution amount: {}", appealContributionAmount);
+
             Integer repId = calculateContributionDTO.getRepId();
             List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, true);
             if (CollectionUtils.isNotEmpty(currContributionList)) {
+                log.info("--- Found at least one contribution");
+
                 Contribution currContribution = currContributionList.get(0);
+                log.info("--- currContribution: {}", currContribution);
+
                 if (currContribution.getUpfrontContributions() == null
                         || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
+                    log.info("--- now calculating contribution for appeal ---");
+
                     CreateContributionRequest createContributionRequest =
                             createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
                     Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
@@ -71,6 +83,8 @@ public class AppealContributionService {
                 return maatCalculateContributionResponseMapper.map(currContribution);
             }
         }
+
+        log.info("--- Returning empty contribution response (so no contribution)");
         return new ApiMaatCalculateContributionResponse();
     }
 
