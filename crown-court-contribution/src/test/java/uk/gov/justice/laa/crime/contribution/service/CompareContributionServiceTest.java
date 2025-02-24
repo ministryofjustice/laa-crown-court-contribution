@@ -1,7 +1,11 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,8 +58,47 @@ class CompareContributionServiceTest {
         assertThat(result).isTrue();
     }
 
+    @ParameterizedTest
+    @MethodSource("getActiveNonIdenticalContribution")
+    void givenActiveNonIdenticalContribution_whenShouldCreateContributionIsInvoked_thenReturnTrue(
+        BigDecimal contributionCap,
+        BigDecimal upfrontContributions,
+        BigDecimal monthlyContributions,
+        LocalDate effectiveDate
+    ) {
+        CalculateContributionDTO calculateContributionDTO =
+            TestModelDataBuilder.getContributionDTOForCompareContributionService(
+                CaseType.COMMITAL.getCaseTypeString(),
+                contributionCap,
+                upfrontContributions,
+                monthlyContributions,
+                effectiveDate,
+                MagCourtOutcome.APPEAL_TO_CC
+            );
+        ContributionResult contributionResult = ContributionResult.builder()
+            .totalAnnualDisposableIncome(BigDecimal.valueOf(16000.00))
+            .monthlyAmount(BigDecimal.valueOf(300.00))
+            .upfrontAmount(BigDecimal.valueOf(250.00))
+            .contributionCap(BigDecimal.valueOf(250.00))
+            .totalMonths(5)
+            .isUplift(false)
+            .basedOn("Means")
+            .effectiveDate(LocalDate.now())
+            .build();
+
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
+            .thenReturn(List.of(
+                    TestModelDataBuilder.buildContributionForCompareContributionService()
+                )
+            );
+
+        boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
+
+        assertThat(result).isTrue();
+    }
+
     @Test
-    void givenActiveNotIdenticalContribution_whenShouldCreateContributionIsInvoked_thenReturnTrue() {
+    void givenMultipleContributionsExistAndActiveContributionIsNotIdentical_whenShouldCreateContributionIsInvoked_thenReturnTrue() {
         CalculateContributionDTO calculateContributionDTO =
                 TestModelDataBuilder.getContributionDTOForCompareContributionService(
                         CaseType.COMMITAL.getCaseTypeString(),
@@ -78,13 +121,48 @@ class CompareContributionServiceTest {
 
         when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
                 .thenReturn(List.of(
-                                TestModelDataBuilder.buildContributionForCompareContributionService()
-                        )
+                        TestModelDataBuilder.buildInactiveContributionForCompareContributionService(),
+                        TestModelDataBuilder.buildContributionForCompareContributionService()
+                    )
                 );
 
         boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isTrue();
+    }
+
+    @Test
+    void givenMultipleContributionsExistAndActiveContributionIsIdentical_whenShouldCreateContributionIsInvoked_thenReturnFalse() {
+        CalculateContributionDTO calculateContributionDTO =
+            TestModelDataBuilder.getContributionDTOForCompareContributionService(
+                CaseType.COMMITAL.getCaseTypeString(),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                LocalDate.now(),
+                MagCourtOutcome.APPEAL_TO_CC
+            );
+        ContributionResult contributionResult = ContributionResult.builder()
+            .totalAnnualDisposableIncome(BigDecimal.valueOf(16000.00))
+            .monthlyAmount(BigDecimal.valueOf(250.00))
+            .upfrontAmount(BigDecimal.valueOf(250.00))
+            .contributionCap(BigDecimal.valueOf(250.00))
+            .totalMonths(5)
+            .isUplift(false)
+            .basedOn("Means")
+            .effectiveDate(LocalDate.now())
+            .build();
+
+        when(maatCourtDataService.findContribution(anyInt(), anyBoolean()))
+            .thenReturn(List.of(
+                    TestModelDataBuilder.buildInactiveContributionForCompareContributionService(),
+                    TestModelDataBuilder.buildContributionForCompareContributionService()
+                )
+            );
+
+        boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
+
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -163,5 +241,34 @@ class CompareContributionServiceTest {
         boolean result = compareContributionService.shouldCreateContribution(calculateContributionDTO, contributionResult);
 
         assertThat(result).isFalse();
+    }
+
+    private static Stream<Arguments> getActiveNonIdenticalContribution() {
+        return Stream.of(
+            Arguments.of(
+                BigDecimal.valueOf(500),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(300),
+                LocalDate.now()
+            ),
+            Arguments.of(
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(500),
+                BigDecimal.valueOf(300),
+                LocalDate.now()
+            ),
+            Arguments.of(
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(500),
+                LocalDate.now()
+            ),
+            Arguments.of(
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(250),
+                BigDecimal.valueOf(300),
+                LocalDate.now().minusDays(1)
+            )
+        );
     }
 }
