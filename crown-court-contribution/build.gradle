@@ -22,7 +22,7 @@ def versions = [
         springCloudStubRunnerVersion    : "4.1.4",
         sentryVersion                   : "7.16.0",
         resilience4jVersion             : "2.2.0",
-        postgresqlVersion               : "42.7.2",
+        postgresqlVersion               : "42.7.5",
         commonsLang3Version             : "3.15.0"
 ]
 
