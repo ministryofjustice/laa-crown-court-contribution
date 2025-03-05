@@ -27,10 +27,6 @@ public class CompareContributionService {
     @Transactional
     public boolean shouldCreateContribution(CalculateContributionDTO calculateContributionDTO, ContributionResult contributionResult) {
         int repId = calculateContributionDTO.getRepId();
-        RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
-        MagCourtOutcome magsCourtOutcome = calculateContributionDTO.getMagCourtOutcome() == null ? null
-                : calculateContributionDTO.getMagCourtOutcome();
-
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, false);
         log.debug("shouldCreateContribution.contributions--" + contributions);
         Optional<Contribution> activeContribution =
@@ -41,8 +37,8 @@ public class CompareContributionService {
 
         if (activeContribution.isPresent()
                 && areContributionRecordsIdentical(contributionResult, activeContribution.get())
-                && !(hasMagsCourtOutcomeChanged(magsCourtOutcome, repOrderDTO)
-                    || CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType()))) {
+                && isMagsCourtOutcomeUnchanged(calculateContributionDTO.getMagCourtOutcome(),
+                                               calculateContributionDTO.getRepOrderDTO())) {
             log.info("Contributions should not be created");
             return false;
         }
@@ -50,10 +46,10 @@ public class CompareContributionService {
         return true;
     }
 
-    private boolean hasMagsCourtOutcomeChanged(MagCourtOutcome magsCourtOutcome, RepOrderDTO repOrderDTO) {
-        if (repOrderDTO == null) return false;
+    private boolean isMagsCourtOutcomeUnchanged(MagCourtOutcome magsCourtOutcome, RepOrderDTO repOrderDTO) {
+        if (repOrderDTO == null) return true;
 
-        return !Objects.equals(magsCourtOutcome, MagCourtOutcome.getFrom(repOrderDTO.getMagsOutcome()));
+        return Objects.equals(magsCourtOutcome, MagCourtOutcome.getFrom(repOrderDTO.getMagsOutcome()));
     }
 
     private static boolean areContributionRecordsIdentical(ContributionResult contributionResult,
