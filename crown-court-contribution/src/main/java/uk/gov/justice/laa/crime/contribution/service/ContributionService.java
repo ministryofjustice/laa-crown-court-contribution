@@ -161,14 +161,6 @@ public class ContributionService {
                 && InitAssessmentResult.PASS.getResult().equals(initialAssessmentResult);
     }
 
-    public boolean hasMessageOutcomeChanged(String msgOutcome, RepOrderDTO repOrderDTO) {
-        if (null != repOrderDTO) {
-            String messageOutcome = Optional.ofNullable(repOrderDTO.getMagsOutcome()).orElse("na");
-            return !messageOutcome.equals(msgOutcome);
-        }
-        return false;
-    }
-
     public boolean hasCCOutcomeChanged(final int repId) {
         List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId);
         if (CollectionUtils.isNotEmpty(repOrderCCOutcomeList)) {

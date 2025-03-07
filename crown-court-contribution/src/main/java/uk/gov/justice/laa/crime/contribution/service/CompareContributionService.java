@@ -9,9 +9,11 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -22,15 +24,9 @@ public class CompareContributionService {
 
     private final MaatCourtDataService maatCourtDataService;
 
-    private final ContributionService contributionService;
-
     @Transactional
     public boolean shouldCreateContribution(CalculateContributionDTO calculateContributionDTO, ContributionResult contributionResult) {
         int repId = calculateContributionDTO.getRepId();
-        RepOrderDTO repOrderDTO = calculateContributionDTO.getRepOrderDTO();
-        String magsCourtOutcome = calculateContributionDTO.getMagCourtOutcome() == null ? null
-                : calculateContributionDTO.getMagCourtOutcome().getOutcome();
-
         List<Contribution> contributions = maatCourtDataService.findContribution(repId, false);
         log.debug("shouldCreateContribution.contributions--" + contributions);
         Optional<Contribution> activeContribution =
@@ -41,13 +37,19 @@ public class CompareContributionService {
 
         if (activeContribution.isPresent()
                 && areContributionRecordsIdentical(contributionResult, activeContribution.get())
-                && !(contributionService.hasMessageOutcomeChanged(magsCourtOutcome, repOrderDTO)
-                    || CaseType.APPEAL_CC.getCaseTypeString().equals(repOrderDTO.getCatyCaseType()))) {
+                && isMagsCourtOutcomeUnchanged(calculateContributionDTO.getMagCourtOutcome(),
+                                               calculateContributionDTO.getRepOrderDTO())) {
             log.info("Contributions should not be created");
             return false;
         }
         log.info("Contributions should be created");
         return true;
+    }
+
+    private boolean isMagsCourtOutcomeUnchanged(MagCourtOutcome magsCourtOutcome, RepOrderDTO repOrderDTO) {
+        if (repOrderDTO == null) return true;
+
+        return Objects.equals(magsCourtOutcome, MagCourtOutcome.getFrom(repOrderDTO.getMagsOutcome()));
     }
 
     private static boolean areContributionRecordsIdentical(ContributionResult contributionResult,
