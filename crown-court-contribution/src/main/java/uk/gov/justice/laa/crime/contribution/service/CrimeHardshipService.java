@@ -13,11 +13,9 @@ import uk.gov.justice.laa.crime.contribution.client.HardshipApiClient;
 @RequiredArgsConstructor
 public class CrimeHardshipService {
 
-    private static final String SERVICE_NAME = "crimeHardshipService";
     private final HardshipApiClient hardshipApiClient;
     private static final String RESPONSE_STRING = "Response from Calculate Hardship API: {}";
 
-    @Retry(name = SERVICE_NAME)
     public ApiCalculateHardshipByDetailResponse calculateHardshipForDetail(ApiCalculateHardshipByDetailRequest calcHardshipRequest) {
         log.debug("Request to calculate hardship for detail: {}", calcHardshipRequest);
         ApiCalculateHardshipByDetailResponse response = hardshipApiClient.calculateHardshipForDetail(calcHardshipRequest);
