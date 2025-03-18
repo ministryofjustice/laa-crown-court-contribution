@@ -1,9 +1,11 @@
 package uk.gov.justice.laa.crime.contribution.config;
 
+import io.github.resilience4j.retry.RetryRegistry;
 import io.netty.resolver.DefaultAddressResolverGroup;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -16,106 +18,115 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import uk.gov.justice.laa.crime.contribution.client.HardshipApiClient;
 import uk.gov.justice.laa.crime.contribution.client.MaatCourtDataApiClient;
+import uk.gov.justice.laa.crime.contribution.filter.Resilience4jRetryFilter;
+import uk.gov.justice.laa.crime.contribution.filter.WebClientFilters;
 
 import java.time.Duration;
+import java.util.List;
 
+@Slf4j
 @Configuration
 @AllArgsConstructor
-@Slf4j
 public class WebClientsConfiguration {
     public static final int MAX_IN_MEMORY_SIZE = 10485760;
+    public static final String HARDSHIP_SERVICE_WEB_CLIENT_NAME = "hardshipWebClient";
+    public static final String COURT_DATA_API_WEB_CLIENT_NAME = "maatCourtDataWebClient";
 
-    @Bean("maatCourtDataWebClient")
-    WebClient maatCourtDataWebClient(ServicesConfiguration servicesConfiguration, ClientRegistrationRepository clientRegistrations,
-                                     OAuth2AuthorizedClientRepository authorizedClients) {
-        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth =
-                new ServletOAuth2AuthorizedClientExchangeFilterFunction(
-                        clientRegistrations, authorizedClients
-                );
-        oauth.setDefaultClientRegistrationId(servicesConfiguration.getMaatApi().getRegistrationId());
-        return getWebClient(servicesConfiguration.getMaatApi().getBaseUrl(), oauth);
+    @Bean
+    WebClientCustomizer webClientCustomizer() {
+        ConnectionProvider provider =
+                ConnectionProvider.builder("custom")
+                        .maxConnections(500)
+                        .maxIdleTime(Duration.ofSeconds(20))
+                        .maxLifeTime(Duration.ofSeconds(60))
+                        .evictInBackground(Duration.ofSeconds(120))
+                        .pendingAcquireTimeout(Duration.ofSeconds(60))
+                        .build();
+
+        return builder -> {
+            builder.clientConnector(
+                    new ReactorClientHttpConnector(
+                            HttpClient.create(provider)
+                                    .resolver(DefaultAddressResolverGroup.INSTANCE)
+                                    .compress(true)
+                                    .responseTimeout(Duration.ofSeconds(30))
+                    )
+            );
+            builder.defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+            builder.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            builder.codecs(configurer -> configurer
+                    .defaultCodecs()
+                    .maxInMemorySize(MAX_IN_MEMORY_SIZE)
+            );
+        };
     }
 
-    @Bean("hardshipWebClient")
-    WebClient hardshipWebClient(ServicesConfiguration servicesConfiguration, ClientRegistrationRepository clientRegistrations,
-                                OAuth2AuthorizedClientRepository authorizedClients) {
-        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth =
-                new ServletOAuth2AuthorizedClientExchangeFilterFunction(
-                        clientRegistrations, authorizedClients
-                );
-        oauth.setDefaultClientRegistrationId(servicesConfiguration.getHardshipApi().getRegistrationId());
-        return getWebClient(servicesConfiguration.getHardshipApi().getBaseUrl(), oauth);
+    @Bean(COURT_DATA_API_WEB_CLIENT_NAME)
+    WebClient maatCourtDataWebClient(WebClient.Builder webClientBuilder,
+                                     ServicesConfiguration servicesConfiguration,
+                                     ClientRegistrationRepository clientRegistrations,
+                                     OAuth2AuthorizedClientRepository authorizedClients,
+                                     RetryRegistry retryRegistry) {
+
+        ServletOAuth2AuthorizedClientExchangeFilterFunction oauthFilter =
+                new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
+        oauthFilter.setDefaultClientRegistrationId(servicesConfiguration.getMaatApi().getRegistrationId());
+
+        Resilience4jRetryFilter retryFilter =
+                new Resilience4jRetryFilter(retryRegistry, COURT_DATA_API_WEB_CLIENT_NAME);
+
+        return webClientBuilder
+                .baseUrl(servicesConfiguration.getMaatApi().getBaseUrl())
+                .filters(filters -> configureFilters(filters, oauthFilter, retryFilter))
+                .build();
+    }
+
+    @Bean(HARDSHIP_SERVICE_WEB_CLIENT_NAME)
+    WebClient hardshipWebClient(WebClient.Builder webClientBuilder,
+                                ServicesConfiguration servicesConfiguration,
+                                ClientRegistrationRepository clientRegistrations,
+                                OAuth2AuthorizedClientRepository authorizedClients,
+                                RetryRegistry retryRegistry) {
+
+        ServletOAuth2AuthorizedClientExchangeFilterFunction oauthFilter =
+                new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
+        oauthFilter.setDefaultClientRegistrationId(servicesConfiguration.getMaatApi().getRegistrationId());
+
+        Resilience4jRetryFilter retryFilter =
+                new Resilience4jRetryFilter(retryRegistry, HARDSHIP_SERVICE_WEB_CLIENT_NAME);
+
+        return webClientBuilder
+                .baseUrl(servicesConfiguration.getHardshipApi().getBaseUrl())
+                .filters(filters -> configureFilters(filters, oauthFilter, retryFilter))
+                .build();
     }
 
     @Bean
-    MaatCourtDataApiClient maatCourtDataApiClient(@Qualifier("maatCourtDataWebClient") WebClient maatCourtDataWebClient) {
+    MaatCourtDataApiClient maatCourtDataApiClient(
+            @Qualifier("maatCourtDataWebClient") WebClient maatCourtDataWebClient) {
         HttpServiceProxyFactory httpServiceProxyFactory =
-                HttpServiceProxyFactory.builderFor(WebClientAdapter.create(maatCourtDataWebClient))
-                        .build();
+                HttpServiceProxyFactory.builderFor(WebClientAdapter.create(maatCourtDataWebClient)).build();
         return httpServiceProxyFactory.createClient(MaatCourtDataApiClient.class);
     }
 
     @Bean
     HardshipApiClient hardshipApiClient(@Qualifier("hardshipWebClient") WebClient hardshipApiClient) {
         HttpServiceProxyFactory httpServiceProxyFactory =
-                HttpServiceProxyFactory.builderFor(WebClientAdapter.create(hardshipApiClient))
-                        .build();
+                HttpServiceProxyFactory.builderFor(WebClientAdapter.create(hardshipApiClient)).build();
         return httpServiceProxyFactory.createClient(HardshipApiClient.class);
     }
 
-    private static WebClient getWebClient(String baseUrl, ServletOAuth2AuthorizedClientExchangeFilterFunction oauth) {
-        ConnectionProvider provider =
-                ConnectionProvider.builder("custom")
-                        .maxConnections(500)
-                        .maxIdleTime(Duration.ofSeconds(20))
-                        .maxLifeTime(Duration.ofSeconds(60))
-                        .pendingAcquireTimeout(Duration.ofSeconds(60))
-                        .evictInBackground(Duration.ofSeconds(120))
-                        .build();
-
-        return WebClient.builder()
-                .baseUrl(baseUrl)
-                .clientConnector(new ReactorClientHttpConnector(
-                                HttpClient.create(provider)
-                                        .resolver(DefaultAddressResolverGroup.INSTANCE)
-                                        .compress(true)
-                                        .responseTimeout(Duration.ofSeconds(30))
-                        )
-                )
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .codecs(configurer -> configurer
-                        .defaultCodecs()
-                        .maxInMemorySize(MAX_IN_MEMORY_SIZE)
-                )
-                .filter(oauth)
-                .filter(logRequestHeaders())
-                .filter(logResponse())
-                .build();
-    }
-
-    public static ExchangeFilterFunction logResponse() {
-        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-            log.info("Response status: {}", clientResponse.statusCode());
-            return Mono.just(clientResponse);
-        });
-    }
-
-    public static ExchangeFilterFunction logRequestHeaders() {
-        return (clientRequest, next) -> {
-            log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-            clientRequest.headers()
-                    .forEach((name, values) -> {
-                        if (!name.equals("Authorization")) {
-                            values.forEach(value -> log.info("{}={}", name, value));
-                        }
-                    });
-            return next.exchange(clientRequest);
-        };
+    private void configureFilters(List<ExchangeFilterFunction> filters,
+                                  ServletOAuth2AuthorizedClientExchangeFilterFunction oauthFilter,
+                                  ExchangeFilterFunction retryFilter) {
+        filters.add(WebClientFilters.logRequestHeaders());
+        filters.add(retryFilter);
+        filters.add(oauthFilter);
+        filters.add(WebClientFilters.errorResponseHandler());
+        filters.add(WebClientFilters.logResponse());
     }
 }
