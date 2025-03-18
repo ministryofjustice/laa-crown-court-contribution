@@ -17,6 +17,7 @@ management:
   tracing:
     propagation:
       type: w3c,b3
+    enabled: true
 
 spring:
   datasource:
