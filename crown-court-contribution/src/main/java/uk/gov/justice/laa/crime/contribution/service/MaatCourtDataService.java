@@ -1,10 +1,9 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.client.MaatCourtDataApiClient;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
@@ -12,8 +11,6 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -24,10 +21,10 @@ public class MaatCourtDataService {
     private static final String RESPONSE_STRING = "Response from Court Data API: {}";
 
     public List<Contribution> findContribution(Integer repId, Boolean findLatestContribution) {
-        log.debug("Request to find contribution for repId: {} findLatestContribution: {} ", repId, findLatestContribution);
-        List<Contribution> response = maatAPIClient.find(repId, findLatestContribution)
-                .onErrorResume(WebClientResponseException.NotFound.class, notFound -> Mono.empty())
-                .block();
+        log.debug("Request to find contribution for repId: {} findLatestContribution: {} ", repId,
+                  findLatestContribution
+        );
+        List<Contribution> response = maatAPIClient.find(repId, findLatestContribution);
         log.debug(RESPONSE_STRING, response);
         return response;
     }
@@ -48,27 +45,21 @@ public class MaatCourtDataService {
 
     public List<RepOrderCCOutcomeDTO> getRepOrderCCOutcomeByRepId(Integer repId) {
         log.debug("Request to get rep order CC outcome for repId: {}", repId);
-        List<RepOrderCCOutcomeDTO> response = maatAPIClient.getRepOrderCCOutcomeByRepId(repId)
-                .onErrorResume(WebClientResponseException.NotFound.class, notFound -> Mono.empty())
-                .block();
+        List<RepOrderCCOutcomeDTO> response = maatAPIClient.getRepOrderCCOutcomeByRepId(repId);
         log.debug(RESPONSE_STRING, response);
         return response;
     }
 
     public List<ContributionsSummaryDTO> getContributionsSummary(Integer repId) {
         log.debug("Request to get contributions summary for repId: {}", repId);
-        List<ContributionsSummaryDTO> response = maatAPIClient.getContributionsSummary(repId)
-                .onErrorResume(WebClientResponseException.NotFound.class, notFound -> Mono.empty())
-                .block();
+        List<ContributionsSummaryDTO> response = maatAPIClient.getContributionsSummary(repId);
         log.debug(RESPONSE_STRING, response);
         return response;
     }
 
     public ContributionCalcParametersDTO getContributionCalcParameters(String effectiveDate) {
         log.debug("Request to get contribution calc parameters for effectiveDate: {}", effectiveDate);
-        ContributionCalcParametersDTO response = maatAPIClient.getContributionCalcParameters(effectiveDate)
-                .onErrorResume(WebClientResponseException.NotFound.class, notFound -> Mono.empty())
-                .block();
+        ContributionCalcParametersDTO response = maatAPIClient.getContributionCalcParameters(effectiveDate);
         log.debug(RESPONSE_STRING, response);
         return response;
     }

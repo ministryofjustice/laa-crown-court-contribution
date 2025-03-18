@@ -109,14 +109,18 @@ public class WebClientsConfiguration {
     MaatCourtDataApiClient maatCourtDataApiClient(
             @Qualifier("maatCourtDataWebClient") WebClient maatCourtDataWebClient) {
         HttpServiceProxyFactory httpServiceProxyFactory =
-                HttpServiceProxyFactory.builderFor(WebClientAdapter.create(maatCourtDataWebClient)).build();
+                HttpServiceProxyFactory
+                        .builderFor(WebClientAdapter.create(maatCourtDataWebClient))
+                        .build();
         return httpServiceProxyFactory.createClient(MaatCourtDataApiClient.class);
     }
 
     @Bean
     HardshipApiClient hardshipApiClient(@Qualifier("hardshipWebClient") WebClient hardshipApiClient) {
         HttpServiceProxyFactory httpServiceProxyFactory =
-                HttpServiceProxyFactory.builderFor(WebClientAdapter.create(hardshipApiClient)).build();
+                HttpServiceProxyFactory
+                        .builderFor(WebClientAdapter.create(hardshipApiClient))
+                        .build();
         return httpServiceProxyFactory.createClient(HardshipApiClient.class);
     }
 
@@ -127,6 +131,7 @@ public class WebClientsConfiguration {
         filters.add(retryFilter);
         filters.add(oauthFilter);
         filters.add(WebClientFilters.errorResponseHandler());
+        filters.add(WebClientFilters.handleNotFoundResponse());
         filters.add(WebClientFilters.logResponse());
     }
 }
