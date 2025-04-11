@@ -94,7 +94,7 @@ public class WebClientsConfiguration {
 
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauthFilter =
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
-        oauthFilter.setDefaultClientRegistrationId(servicesConfiguration.getMaatApi().getRegistrationId());
+        oauthFilter.setDefaultClientRegistrationId(servicesConfiguration.getHardshipApi().getRegistrationId());
 
         Resilience4jRetryFilter retryFilter =
                 new Resilience4jRetryFilter(retryRegistry, HARDSHIP_SERVICE_WEB_CLIENT_NAME);
