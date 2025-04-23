@@ -14,10 +14,10 @@ public class WebClientFilters {
 
     public static ExchangeFilterFunction logResponse() {
         return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-            if (clientResponse.statusCode().is4xxClientError() || clientResponse.statusCode().is5xxServerError()) {
-                log.error("❌  Response status: {}", clientResponse.statusCode());
-            } else if (clientResponse.statusCode().is2xxSuccessful()) {
+            if (clientResponse.statusCode().is2xxSuccessful() || clientResponse.statusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
                 log.info("✅ Response status: {}", clientResponse.statusCode());
+            } else if (clientResponse.statusCode().is4xxClientError() || clientResponse.statusCode().is5xxServerError()) {
+                log.error("❌  Response status: {}", clientResponse.statusCode());
             }
             return Mono.just(clientResponse);
         });
@@ -29,7 +29,7 @@ public class WebClientFilters {
             clientRequest.headers()
                     .forEach((name, values) -> {
                         if (!name.equals(HttpHeaders.AUTHORIZATION)) {
-                            values.forEach(value -> log.info("{}={}", name, value));
+                            values.forEach(value -> log.debug("{}={}", name, value));
                         }
                     });
             return next.exchange(clientRequest);
