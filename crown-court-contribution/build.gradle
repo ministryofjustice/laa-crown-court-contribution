@@ -138,16 +138,4 @@ sonar {
     }
 }
 
-jsonSchema2Pojo {
-    executions {
-        main {
-            methods.builders = true
-            methods.buildersDynamic = true
-            methods.annotateJsr303Jakarta = true
-            fields.floatUseBigDecimal = true
-            dateTime.dateTimeType = "java.time.LocalDateTime"
-            klass.targetPackage = "uk.gov.justice.laa.crime.contribution.model"
-            io.source.setFrom files("${project.rootDir}/src/main/resources/schemas")
-        }
-    }
-}
+
