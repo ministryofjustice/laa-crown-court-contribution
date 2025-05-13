@@ -14,7 +14,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 def versions = [
-        pitest                          : "1.17.0",
         springdocVersion                : "2.7.0",
         crimeCommonsClasses             : "4.7.1",
         crimeCommonsModsSchemas         : "1.26.1",
@@ -75,7 +74,6 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok"
 
     testImplementation "com.h2database:h2"
-    testImplementation "org.pitest:pitest:$versions.pitest"
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$versions.springCloudStubRunnerVersion"
 
