@@ -67,4 +67,3 @@ services:
   hardship-api:
     base-url: http://localhost:${wiremock.server.port}
     registrationId: hardship
-
