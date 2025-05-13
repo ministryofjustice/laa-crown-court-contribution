@@ -17,10 +17,10 @@ def versions = [
         springdocVersion                : "2.7.0",
         crimeCommonsClasses             : "4.7.1",
         crimeCommonsModsSchemas         : "1.26.1",
-        springCloudStubRunnerVersion    : "4.1.4",
         sentryVersion                   : "7.16.0",
         resilience4jVersion             : "2.2.0",
-        commonsLang3Version             : "3.15.0"
+        commonsLang3Version             : "3.15.0",
+        wiremock                        : "3.10.0"
 ]
 
 configurations {
@@ -75,7 +75,8 @@ dependencies {
 
     testImplementation "com.h2database:h2"
     testImplementation "org.springframework.security:spring-security-test"
-    testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$versions.springCloudStubRunnerVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.wiremock.integrations:wiremock-spring-boot:$versions.wiremock"
 
 
 }
