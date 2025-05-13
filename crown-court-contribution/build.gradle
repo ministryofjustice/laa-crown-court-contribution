@@ -14,13 +14,13 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 def versions = [
-        springdocVersion                : "2.8.6",
-        crimeCommonsClasses             : "4.7.1",
-        crimeCommonsModsSchemas         : "1.26.1",
-        sentryVersion                   : "8.11.1",
-        resilience4jVersion             : "2.3.0",
-        commonsLang3Version             : "3.17.0",
-        wiremock                        : "3.10.0"
+        springdoc                : "2.8.6",
+        crimeCommonsClasses      : "4.7.1",
+        crimeCommonsModsSchemas  : "1.26.1",
+        sentry                   : "8.11.1",
+        resilience4j             : "2.3.0",
+        commonsLang3             : "3.17.0",
+        wiremock                 : "3.10.0"
 ]
 
 configurations {
@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
 
-    implementation platform("io.sentry:sentry-bom:$versions.sentryVersion")
+    implementation platform("io.sentry:sentry-bom:$versions.sentry")
     implementation "io.sentry:sentry-spring-boot-starter-jakarta"
     implementation "io.sentry:sentry-logback"
 
@@ -50,11 +50,11 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
-    implementation "org.apache.commons:commons-lang3:$versions.commonsLang3Version"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdoc"
+    implementation "org.apache.commons:commons-lang3:$versions.commonsLang3"
 
-    implementation "io.github.resilience4j:resilience4j-reactor:$versions.resilience4jVersion"
-    implementation "io.github.resilience4j:resilience4j-spring-boot3:$versions.resilience4jVersion"
+    implementation "io.github.resilience4j:resilience4j-reactor:$versions.resilience4j"
+    implementation "io.github.resilience4j:resilience4j-spring-boot3:$versions.resilience4j"
 
     implementation "org.postgresql:postgresql"
     implementation "org.liquibase:liquibase-core"
