@@ -21,7 +21,6 @@ def versions = [
         springCloudStubRunnerVersion    : "4.1.4",
         sentryVersion                   : "7.16.0",
         resilience4jVersion             : "2.2.0",
-        postgresqlVersion               : "42.7.2",
         commonsLang3Version             : "3.15.0"
 ]
 
@@ -51,18 +50,18 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation "org.springframework.security:spring-security-crypto"
+
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
     implementation "org.apache.commons:commons-lang3:$versions.commonsLang3Version"
 
     implementation "io.github.resilience4j:resilience4j-reactor:$versions.resilience4jVersion"
     implementation "io.github.resilience4j:resilience4j-spring-boot3:$versions.resilience4jVersion"
 
-    implementation "org.postgresql:postgresql:$versions.postgresqlVersion"
+    implementation "org.postgresql:postgresql"
     implementation "org.liquibase:liquibase-core"
 
-    implementation "io.micrometer:micrometer-registry-prometheus"
     implementation 'io.micrometer:micrometer-tracing'
+    implementation "io.micrometer:micrometer-registry-prometheus"
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 
     implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsClasses"
@@ -72,13 +71,14 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
+    testCompileOnly "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok"
+
     testImplementation "com.h2database:h2"
     testImplementation "org.pitest:pitest:$versions.pitest"
     testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$versions.springCloudStubRunnerVersion"
 
-    testCompileOnly "org.projectlombok:lombok"
-    testAnnotationProcessor "org.projectlombok:lombok"
 
 }
 
