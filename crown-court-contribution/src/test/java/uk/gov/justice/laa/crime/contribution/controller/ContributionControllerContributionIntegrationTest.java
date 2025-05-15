@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -55,7 +56,8 @@ class ContributionControllerContributionIntegrationTest {
 
     private MockMvc mvc;
     private static final String ENDPOINT_URL = "/api/internal/v1/contribution/calculate-contribution";
-    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL = "/api/internal/v1/contribution/summaries/" + TestModelDataBuilder.REP_ID;
+    private static final String GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL =
+            "/api/internal/v1/contribution/summaries/" + TestModelDataBuilder.REP_ID;
     private static final String CHECK_CONTRIBUTION_RULE_ENDPOINT_URL = "/api/internal/v1/contribution/check-contribution-rule";
 
     @InjectWireMock
@@ -71,6 +73,12 @@ class ContributionControllerContributionIntegrationTest {
     private WebApplicationContext webApplicationContext;
 
 
+    @BeforeAll
+    void configureMockMvc() {
+        mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+                .addFilter(springSecurityFilterChain).build();
+    }
+
     @BeforeEach
     void setup() throws JsonProcessingException {
         stubForOAuth();
@@ -79,7 +87,6 @@ class ContributionControllerContributionIntegrationTest {
     }
 
     void stubForOAuth() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> token = Map.of(
                 "expires_in", 3600,
                 "token_type", "Bearer",
@@ -88,24 +95,24 @@ class ContributionControllerContributionIntegrationTest {
 
         wiremock.stubFor(
                 post("/oauth2/token").willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(mapper.writeValueAsString(token))
+                        WireMock.okJson(objectMapper.writeValueAsString(token))
                 )
         );
     }
 
 
     private void setupAppealStubbing(ApiMaatCalculateContributionRequest appealContributionRequest,
-                                     Contribution contribution) throws JsonProcessingException {
+            Contribution contribution) throws JsonProcessingException {
 
         var repOrderUrl = "/rep-orders/" + appealContributionRequest.getRepId();
 
         wiremock.stubFor(get(urlEqualTo(repOrderUrl))
                 .willReturn(
                         WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getRepOrderDTO()))
+                                .withHeader("Content-Type",
+                                        String.valueOf(MediaType.APPLICATION_JSON))
+                                .withBody(objectMapper.writeValueAsString(
+                                        TestModelDataBuilder.getRepOrderDTO()))
                 )
         );
 
@@ -114,7 +121,8 @@ class ContributionControllerContributionIntegrationTest {
         wiremock.stubFor(get(urlPathMatching(findContributionUrl))
                 .willReturn(
                         WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                                .withHeader("Content-Type",
+                                        String.valueOf(MediaType.APPLICATION_JSON))
                                 .withBody(objectMapper.writeValueAsString(
                                                 List.of(contribution)
                                         )
@@ -124,19 +132,22 @@ class ContributionControllerContributionIntegrationTest {
     }
 
     @Test
-    void givenAEmptyContent_whenCalculateContributionIsInvoked_thenFailsBadRequest() throws Exception {
+    void givenAEmptyContent_whenCalculateContributionIsInvoked_thenFailsBadRequest()
+            throws Exception {
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, "{}", ENDPOINT_URL))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void givenAEmptyOAuthToken_whenCalculateContributionIsInvoked_thenFailsUnauthorizedAccess() throws Exception {
+    void givenAEmptyOAuthToken_whenCalculateContributionIsInvoked_thenFailsUnauthorizedAccess()
+            throws Exception {
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, "{}", ENDPOINT_URL, false))
                 .andExpect(status().isUnauthorized()).andReturn();
     }
 
     @Test
-    void givenAppealCaseWithSameContributions_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
+    void givenAppealCaseWithSameContributions_whenCalculateContributionIsInvoked_thenOkResponse()
+            throws Exception {
         ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
@@ -151,7 +162,8 @@ class ContributionControllerContributionIntegrationTest {
     }
 
     @Test
-    void givenAppealCaseWithDiffContributions_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
+    void givenAppealCaseWithDiffContributions_whenCalculateContributionIsInvoked_thenOkResponse()
+            throws Exception {
         Contribution newContribution = TestModelDataBuilder.buildContribution();
         newContribution.setUpfrontContributions(BigDecimal.valueOf(500));
         ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
@@ -168,7 +180,8 @@ class ContributionControllerContributionIntegrationTest {
         wiremock.stubFor(post(urlEqualTo(createContributionUrl))
                 .willReturn(
                         WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                                .withHeader("Content-Type",
+                                        String.valueOf(MediaType.APPLICATION_JSON))
                                 .withBody(objectMapper.writeValueAsString(newContribution))
                 )
         );
@@ -178,15 +191,18 @@ class ContributionControllerContributionIntegrationTest {
     }
 
     @Test
-    void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        String requestData = objectMapper.writeValueAsString(new ApiMaatCalculateContributionRequest());
+    void givenInvalidRequestData_whenCalculateContributionIsInvoked_thenBadRequestResponse()
+            throws Exception {
+        String requestData = objectMapper.writeValueAsString(
+                new ApiMaatCalculateContributionRequest());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, ENDPOINT_URL))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void givenMaatApiException_whenCalculateContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
+    void givenMaatApiException_whenCalculateContributionIsInvoked_thenInternalServerErrorResponse()
+            throws Exception {
         ApiMaatCalculateContributionRequest appealContributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         String requestData = objectMapper.writeValueAsString(appealContributionRequest);
 
@@ -199,7 +215,8 @@ class ContributionControllerContributionIntegrationTest {
                         WireMock.aResponse()
                                 .withStatus(NOT_IMPLEMENTED.code())
                                 .withBody(Json.write(errorDTO))
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                                .withHeader("Content-Type",
+                                        String.valueOf(MediaType.APPLICATION_JSON))
                 )
         );
 
@@ -209,7 +226,8 @@ class ContributionControllerContributionIntegrationTest {
     }
 
     @Test
-    void givenMaatApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
+    void givenMaatApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse()
+            throws Exception {
         var summariesUrl = "/contributions/" + TestModelDataBuilder.REP_ID + "/summary";
         ErrorDTO errorDTO = ErrorDTO.builder()
                 .code(HttpStatus.NOT_IMPLEMENTED.name())
@@ -219,49 +237,61 @@ class ContributionControllerContributionIntegrationTest {
                         WireMock.aResponse()
                                 .withStatus(NOT_IMPLEMENTED.code())
                                 .withBody(Json.write(errorDTO))
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                                .withHeader("Content-Type",
+                                        String.valueOf(MediaType.APPLICATION_JSON))
                 )
         );
-        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "",
+                        GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
                 .andExpect(status().is5xxServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void givenApiMaatCalculateContributionRequest_whenGetContributionSummariesIsInvoked_thenOkResponse() throws Exception {
-        List<ContributionsSummaryDTO> contributionsSummaryDTOList = List.of(TestModelDataBuilder.getContributionSummaryDTO());
+    void givenApiMaatCalculateContributionRequest_whenGetContributionSummariesIsInvoked_thenOkResponse()
+            throws Exception {
+        List<ContributionsSummaryDTO> contributionsSummaryDTOList = List.of(
+                TestModelDataBuilder.getContributionSummaryDTO());
         var summariesUrl = "/contributions/" + TestModelDataBuilder.REP_ID + "/summary";
 
         wiremock.stubFor(get(urlEqualTo(summariesUrl))
                 .willReturn(
                         WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(contributionsSummaryDTOList))
+                                .withHeader("Content-Type",
+                                        String.valueOf(MediaType.APPLICATION_JSON))
+                                .withBody(objectMapper.writeValueAsString(
+                                        contributionsSummaryDTOList))
                 )
         );
-        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "", GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.GET, "",
+                        GET_CONTRIBUTION_SUMMARIES_ENDPOINT_URL))
                 .andExpect(status().isOk());
     }
 
 
     @Test
-    void givenApiMaatCalculateContributionRequest_whenCheckContributionRuleIsInvoked_thenOkResponse() throws Exception {
+    void givenApiMaatCalculateContributionRequest_whenCheckContributionRuleIsInvoked_thenOkResponse()
+            throws Exception {
         ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
                 TestModelDataBuilder.buildCheckContributionRuleRequest();
         String requestData = objectMapper.writeValueAsString(apiMaatCheckContributionRuleRequest);
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData,
+                        CHECK_CONTRIBUTION_RULE_ENDPOINT_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").value(Boolean.TRUE));
     }
 
     @Test
-    void givenApiMaatCalculateContributionRequest_whenCheckContributionRuleIsInvoked_thenFalseIsReturned() throws Exception {
+    void givenApiMaatCalculateContributionRequest_whenCheckContributionRuleIsInvoked_thenFalseIsReturned()
+            throws Exception {
         ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
                 TestModelDataBuilder.buildCheckContributionRuleRequest();
-        apiMaatCheckContributionRuleRequest.setCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.AQUITTED)));
+        apiMaatCheckContributionRuleRequest.setCrownCourtOutcome(
+                List.of(getApiCrownCourtOutcome(CrownCourtOutcome.AQUITTED)));
         String requestData = objectMapper.writeValueAsString(apiMaatCheckContributionRuleRequest);
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData,
+                        CHECK_CONTRIBUTION_RULE_ENDPOINT_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").value(Boolean.FALSE));
