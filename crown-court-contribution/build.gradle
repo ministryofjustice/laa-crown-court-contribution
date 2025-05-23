@@ -19,7 +19,7 @@ def versions = [
         springdocVersion                : "2.7.0",
         crimeCommonsClasses             : "4.2.1",
         crimeCommonsModsSchemas         : "1.26.1",
-        springCloudStubRunnerVersion    : "4.1.4",
+        springCloudStubRunnerVersion    : "4.2.1",
         sentryVersion                   : "7.16.0",
         resilience4jVersion             : "2.2.0",
         postgresqlVersion               : "42.7.2",
