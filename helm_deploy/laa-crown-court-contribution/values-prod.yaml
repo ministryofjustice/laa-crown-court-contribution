@@ -22,8 +22,8 @@ jwt:
   issuerUri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_TXQgAwM8B
 
 maatApi:
-  baseUrl: https://maat-cd-api.legalservices.gov.uk/api/internal/v1/assessment
-  oauthUrl: https://maat-cd-api-prd.auth.eu-west-2.amazoncognito.com/oauth2/token
+  baseUrl: https://laa-maat-data-api-prod.apps.live.cloud-platform.service.justice.gov.uk/api/internal/v1/assessment
+  oauthUrl: https://maat-api-prd.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 hardshipApi:
   baseUrl: http://laa-crime-hardship.laa-crime-hardship-prod.svc.cluster.local/api/internal/v1/hardship
@@ -44,18 +44,7 @@ service:
   targetPort: 8089
 
 ingress:
-  enabled: true
-  annotations:
-    external-dns.alpha.kubernetes.io/aws-weight: "100"
-    external-dns.alpha.kubernetes.io/set-identifier: "laa-crown-court-contribution-laa-crown-court-contribution-prod-green"
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "300"
-  externalAnnotations: {}
-  hosts:
-    - host: laa-crown-court-contribution-prod.apps.live.cloud-platform.service.justice.gov.uk
-      paths: ["/open-api/"]
-  tls: []
-  className: default
+  enabled: false
 
 autoscaling:
   enabled: false
