@@ -1,11 +1,6 @@
 server:
   port: 8089
 
-management:
-  tracing:
-    propagation:
-      type: w3c,b3
-
 spring:
   datasource:
     url: jdbc:h2:mem:crime_means_assessment;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
@@ -30,9 +25,9 @@ spring:
       client:
         provider:
           maat-api:
-            token-uri: http://localhost:9999/oauth2/token
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
           hardship:
-            token-uri: http://localhost:9999/oauth2/token
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
         registration:
           maat-api:
             client-id: dummy-client
@@ -50,10 +45,25 @@ contribution:
   security:
     issuer-uri: http://localhost:${server.port}
 
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 2s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retry-exceptions:
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+          - org.springframework.web.reactive.function.client.WebClientResponseException.BadGateway
+          - org.springframework.web.reactive.function.client.WebClientResponseException.TooManyRequests
+          - org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable
+          - org.springframework.web.reactive.function.client.WebClientResponseException.GatewayTimeout
+
 services:
   maat-api:
-    base-url: http://localhost:9999
+    base-url: http://localhost:${wiremock.server.port}
     registrationId: maat-api
   hardship-api:
-    base-url: http://localhost:9999
+    base-url: http://localhost:${wiremock.server.port}
     registrationId: hardship
