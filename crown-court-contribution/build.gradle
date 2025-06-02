@@ -15,7 +15,7 @@ java {
 }
 def versions = [
         springdoc                : "2.8.6",
-        crimeCommonsClasses      : "4.7.1",
+        crimeCommonsClasses      : "4.10.0",
         crimeCommonsModsSchemas  : "1.36.0",
         sentry                   : "8.11.1",
         resilience4j             : "2.3.0",
