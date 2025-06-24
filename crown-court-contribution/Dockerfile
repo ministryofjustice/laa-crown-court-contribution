@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-alpine
+FROM amazoncorretto:21-alpine
 RUN mkdir -p /opt/laa-crown-court-contribution/
 WORKDIR /opt/laa-crown-court-contribution/
 COPY ./build/libs/crown-court-contribution.jar /opt/laa-crown-court-contribution/app.jar
