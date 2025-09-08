@@ -14,7 +14,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 def versions = [
-        springdoc                : "2.8.6",
+        springdoc                : "2.8.13",
         crimeCommonsClasses      : "4.7.1",
         crimeCommonsModsSchemas  : "1.36.0",
         sentry                   : "8.11.1",
