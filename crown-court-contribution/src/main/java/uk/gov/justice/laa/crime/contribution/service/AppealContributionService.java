@@ -58,17 +58,17 @@ public class AppealContributionService {
                     .getContributionAmount();
 
             Integer repId = calculateContributionDTO.getRepId();
-            List<Contribution> currContributionList = maatCourtDataService.findContribution(repId, true);
-            if (CollectionUtils.isNotEmpty(currContributionList)) {
-                Contribution currContribution = currContributionList.get(0);
-                if (currContribution.getUpfrontContributions() == null
-                        || currContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
+            List<Contribution> currentContributionList = maatCourtDataService.findContribution(repId, true);
+            if (CollectionUtils.isNotEmpty(currentContributionList)) {
+                Contribution currentContribution = currentContributionList.get(0);
+                if (currentContribution.getUpfrontContributions() == null
+                        || currentContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {
                     CreateContributionRequest createContributionRequest =
                             createContributionRequestMapper.map(calculateContributionDTO, appealContributionAmount);
                     Contribution newContribution = maatCourtDataService.createContribution(createContributionRequest);
                     return maatCalculateContributionResponseMapper.map(newContribution);
                 }
-                return maatCalculateContributionResponseMapper.map(currContribution);
+                return maatCalculateContributionResponseMapper.map(currentContribution);
             }
         }
         return new ApiMaatCalculateContributionResponse();

@@ -132,11 +132,11 @@ public class MaatCalculateContributionService {
         if (committalDate == null) {
             return DateUtil.parseLocalDate(assessmentDate);
         } else {
-            LocalDate assDate = DateUtil.parseLocalDate(assessmentDate);
-            if (committalDate.isAfter(assDate)) {
+            LocalDate effectiveDate = DateUtil.parseLocalDate(assessmentDate);
+            if (committalDate.isAfter(effectiveDate)) {
                 return committalDate;
             } else {
-                return assDate;
+                return effectiveDate;
             }
         }
     }
@@ -154,8 +154,8 @@ public class MaatCalculateContributionService {
     }
 
     public List<ApiContributionSummary> getContributionSummaries(final int repId) {
-        List<ContributionsSummaryDTO> contribSummaryList = maatCourtDataService.getContributionsSummary(repId);
-        return contribSummaryList != null ? contribSummaryList.stream().map(contributionSummaryMapper::map)
+        List<ContributionsSummaryDTO> contributionSummaryList = maatCourtDataService.getContributionsSummary(repId);
+        return contributionSummaryList != null ? contributionSummaryList.stream().map(contributionSummaryMapper::map)
                 .toList() : List.of();
     }
 
