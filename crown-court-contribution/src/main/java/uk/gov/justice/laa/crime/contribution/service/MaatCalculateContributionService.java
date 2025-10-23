@@ -69,9 +69,8 @@ public class MaatCalculateContributionService {
             return calculateContributionDTO.getDisposableIncomeAfterMagHardship();
         } else if (calculateContributionDTO.getTotalAnnualDisposableIncome() != null) {
             return calculateContributionDTO.getTotalAnnualDisposableIncome();
-        } else {
-            return BigDecimal.ZERO;
         }
+        return BigDecimal.ZERO;
     }
 
     public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
@@ -131,14 +130,13 @@ public class MaatCalculateContributionService {
         }
         if (committalDate == null) {
             return DateUtil.parseLocalDate(assessmentDate);
-        } else {
-            LocalDate effectiveDate = DateUtil.parseLocalDate(assessmentDate);
-            if (committalDate.isAfter(effectiveDate)) {
-                return committalDate;
-            } else {
-                return effectiveDate;
-            }
         }
+        LocalDate effectiveDate = DateUtil.parseLocalDate(assessmentDate);
+        if (committalDate.isAfter(effectiveDate)) {
+            return committalDate;
+        }
+        return effectiveDate;
+
     }
 
     public ApiMaatCalculateContributionResponse calculateContribution(
@@ -205,11 +203,10 @@ public class MaatCalculateContributionService {
             return null;
         }
 
-        ApiCrownCourtOutcome apiCrownCourtOutcome = crownCourtOutcomeList.get(0);
+        ApiCrownCourtOutcome apiCrownCourtOutcome = crownCourtOutcomeList.getFirst();
         if (apiCrownCourtOutcome == null || apiCrownCourtOutcome.getOutcome() == null) {
             return null;
         }
-
         return apiCrownCourtOutcome.getOutcome().getCode();
     }
 
@@ -291,9 +288,8 @@ public class MaatCalculateContributionService {
             CreateContributionRequest createContributionRequest =
                     createContributionRequestMapper.map(calculateContributionDTO, result);
             return maatCourtDataService.createContribution(createContributionRequest);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public ContributionResult calculateContributions(final CalculateContributionDTO calculateContributionDTO,
