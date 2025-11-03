@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 @AllArgsConstructor
 public enum CorrespondenceType {
-
     CONTRIBUTION_NOTICE("CONTRIBUTION_NOTICE", "Contribution Notice", "Rhybudd Cyfrannu"),
     INCOME_EVIDENCE_1("INCOME EVIDENCE 1", "Income Evidence Request", "Cais am dystiolaeth o Incwm"),
     INCOME_EVIDENCE_2("INCOME EVIDENCE 2", "Income Evidence Reminder", "Tystiolaeth o Incwm -  Llythyr Atgoffa"),
@@ -30,6 +29,7 @@ public enum CorrespondenceType {
         return Stream.of(CorrespondenceType.values())
                 .filter(correspondenceType -> correspondenceType.code.equals(code))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Correspondence Types with value: %s does not exist.", code)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Correspondence Types with value: %s does not exist.", code)));
     }
 }

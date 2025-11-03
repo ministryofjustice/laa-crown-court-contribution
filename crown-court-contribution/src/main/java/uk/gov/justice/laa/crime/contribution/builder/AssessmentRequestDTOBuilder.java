@@ -2,9 +2,10 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
+
+import org.springframework.stereotype.Component;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,6 +21,5 @@ public class AssessmentRequestDTOBuilder {
                 .passportResult(request.getPassportResult());
 
         return builder.build();
-
     }
 }

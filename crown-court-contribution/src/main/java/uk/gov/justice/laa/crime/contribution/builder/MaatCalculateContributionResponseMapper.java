@@ -1,20 +1,23 @@
 package uk.gov.justice.laa.crime.contribution.builder;
 
+import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
+
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
-import static uk.gov.justice.laa.crime.contribution.util.DateUtil.convertDateToDateTime;
+import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
 public class MaatCalculateContributionResponseMapper {
-    public ApiMaatCalculateContributionResponse map(ContributionResult result, Contribution createdContribution,
-                                                    ContributionResponseDTO contributionResponseDTO) {
+    public ApiMaatCalculateContributionResponse map(
+            ContributionResult result,
+            Contribution createdContribution,
+            ContributionResponseDTO contributionResponseDTO) {
         ApiMaatCalculateContributionResponse response = new ApiMaatCalculateContributionResponse()
                 .withContributionCap(result.contributionCap())
                 .withEffectiveDate(DateUtil.convertDateToDateTime(result.effectiveDate()))

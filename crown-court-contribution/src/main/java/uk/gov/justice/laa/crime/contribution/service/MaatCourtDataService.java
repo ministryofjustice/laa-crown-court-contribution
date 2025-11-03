@@ -1,9 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.client.MaatCourtDataApiClient;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
@@ -11,6 +9,10 @@ import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -21,9 +23,10 @@ public class MaatCourtDataService {
     private static final String RESPONSE_STRING = "Response from Court Data API: {}";
 
     public List<Contribution> findContribution(Integer repId, Boolean findLatestContribution) {
-        log.debug("Request to find contribution for repId: {} findLatestContribution: {} ", repId,
-                  findLatestContribution
-        );
+        log.debug(
+                "Request to find contribution for repId: {} findLatestContribution: {} ",
+                repId,
+                findLatestContribution);
         List<Contribution> response = maatAPIClient.find(repId, findLatestContribution);
         log.debug(RESPONSE_STRING, response);
         return response;

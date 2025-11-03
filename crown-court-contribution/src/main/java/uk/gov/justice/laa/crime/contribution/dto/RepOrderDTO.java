@@ -35,8 +35,10 @@ public class RepOrderDTO {
     private String evidenceFeeLevel;
     private String rorsStatus;
     private String iojResult;
+
     @Builder.Default
     private List<PassportAssessmentDTO> passportAssessments = new ArrayList<>();
+
     @Builder.Default
     private List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>();
 }

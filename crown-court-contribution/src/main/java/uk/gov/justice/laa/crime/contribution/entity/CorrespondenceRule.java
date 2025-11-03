@@ -26,9 +26,15 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Entity
-@Table(name = "correspondence_rules", schema = "crown_court_contribution", indexes = {
-        @Index(name = "unique_corr_rule", columnList = "means_result, mcoo_outcome, ccoo_outcome, ioj_result", unique = true)
-})
+@Table(
+        name = "correspondence_rules",
+        schema = "crown_court_contribution",
+        indexes = {
+            @Index(
+                    name = "unique_corr_rule",
+                    columnList = "means_result, mcoo_outcome, ccoo_outcome, ioj_result",
+                    unique = true)
+        })
 public class CorrespondenceRule {
     @Id
     @Column(name = "id")
@@ -77,5 +83,4 @@ public class CorrespondenceRule {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reassessment_cote_id")
     private CorrespondenceTemplate reassessmentCote;
-
 }

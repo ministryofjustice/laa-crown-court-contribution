@@ -1,11 +1,10 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import static java.util.Optional.ofNullable;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
@@ -31,8 +30,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.Optional.ofNullable;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -45,53 +46,50 @@ public class ContributionService {
     private final ContributionResponseDTOMapper contributionResponseDTOMapper;
 
     protected static String getPassportAssessmentResult(final RepOrderDTO repOrderDTO) {
-        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(
-                repOrderDTO.getPassportAssessments()
-                        .stream()
-                        .filter(passportAssessmentDTO -> Constants.Y.equals(
-                                passportAssessmentDTO.getReplaced()))
-                        .toList()
-        );
+        List<PassportAssessmentDTO> passportAssessments = new ArrayList<>(repOrderDTO.getPassportAssessments().stream()
+                .filter(passportAssessmentDTO -> Constants.Y.equals(passportAssessmentDTO.getReplaced()))
+                .toList());
         passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
         return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
     }
 
     protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
-        List<FinancialAssessmentDTO> financialAssessments = new ArrayList<>(
-                repOrderDTO.getFinancialAssessments()
-                        .stream()
-                        .filter(financialAssessmentDTO -> Constants.N.equals(
-                                financialAssessmentDTO.getReplaced()))
-                        .toList()
-        );
+        List<FinancialAssessmentDTO> financialAssessments =
+                new ArrayList<>(repOrderDTO.getFinancialAssessments().stream()
+                        .filter(financialAssessmentDTO -> Constants.N.equals(financialAssessmentDTO.getReplaced()))
+                        .toList());
         financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
-        return financialAssessments.isEmpty() ? null : financialAssessments.get(0).getInitResult();
+        return financialAssessments.isEmpty()
+                ? null
+                : financialAssessments.get(0).getInitResult();
     }
 
     public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
         AssessmentResponseDTO response = new AssessmentResponseDTO();
-        response.setIojResult(ofNullable(request.getDecisionResult())
-                .orElse(request.getIojResult()));
+        response.setIojResult(ofNullable(request.getDecisionResult()).orElse(request.getIojResult()));
 
         if (StringUtils.isNotBlank(request.getPassportResult())) {
             if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
                 response.setMeansResult(Constants.PASSPORT);
             } else if (Constants.FAIL.equals(request.getPassportResult())) {
                 response.setMeansResult(Constants.FAILPORT);
-            } else if (PASS.equals(request.getInitResult()) ||
-                    PASS.equals(request.getFullResult()) ||
-                    PASS.equals(request.getHardshipResult())) {
+            } else if (PASS.equals(request.getInitResult())
+                    || PASS.equals(request.getFullResult())
+                    || PASS.equals(request.getHardshipResult())) {
                 response.setMeansResult(PASS);
             } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION)
-                    .contains(request.getInitResult()) &&
-                    (Constants.FAIL.equals(request.getFullResult())) &&
-                    (Constants.FAIL.equals(ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
+                            .contains(request.getInitResult())
+                    && (Constants.FAIL.equals(request.getFullResult()))
+                    && (Constants.FAIL.equals(
+                            ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
                 response.setMeansResult(Constants.FAIL);
             }
         } else {
             if (StringUtils.isBlank(request.getFullResult())) {
-                response.setMeansResult(StringUtils.isBlank(request.getInitResult()) ? Constants.NONE
-                        : Constants.INIT.concat(request.getInitResult()));
+                response.setMeansResult(
+                        StringUtils.isBlank(request.getInitResult())
+                                ? Constants.NONE
+                                : Constants.INIT.concat(request.getInitResult()));
             } else {
                 response.setMeansResult(request.getFullResult());
             }
@@ -113,7 +111,8 @@ public class ContributionService {
         request.setIojResult(assessmentResponseDTO.getIojResult());
         request.setMeansResult(assessmentResponseDTO.getMeansResult());
 
-        if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY).contains(request.getCaseType())
+        if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY)
+                        .contains(request.getCaseType())
                 || request.getEffectiveDate() != null
                 || (CaseType.APPEAL_CC.equals(request.getCaseType()) && PASS.equals(request.getIojResult()))) {
 
@@ -128,8 +127,9 @@ public class ContributionService {
             }
         }
 
-        if (INEL.equals(request.getFullResult()) ||
-                (request.getMonthlyContribs() != null && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0)) {
+        if (INEL.equals(request.getFullResult())
+                || (request.getMonthlyContribs() != null
+                        && request.getMonthlyContribs().compareTo(BigDecimal.ZERO) > 0)) {
             contributionResponse.setDoContribs(Constants.Y);
         }
 
@@ -142,13 +142,14 @@ public class ContributionService {
 
     @Transactional
     public CorrespondenceRuleAndTemplateInfo getCoteInfo(ContributionRequestDTO contributionRequestDTO) {
-        return correspondenceRuleRepository.getCoteInfo(
-                contributionRequestDTO.getMeansResult(),
-                contributionRequestDTO.getIojResult(),
-                contributionRequestDTO.getMagCourtOutcome(),
-                contributionRequestDTO.getCrownCourtOutcome(),
-                contributionRequestDTO.getInitResult()
-        ).orElse(null);
+        return correspondenceRuleRepository
+                .getCoteInfo(
+                        contributionRequestDTO.getMeansResult(),
+                        contributionRequestDTO.getIojResult(),
+                        contributionRequestDTO.getMagCourtOutcome(),
+                        contributionRequestDTO.getCrownCourtOutcome(),
+                        contributionRequestDTO.getInitResult())
+                .orElse(null);
     }
 
     public boolean isCds15WorkAround(final RepOrderDTO repOrderDTO) {
@@ -166,17 +167,20 @@ public class ContributionService {
         if (CollectionUtils.isNotEmpty(repOrderCCOutcomeList)) {
             Optional<RepOrderCCOutcomeDTO> outcomeDTO =
                     repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
-            return outcomeDTO.isPresent() && outcomeDTO.get().getOutcome() != null
-                    && !CrownCourtOutcome.AQUITTED.getCode().equals(outcomeDTO.get().getOutcome());
+            return outcomeDTO.isPresent()
+                    && outcomeDTO.get().getOutcome() != null
+                    && !CrownCourtOutcome.AQUITTED
+                            .getCode()
+                            .equals(outcomeDTO.get().getOutcome());
         }
         return false;
     }
 
     public boolean hasApplicationStatusChanged(RepOrderDTO repOrderDTO, CaseType caseType, String status) {
         log.info("Get applicant details from Crime Apply datastore");
-        return CaseType.INDICTABLE.equals(caseType) && repOrderDTO != null
+        return CaseType.INDICTABLE.equals(caseType)
+                && repOrderDTO != null
                 && repOrderDTO.getRorsStatus() != null
                 && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
     }
-
 }

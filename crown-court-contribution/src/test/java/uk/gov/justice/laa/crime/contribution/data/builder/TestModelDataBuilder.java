@@ -1,6 +1,8 @@
 package uk.gov.justice.laa.crime.contribution.data.builder;
 
-import org.springframework.stereotype.Component;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
+
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
@@ -36,8 +38,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TestModelDataBuilder {
@@ -62,7 +63,8 @@ public class TestModelDataBuilder {
                 .initResult(PASS)
                 .fullResult(FULL)
                 .hardshipResult(PASS)
-                .passportResult(PASS).build();
+                .passportResult(PASS)
+                .build();
     }
 
     public static CorrespondenceRuleAndTemplateInfo getCorrespondenceRuleAndTemplateInfo() {
@@ -134,17 +136,18 @@ public class TestModelDataBuilder {
     }
 
     public static ApiCrownCourtOutcome getApiCrownCourtOutcome(CrownCourtOutcome crownCourtOutcome) {
-        return new ApiCrownCourtOutcome()
-                .withOutcome(crownCourtOutcome);
+        return new ApiCrownCourtOutcome().withOutcome(crownCourtOutcome);
     }
 
     public static List<ApiCrownCourtOutcome> getApiCrownCourtSummary() {
-        return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.UNSUCCESSFUL),
+        return List.of(
+                getApiCrownCourtOutcome(CrownCourtOutcome.UNSUCCESSFUL),
                 getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED));
     }
 
     public static List<ApiCrownCourtOutcome> getApiCrownCourtSummaryAppeal() {
-        return List.of(getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED),
+        return List.of(
+                getApiCrownCourtOutcome(CrownCourtOutcome.ABANDONED),
                 getApiCrownCourtOutcome(CrownCourtOutcome.PART_CONVICTED),
                 getApiCrownCourtOutcome(CrownCourtOutcome.SUCCESSFUL));
     }
@@ -275,18 +278,18 @@ public class TestModelDataBuilder {
 
     public static Contribution buildInactiveContributionForCompareContributionService() {
         return Contribution.builder()
-            .id(124)
-            .applicantId(123)
-            .repId(123)
-            .replacedDate(LocalDate.now().minusDays(1))
-            .calcDate(LocalDate.now().minusDays(1))
-            .contributionCap(BigDecimal.valueOf(250))
-            .monthlyContributions(BigDecimal.valueOf(300))
-            .upfrontContributions(BigDecimal.valueOf(250))
-            .effectiveDate(LocalDate.now())
-            .userCreated("test")
-            .active("N")
-            .build();
+                .id(124)
+                .applicantId(123)
+                .repId(123)
+                .replacedDate(LocalDate.now().minusDays(1))
+                .calcDate(LocalDate.now().minusDays(1))
+                .contributionCap(BigDecimal.valueOf(250))
+                .monthlyContributions(BigDecimal.valueOf(300))
+                .upfrontContributions(BigDecimal.valueOf(250))
+                .effectiveDate(LocalDate.now())
+                .userCreated("test")
+                .active("N")
+                .build();
     }
 
     public static ApiMaatCalculateContributionRequest buildAppealContributionRequest() {
@@ -310,8 +313,7 @@ public class TestModelDataBuilder {
     }
 
     public static ApiMaatCheckContributionRuleRequest buildCheckContributionRuleRequest() {
-        return new ApiMaatCheckContributionRuleRequest()
-                .withCaseType(CaseType.EITHER_WAY);
+        return new ApiMaatCheckContributionRuleRequest().withCaseType(CaseType.EITHER_WAY);
     }
 
     public static ApiCalculateContributionRequest buildApiCalculateContributionRequest() {
@@ -348,12 +350,13 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static CalculateContributionDTO getContributionDTOForCompareContributionService(String caseType,
-                                                                                           BigDecimal contributionCap,
-                                                                                           BigDecimal upfrontContributions,
-                                                                                           BigDecimal monthlyContributions,
-                                                                                           LocalDate effectiveDate,
-                                                                                           MagCourtOutcome magCourtOutcome) {
+    public static CalculateContributionDTO getContributionDTOForCompareContributionService(
+            String caseType,
+            BigDecimal contributionCap,
+            BigDecimal upfrontContributions,
+            BigDecimal monthlyContributions,
+            LocalDate effectiveDate,
+            MagCourtOutcome magCourtOutcome) {
         return CalculateContributionDTO.builder()
                 .repId(123)
                 .applicantId(123)
@@ -370,7 +373,6 @@ public class TestModelDataBuilder {
                 .dateUpliftRemoved(UPLIFT_REMOVED_DATE)
                 .transferStatus(TransferStatus.REQUESTED)
                 .build();
-
     }
 
     public static ContributionResult getContributionResult() {
@@ -387,9 +389,7 @@ public class TestModelDataBuilder {
     }
 
     public static RepOrderDTO getRepOrderDTOForCaseType(String caseType) {
-        return RepOrderDTO.builder()
-                .id(123)
-                .catyCaseType(caseType).build();
+        return RepOrderDTO.builder().id(123).catyCaseType(caseType).build();
     }
 
     public static Contribution getContribution() {
@@ -409,9 +409,7 @@ public class TestModelDataBuilder {
     }
 
     public static ApiCalculateHardshipByDetailRequest getApiCalculateHardshipByDetailRequest() {
-        return new ApiCalculateHardshipByDetailRequest()
-                .withDetailType("TEST")
-                .withRepId(REP_ID);
+        return new ApiCalculateHardshipByDetailRequest().withDetailType("TEST").withRepId(REP_ID);
     }
 
     public static ApiMaatCalculateContributionResponse getApiMaatCalculateContributionResponse() {

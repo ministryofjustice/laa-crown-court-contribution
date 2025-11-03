@@ -1,6 +1,17 @@
 package uk.gov.justice.laa.crime.contribution.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
+
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
+import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.service.CalculateContributionService;
+import uk.gov.justice.laa.crime.contribution.tracing.TraceIdHandler;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,17 +22,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
-import uk.gov.justice.laa.crime.contribution.tracing.TraceIdHandler;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionResponse;
-import uk.gov.justice.laa.crime.contribution.service.CalculateContributionService;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @DirtiesContext
 @AutoConfigureMockMvc(addFilters = false)
@@ -44,7 +46,8 @@ class CalculateContributionControllerTest {
 
     @Test
     void givenValidRequest_whenCalculateContributionIsInvoked_thenOkResponse() throws Exception {
-        ApiCalculateContributionRequest apiCalculateContributionRequest = TestModelDataBuilder.buildApiCalculateContributionRequest();
+        ApiCalculateContributionRequest apiCalculateContributionRequest =
+                TestModelDataBuilder.buildApiCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
         when(calculateContributionService.calculateContribution(any(ApiCalculateContributionRequest.class)))
@@ -57,7 +60,8 @@ class CalculateContributionControllerTest {
 
     @Test
     void givenInvalidRequest_whenCalculateContributionIsInvoked_thenBadRequestResponse() throws Exception {
-        ApiCalculateContributionRequest apiCalculateContributionRequest  = TestModelDataBuilder.buildInvalidApiCalculateContributionRequest();
+        ApiCalculateContributionRequest apiCalculateContributionRequest =
+                TestModelDataBuilder.buildInvalidApiCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.GET, requestData, ENDPOINT_URL, false))
@@ -66,7 +70,8 @@ class CalculateContributionControllerTest {
 
     @Test
     void givenClientApiException_whenCalculateContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
-        ApiCalculateContributionRequest apiCalculateContributionRequest = TestModelDataBuilder.buildApiCalculateContributionRequest();
+        ApiCalculateContributionRequest apiCalculateContributionRequest =
+                TestModelDataBuilder.buildApiCalculateContributionRequest();
         String requestData = objectMapper.writeValueAsString(apiCalculateContributionRequest);
 
         when(calculateContributionService.calculateContribution(any(ApiCalculateContributionRequest.class)))

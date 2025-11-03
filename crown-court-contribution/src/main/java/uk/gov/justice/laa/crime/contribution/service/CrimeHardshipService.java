@@ -2,10 +2,11 @@ package uk.gov.justice.laa.crime.contribution.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.ApiCalculateHardshipByDetailResponse;
 import uk.gov.justice.laa.crime.contribution.client.HardshipApiClient;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
