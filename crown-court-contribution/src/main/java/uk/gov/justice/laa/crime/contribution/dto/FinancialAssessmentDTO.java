@@ -50,8 +50,10 @@ public class FinancialAssessmentDTO {
     private String userModified;
     private Integer usn;
     private String rtCode;
+
     @Builder.Default
     private String replaced = "N";
+
     private LocalDateTime firstReminderDate;
     private LocalDateTime secondReminderDate;
     private LocalDateTime evidenceReceivedDate;

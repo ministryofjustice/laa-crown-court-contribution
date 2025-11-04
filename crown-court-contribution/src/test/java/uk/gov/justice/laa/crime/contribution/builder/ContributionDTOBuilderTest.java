@@ -1,18 +1,19 @@
 package uk.gov.justice.laa.crime.contribution.builder;
 
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.CaseType;
+
+import java.math.BigDecimal;
+
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.enums.AppealType;
-import uk.gov.justice.laa.crime.enums.CaseType;
-
-import java.math.BigDecimal;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionDTOBuilderTest {
@@ -21,11 +22,11 @@ class ContributionDTOBuilderTest {
     private SoftAssertions softly;
 
     @BeforeEach
-    void setUp() {
-    }
+    void setUp() {}
 
     @Test
-    void givenAValidRequestWithoutContributions_whenBuildIsInvoked_thenACalculateContributionDTOWithZeroContributionsIsCreated() {
+    void
+            givenAValidRequestWithoutContributions_whenBuildIsInvoked_thenACalculateContributionDTOWithZeroContributionsIsCreated() {
         ApiMaatCalculateContributionRequest contributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
 
         CalculateContributionDTO actualContributionDTO = ContributionDTOBuilder.build(contributionRequest);
@@ -46,15 +47,19 @@ class ContributionDTOBuilderTest {
         softly.assertThat(actualContributionDTO.getCommittalDate()).isNull();
         softly.assertThat(actualContributionDTO.getMagCourtOutcome()).isNull();
         softly.assertThat(actualContributionDTO.getCrownCourtOutcomeList()).isEmpty();
-        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterCrownHardship()).isNull();
-        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterMagHardship()).isNull();
-        softly.assertThat(actualContributionDTO.getTotalAnnualDisposableIncome()).isNull();
+        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterCrownHardship())
+                .isNull();
+        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterMagHardship())
+                .isNull();
+        softly.assertThat(actualContributionDTO.getTotalAnnualDisposableIncome())
+                .isNull();
 
         softly.assertAll();
     }
 
     @Test
-    void givenAValidRequestWithContributions_whenBuildIsInvoked_thenACalculateContributionDTOWithContributionsIsCreated() {
+    void
+            givenAValidRequestWithContributions_whenBuildIsInvoked_thenACalculateContributionDTOWithContributionsIsCreated() {
         ApiMaatCalculateContributionRequest contributionRequest = TestModelDataBuilder.buildAppealContributionRequest();
         contributionRequest.setMonthlyContributions(BigDecimal.valueOf(123));
         contributionRequest.setUpfrontContributions(BigDecimal.valueOf(123));
@@ -77,9 +82,12 @@ class ContributionDTOBuilderTest {
         softly.assertThat(actualContributionDTO.getCommittalDate()).isNull();
         softly.assertThat(actualContributionDTO.getMagCourtOutcome()).isNull();
         softly.assertThat(actualContributionDTO.getCrownCourtOutcomeList()).isEmpty();
-        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterCrownHardship()).isNull();
-        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterMagHardship()).isNull();
-        softly.assertThat(actualContributionDTO.getTotalAnnualDisposableIncome()).isNull();
+        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterCrownHardship())
+                .isNull();
+        softly.assertThat(actualContributionDTO.getDisposableIncomeAfterMagHardship())
+                .isNull();
+        softly.assertThat(actualContributionDTO.getTotalAnnualDisposableIncome())
+                .isNull();
 
         softly.assertAll();
     }

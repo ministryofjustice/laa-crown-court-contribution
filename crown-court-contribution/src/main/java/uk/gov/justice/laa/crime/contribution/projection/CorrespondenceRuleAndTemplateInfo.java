@@ -5,9 +5,14 @@ package uk.gov.justice.laa.crime.contribution.projection;
  */
 public interface CorrespondenceRuleAndTemplateInfo {
     String getCalcContribs();
+
     Integer getUpliftCoteId();
+
     Integer getReassessmentCoteId();
+
     Integer getId();
+
     String getCotyCorrespondenceType();
+
     String getDescription();
 }

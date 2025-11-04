@@ -1,8 +1,18 @@
 package uk.gov.justice.laa.crime.contribution.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -15,9 +25,15 @@ import java.util.Set;
 @Setter
 @ToString
 @Entity
-@Table(name = "correspondence_templates", schema = "crown_court_contribution", indexes = {
-        @Index(name = "cote_uk", columnList = "id, effective_date, template, coty_correspondence_type", unique = true)
-})
+@Table(
+        name = "correspondence_templates",
+        schema = "crown_court_contribution",
+        indexes = {
+            @Index(
+                    name = "cote_uk",
+                    columnList = "id, effective_date, template, coty_correspondence_type",
+                    unique = true)
+        })
 public class CorrespondenceTemplate {
     @Id
     @Column(name = "id", nullable = false)
@@ -49,5 +65,4 @@ public class CorrespondenceTemplate {
     @Builder.Default
     @OneToMany(mappedBy = "reassessmentCote")
     private Set<CorrespondenceRule> correspondenceRulesRC = new LinkedHashSet<>();
-
 }

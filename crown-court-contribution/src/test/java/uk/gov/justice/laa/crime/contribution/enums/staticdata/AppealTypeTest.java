@@ -1,11 +1,11 @@
 package uk.gov.justice.laa.crime.contribution.enums.staticdata;
 
-import org.junit.jupiter.api.Test;
-import uk.gov.justice.laa.crime.enums.AppealType;
-
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
+import uk.gov.justice.laa.crime.enums.AppealType;
+
+import org.junit.jupiter.api.Test;
 
 class AppealTypeTest {
 
@@ -21,9 +21,7 @@ class AppealTypeTest {
 
     @Test
     void givenInvalidResultString_whenGetFromIsInvoked_thenExceptionIsThrown() {
-        assertThatThrownBy(
-                () -> AppealType.getFrom("MOCK_RESULT_STRING")
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> AppealType.getFrom("MOCK_RESULT_STRING")).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

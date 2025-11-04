@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.contribution.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiCalculateContributionRequest;
@@ -39,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -57,11 +58,11 @@ public class MaatCalculateContributionService {
     private final CalculateContributionRequestMapper calculateContributionRequestMapper;
     private final MaatCalculateContributionResponseMapper maatCalculateContributionResponseMapper;
 
-    private static boolean isUpliftApplied(CalculateContributionDTO calculateContributionDTO,
-                                           ContributionResponseDTO contributionResponseDTO) {
-        return contributionResponseDTO.getUpliftCote() != null &&
-                calculateContributionDTO.getDateUpliftApplied() != null &&
-                calculateContributionDTO.getDateUpliftRemoved() == null;
+    private static boolean isUpliftApplied(
+            CalculateContributionDTO calculateContributionDTO, ContributionResponseDTO contributionResponseDTO) {
+        return contributionResponseDTO.getUpliftCote() != null
+                && calculateContributionDTO.getDateUpliftApplied() != null
+                && calculateContributionDTO.getDateUpliftRemoved() == null;
     }
 
     public static BigDecimal getAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO) {
@@ -73,9 +74,10 @@ public class MaatCalculateContributionService {
         return BigDecimal.ZERO;
     }
 
-    public static String getEffectiveDateByNewWorkReason(final CalculateContributionDTO calculateContributionDTO,
-                                                         final BigDecimal newMonthlyContributions,
-                                                         final LocalDate assessmentEffectiveDate) {
+    public static String getEffectiveDateByNewWorkReason(
+            final CalculateContributionDTO calculateContributionDTO,
+            final BigDecimal newMonthlyContributions,
+            final LocalDate assessmentEffectiveDate) {
         NewWorkReason newWorkReason = getNewWorkReason(calculateContributionDTO);
 
         if (NewWorkReason.FMA == newWorkReason) {
@@ -84,8 +86,8 @@ public class MaatCalculateContributionService {
 
         if (NewWorkReason.PAI == newWorkReason) {
             if (calculateContributionDTO.getMonthlyContributions() != null
-                && newMonthlyContributions != null
-                && newMonthlyContributions.compareTo(calculateContributionDTO.getMonthlyContributions()) <= 0) {
+                    && newMonthlyContributions != null
+                    && newMonthlyContributions.compareTo(calculateContributionDTO.getMonthlyContributions()) <= 0) {
                 return calculateContributionDTO.getEffectiveDate().toString();
             }
 
@@ -93,16 +95,20 @@ public class MaatCalculateContributionService {
         }
 
         return calculateContributionDTO.getEffectiveDate() != null
-            ? calculateContributionDTO.getEffectiveDate().toString() : assessmentEffectiveDate.toString();
+                ? calculateContributionDTO.getEffectiveDate().toString()
+                : assessmentEffectiveDate.toString();
     }
 
     public static NewWorkReason getNewWorkReason(final CalculateContributionDTO calculateContributionDTO) {
         return calculateContributionDTO.getAssessments().stream()
-                .filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst()
+                .filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT)
+                .findFirst()
                 .map(ApiAssessment::getNewWorkReason)
                 .orElse(calculateContributionDTO.getAssessments().stream()
-                        .filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst()
-                        .map(ApiAssessment::getNewWorkReason).orElse(null));
+                        .filter(it -> it.getAssessmentType() == AssessmentType.INIT)
+                        .findFirst()
+                        .map(ApiAssessment::getNewWorkReason)
+                        .orElse(null));
     }
 
     /**
@@ -116,16 +122,22 @@ public class MaatCalculateContributionService {
     public static LocalDate getEffectiveDate(final CalculateContributionDTO calculateContributionDTO) {
         LocalDate committalDate = calculateContributionDTO.getCommittalDate();
         Optional<ApiAssessment> passAssessment = calculateContributionDTO.getAssessments().stream()
-                .filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT).findFirst();
-        LocalDateTime assessmentDate = passAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
+                .filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT)
+                .findFirst();
+        LocalDateTime assessmentDate =
+                passAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
         if (assessmentDate == null) {
             Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream()
-                    .filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
-            assessmentDate = fullAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
+                    .filter(it -> it.getAssessmentType() == AssessmentType.FULL)
+                    .findFirst();
+            assessmentDate =
+                    fullAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
             if (assessmentDate == null) {
                 Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream()
-                        .filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
-                assessmentDate = initAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
+                        .filter(it -> it.getAssessmentType() == AssessmentType.INIT)
+                        .findFirst();
+                assessmentDate =
+                        initAssessment.map(ApiAssessment::getAssessmentDate).orElse(null);
             }
         }
         if (committalDate == null) {
@@ -136,7 +148,6 @@ public class MaatCalculateContributionService {
             return committalDate;
         }
         return effectiveDate;
-
     }
 
     public ApiMaatCalculateContributionResponse calculateContribution(
@@ -153,42 +164,46 @@ public class MaatCalculateContributionService {
 
     public List<ApiContributionSummary> getContributionSummaries(final int repId) {
         List<ContributionsSummaryDTO> contributionSummaryList = maatCourtDataService.getContributionsSummary(repId);
-        return contributionSummaryList != null ? contributionSummaryList.stream().map(contributionSummaryMapper::map)
-                .toList() : List.of();
+        return contributionSummaryList != null
+                ? contributionSummaryList.stream()
+                        .map(contributionSummaryMapper::map)
+                        .toList()
+                : List.of();
     }
 
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(
-            final CalculateContributionDTO calculateContributionDTO,
-            final RepOrderDTO repOrderDTO) {
+            final CalculateContributionDTO calculateContributionDTO, final RepOrderDTO repOrderDTO) {
         log.info("Start getCalculateContributionResponse");
 
         Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream()
-                .filter(it -> it.getAssessmentType() == AssessmentType.FULL).findFirst();
+                .filter(it -> it.getAssessmentType() == AssessmentType.FULL)
+                .findFirst();
         Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream()
-                .filter(it -> it.getAssessmentType() == AssessmentType.INIT).findFirst();
-        String fullResult = fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
+                .filter(it -> it.getAssessmentType() == AssessmentType.INIT)
+                .findFirst();
+        String fullResult =
+                fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
 
         String crownCourtOutcome = getCrownCourtOutcome(calculateContributionDTO);
 
-        String magCourtOutcome = (calculateContributionDTO.getMagCourtOutcome() != null) ?
-                calculateContributionDTO.getMagCourtOutcome().getOutcome() : null;
+        String magCourtOutcome = (calculateContributionDTO.getMagCourtOutcome() != null)
+                ? calculateContributionDTO.getMagCourtOutcome().getOutcome()
+                : null;
 
         ContributionResponseDTO contributionResponseDTO =
-                contributionService.checkContributionsCondition(
-                        ContributionRequestDTO.builder()
-                                .caseType(calculateContributionDTO.getCaseType())
-                                .effectiveDate(calculateContributionDTO.getEffectiveDate())
-                                .iojResult(repOrderDTO.getIojResult())
-                                .monthlyContribs(calculateContributionDTO.getMonthlyContributions())
-                                .fullResult(fullResult)
-                                .initResult(initAssessment.map(
-                                                assessment -> assessment.getResult().name())
-                                        .orElse(null))
-                                .magCourtOutcome(magCourtOutcome)
-                                .crownCourtOutcome(crownCourtOutcome)
-                                .removeContribs(calculateContributionDTO.getRemoveContribs())
-                                .build()
-                );
+                contributionService.checkContributionsCondition(ContributionRequestDTO.builder()
+                        .caseType(calculateContributionDTO.getCaseType())
+                        .effectiveDate(calculateContributionDTO.getEffectiveDate())
+                        .iojResult(repOrderDTO.getIojResult())
+                        .monthlyContribs(calculateContributionDTO.getMonthlyContributions())
+                        .fullResult(fullResult)
+                        .initResult(initAssessment
+                                .map(assessment -> assessment.getResult().name())
+                                .orElse(null))
+                        .magCourtOutcome(magCourtOutcome)
+                        .crownCourtOutcome(crownCourtOutcome)
+                        .removeContribs(calculateContributionDTO.getRemoveContribs())
+                        .build());
 
         if (Constants.Y.equals(contributionResponseDTO.getDoContribs())) {
             return performContributions(calculateContributionDTO, contributionResponseDTO, fullResult, repOrderDTO);
@@ -210,25 +225,28 @@ public class MaatCalculateContributionService {
         return apiCrownCourtOutcome.getOutcome().getCode();
     }
 
-    public ApiMaatCalculateContributionResponse performContributions(final CalculateContributionDTO calculateContributionDTO,
-                                                                     final ContributionResponseDTO contributionResponseDTO,
-                                                                     final String fullResult,
-                                                                     final RepOrderDTO repOrderDTO) {
+    public ApiMaatCalculateContributionResponse performContributions(
+            final CalculateContributionDTO calculateContributionDTO,
+            final ContributionResponseDTO contributionResponseDTO,
+            final String fullResult,
+            final RepOrderDTO repOrderDTO) {
         ContributionResult result;
 
-        //Use Calculated Monthly Contributions value - p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
-        if ((Constants.Y.equals(contributionResponseDTO.getCalcContribs()) ||
-                contributionResponseDTO.getId() != null ||
-                (calculateContributionDTO.getMonthlyContributions() != null && calculateContributionDTO.getMonthlyContributions()
-                        .compareTo(BigDecimal.ZERO) > 0)) &&
-                !Constants.INEL.equals(fullResult)) {
+        // Use Calculated Monthly Contributions value -
+        // p_application_object.crown_court_overview_object.contributions_object.monthly_contribs > 0 ->
+        if ((Constants.Y.equals(contributionResponseDTO.getCalcContribs())
+                        || contributionResponseDTO.getId() != null
+                        || (calculateContributionDTO.getMonthlyContributions() != null
+                                && calculateContributionDTO
+                                                .getMonthlyContributions()
+                                                .compareTo(BigDecimal.ZERO)
+                                        > 0))
+                && !Constants.INEL.equals(fullResult)) {
             result = calculateContributions(calculateContributionDTO, contributionResponseDTO);
         } else {
             LocalDate assessmentEffectiveDate = getEffectiveDate(calculateContributionDTO);
             String effectiveDate =
-                    getEffectiveDateByNewWorkReason(calculateContributionDTO, BigDecimal.ZERO,
-                            assessmentEffectiveDate
-                    );
+                    getEffectiveDateByNewWorkReason(calculateContributionDTO, BigDecimal.ZERO, assessmentEffectiveDate);
             result = ContributionResult.builder()
                     .monthlyAmount(BigDecimal.ZERO)
                     .contributionCap(BigDecimal.ZERO)
@@ -244,24 +262,28 @@ public class MaatCalculateContributionService {
         return maatCalculateContributionResponseMapper.map(result, createdContribution, contributionResponseDTO);
     }
 
-    private boolean shouldCreateContributions(ContributionResult result, CalculateContributionDTO calculateContributionDTO) {
-        return (result.monthlyAmount() != null && calculateContributionDTO.getMonthlyContributions() != null
-            && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
-                || (result.effectiveDate() != null && !result.effectiveDate()
-                .equals(calculateContributionDTO.getEffectiveDate()));
+    private boolean shouldCreateContributions(
+            ContributionResult result, CalculateContributionDTO calculateContributionDTO) {
+        return (result.monthlyAmount() != null
+                        && calculateContributionDTO.getMonthlyContributions() != null
+                        && result.monthlyAmount().compareTo(calculateContributionDTO.getMonthlyContributions()) != 0)
+                || (result.effectiveDate() != null
+                        && !result.effectiveDate().equals(calculateContributionDTO.getEffectiveDate()));
     }
 
-    public Contribution verifyAndCreateContributions(final CalculateContributionDTO calculateContributionDTO,
-                                                     final RepOrderDTO repOrderDTO,
-                                                     final ContributionResult result) {
+    public Contribution verifyAndCreateContributions(
+            final CalculateContributionDTO calculateContributionDTO,
+            final RepOrderDTO repOrderDTO,
+            final ContributionResult result) {
 
-        if (result != null && (shouldCreateContributions(result, calculateContributionDTO)
-                || (repOrderDTO != null && isCreateContributionRequired(calculateContributionDTO, repOrderDTO)))) {
+        if (result != null
+                && (shouldCreateContributions(result, calculateContributionDTO)
+                        || (repOrderDTO != null
+                                && isCreateContributionRequired(calculateContributionDTO, repOrderDTO)))) {
             return createContributions(calculateContributionDTO, result);
         }
         return null;
     }
-
 
     public Contribution getCurrentContribution(final CalculateContributionDTO calculateContributionDTO) {
         final Integer contributionId = calculateContributionDTO.getContributionId();
@@ -269,20 +291,25 @@ public class MaatCalculateContributionService {
         if (contributionId != null) {
             contributionsList = maatCourtDataService.findContribution(calculateContributionDTO.getRepId(), false);
         }
-        return contributionsList.stream().filter(x -> contributionId.equals(x.getId())).findFirst().orElse(null);
+        return contributionsList.stream()
+                .filter(x -> contributionId.equals(x.getId()))
+                .findFirst()
+                .orElse(null);
     }
 
-    public boolean isCreateContributionRequired(final CalculateContributionDTO calculateContributionDTO,
-                                                final RepOrderDTO repOrderDTO) {
+    public boolean isCreateContributionRequired(
+            final CalculateContributionDTO calculateContributionDTO, final RepOrderDTO repOrderDTO) {
 
         return (contributionService.hasApplicationStatusChanged(
-                repOrderDTO, calculateContributionDTO.getCaseType(), calculateContributionDTO.getApplicationStatus())
+                        repOrderDTO,
+                        calculateContributionDTO.getCaseType(),
+                        calculateContributionDTO.getApplicationStatus())
                 || contributionService.hasCCOutcomeChanged(repOrderDTO.getId())
                 || contributionService.isCds15WorkAround(repOrderDTO));
     }
 
-    public Contribution createContributions(final CalculateContributionDTO calculateContributionDTO,
-                                            ContributionResult result) {
+    public Contribution createContributions(
+            final CalculateContributionDTO calculateContributionDTO, ContributionResult result) {
         log.info("Inactivate existing Contribution and create a new Contribution");
         if (compareContributionService.shouldCreateContribution(calculateContributionDTO, result)) {
             CreateContributionRequest createContributionRequest =
@@ -292,36 +319,38 @@ public class MaatCalculateContributionService {
         return null;
     }
 
-    public ContributionResult calculateContributions(final CalculateContributionDTO calculateContributionDTO,
-                                                     final ContributionResponseDTO contributionResponseDTO) {
+    public ContributionResult calculateContributions(
+            final CalculateContributionDTO calculateContributionDTO,
+            final ContributionResponseDTO contributionResponseDTO) {
         log.debug("Request to Calculate Contributions - calculateContributionDTO : {}", calculateContributionDTO);
         log.debug("Request to Calculate Contributions - contributionResponseDTO : {}", contributionResponseDTO);
 
         LocalDate assessmentEffectiveDate = getEffectiveDate(calculateContributionDTO);
         ContributionCalcParametersDTO contributionCalcParametersDTO =
-                maatCourtDataService.getContributionCalcParameters(DateUtil.getLocalDateString(assessmentEffectiveDate));
+                maatCourtDataService.getContributionCalcParameters(
+                        DateUtil.getLocalDateString(assessmentEffectiveDate));
         CrownCourtOutcome crownCourtOutcome =
                 contributionRulesService.getActiveCCOutcome(calculateContributionDTO.getCrownCourtOutcomeList());
 
-        BigDecimal annualDisposableIncome = calculateAnnualDisposableIncome(calculateContributionDTO, crownCourtOutcome);
-        int totalMonths = Constants.N.equals(
-                contributionResponseDTO.getCalcContribs()) ? 0 : contributionCalcParametersDTO.getTotalMonths();
+        BigDecimal annualDisposableIncome =
+                calculateAnnualDisposableIncome(calculateContributionDTO, crownCourtOutcome);
+        int totalMonths = Constants.N.equals(contributionResponseDTO.getCalcContribs())
+                ? 0
+                : contributionCalcParametersDTO.getTotalMonths();
 
-        ApiCalculateContributionRequest apiCalculateContributionRequest =
-                calculateContributionRequestMapper.map(contributionCalcParametersDTO,
-                        annualDisposableIncome, isUpliftApplied(calculateContributionDTO,
-                                contributionResponseDTO
-                        ),
-                        calculateContributionDTO.getContributionCap()
-                );
+        ApiCalculateContributionRequest apiCalculateContributionRequest = calculateContributionRequestMapper.map(
+                contributionCalcParametersDTO,
+                annualDisposableIncome,
+                isUpliftApplied(calculateContributionDTO, contributionResponseDTO),
+                calculateContributionDTO.getContributionCap());
 
         // Revisit the request to pass the offenceType object for Contribs Cap
         ApiCalculateContributionResponse apiCalculateContributionResponse =
                 calculateContributionService.calculateContribution(apiCalculateContributionRequest);
-        String effectiveDate =
-                getEffectiveDateByNewWorkReason(calculateContributionDTO, apiCalculateContributionResponse.getMonthlyContributions(),
-                        assessmentEffectiveDate
-                );
+        String effectiveDate = getEffectiveDateByNewWorkReason(
+                calculateContributionDTO,
+                apiCalculateContributionResponse.getMonthlyContributions(),
+                assessmentEffectiveDate);
 
         return ContributionResult.builder()
                 .totalMonths(totalMonths)
@@ -335,17 +364,16 @@ public class MaatCalculateContributionService {
                 .build();
     }
 
-    public BigDecimal calculateAnnualDisposableIncome(final CalculateContributionDTO calculateContributionDTO,
-                                                      final CrownCourtOutcome crownCourtOutcome) {
+    public BigDecimal calculateAnnualDisposableIncome(
+            final CalculateContributionDTO calculateContributionDTO, final CrownCourtOutcome crownCourtOutcome) {
         if (calculateContributionDTO.getDisposableIncomeAfterCrownHardship() != null) {
             return calculateContributionDTO.getDisposableIncomeAfterCrownHardship();
         }
 
-        boolean isContributionRuleApplicable =
-                contributionRulesService.isContributionRuleApplicable(calculateContributionDTO.getCaseType(),
-                        calculateContributionDTO.getMagCourtOutcome(),
-                        crownCourtOutcome
-                );
+        boolean isContributionRuleApplicable = contributionRulesService.isContributionRuleApplicable(
+                calculateContributionDTO.getCaseType(),
+                calculateContributionDTO.getMagCourtOutcome(),
+                crownCourtOutcome);
         if (isContributionRuleApplicable) {
             return getAnnualDisposableIncome(calculateContributionDTO)
                     .add(calculateVariationAmount(calculateContributionDTO.getRepId()));

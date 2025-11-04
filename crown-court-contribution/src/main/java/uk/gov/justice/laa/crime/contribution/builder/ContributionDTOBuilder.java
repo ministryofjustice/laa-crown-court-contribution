@@ -2,14 +2,15 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import org.springframework.stereotype.Component;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,8 +30,8 @@ public class ContributionDTOBuilder {
                 // initialised but empty object (where monthly contributions is null and therefore
                 // represents no actual contribution).
                 .monthlyContributions(request.getMonthlyContributions())
-
-                .upfrontContributions(request.getUpfrontContributions() != null ? request.getUpfrontContributions() : BigDecimal.ZERO)
+                .upfrontContributions(
+                        request.getUpfrontContributions() != null ? request.getUpfrontContributions() : BigDecimal.ZERO)
                 .dateUpliftApplied(DateUtil.parseLocalDate(request.getDateUpliftApplied()))
                 .dateUpliftRemoved(DateUtil.parseLocalDate(request.getDateUpliftRemoved()))
                 .caseType(request.getCaseType())
@@ -48,8 +49,8 @@ public class ContributionDTOBuilder {
                 .build();
     }
 
-    public static void build(final CalculateContributionDTO contributionDTO,
-                             final ApiMaatCalculateContributionResponse response) {
+    public static void build(
+            final CalculateContributionDTO contributionDTO, final ApiMaatCalculateContributionResponse response) {
 
         contributionDTO.setContributionCap(response.getContributionCap());
         contributionDTO.setEffectiveDate(DateUtil.parseLocalDate(response.getEffectiveDate()));

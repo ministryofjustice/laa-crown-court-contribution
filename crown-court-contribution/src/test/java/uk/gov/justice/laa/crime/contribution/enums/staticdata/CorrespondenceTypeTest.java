@@ -1,10 +1,11 @@
 package uk.gov.justice.laa.crime.contribution.enums.staticdata;
 
-import org.junit.jupiter.api.Test;
-import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
+
+import org.junit.jupiter.api.Test;
 
 class CorrespondenceTypeTest {
 
@@ -20,9 +21,8 @@ class CorrespondenceTypeTest {
 
     @Test
     void givenInvalidResultString_whenGetFromIsInvoked_thenExceptionIsThrown() {
-        assertThatThrownBy(
-                () -> CorrespondenceType.getFrom("MOCK_RESULT_STRING")
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> CorrespondenceType.getFrom("MOCK_RESULT_STRING"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

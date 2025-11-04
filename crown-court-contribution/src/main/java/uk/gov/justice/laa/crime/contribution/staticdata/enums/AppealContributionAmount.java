@@ -11,14 +11,14 @@ import java.math.BigDecimal;
 @Getter
 @AllArgsConstructor
 public enum AppealContributionAmount {
-
     NO_CONTRIBUTION(new BigDecimal(0)),
     PART_CONTRIBUTION(new BigDecimal(250)),
     FULL_CONTRIBUTION(new BigDecimal(500));
 
     private final BigDecimal contributionAmount;
 
-    public static AppealContributionAmount calculate(AppealType appealType, CrownCourtOutcome appealOutcome, AssessmentResult assessmentResult) {
+    public static AppealContributionAmount calculate(
+            AppealType appealType, CrownCourtOutcome appealOutcome, AssessmentResult assessmentResult) {
         if (AssessmentResult.PASS.equals(assessmentResult)) {
             return NO_CONTRIBUTION;
         }

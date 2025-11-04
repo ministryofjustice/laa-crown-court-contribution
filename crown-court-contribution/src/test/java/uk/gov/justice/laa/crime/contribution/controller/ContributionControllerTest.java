@@ -1,16 +1,13 @@
 package uk.gov.justice.laa.crime.contribution.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
+
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
@@ -25,13 +22,18 @@ import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @DirtiesContext
 @AutoConfigureMockMvc(addFilters = false)
@@ -86,7 +88,8 @@ class ContributionControllerTest {
     }
 
     @Test
-    void givenClientApiException_whenCalculateAppealContributionIsInvoked_thenInternalServerErrorResponse() throws Exception {
+    void givenClientApiException_whenCalculateAppealContributionIsInvoked_thenInternalServerErrorResponse()
+            throws Exception {
         ApiMaatCalculateContributionRequest appealContributionRequest =
                 TestModelDataBuilder.buildAppealContributionRequest();
 
@@ -111,7 +114,8 @@ class ContributionControllerTest {
     }
 
     @Test
-    void givenClientApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse() throws Exception {
+    void givenClientApiException_whenGetContributionSummariesIsInvoked_thenInternalServerErrorResponse()
+            throws Exception {
         when(maatCalculateContributionService.getContributionSummaries(anyInt()))
                 .thenThrow(WebClientRequestException.class);
 
@@ -125,8 +129,7 @@ class ContributionControllerTest {
         ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
                 TestModelDataBuilder.buildCheckContributionRuleRequest();
         String requestData = objectMapper.writeValueAsString(apiMaatCheckContributionRuleRequest);
-        when(contributionRulesService.getActiveCCOutcome(any()))
-                .thenReturn(CrownCourtOutcome.SUCCESSFUL);
+        when(contributionRulesService.getActiveCCOutcome(any())).thenReturn(CrownCourtOutcome.SUCCESSFUL);
         when(contributionRulesService.isContributionRuleApplicable(any(), any(), any()))
                 .thenReturn(Boolean.TRUE);
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
@@ -140,8 +143,7 @@ class ContributionControllerTest {
         ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
                 TestModelDataBuilder.buildCheckContributionRuleRequest();
         String requestData = objectMapper.writeValueAsString(apiMaatCheckContributionRuleRequest);
-        when(contributionRulesService.getActiveCCOutcome(any()))
-                .thenThrow(new RuntimeException("Test Exception"));
+        when(contributionRulesService.getActiveCCOutcome(any())).thenThrow(new RuntimeException("Test Exception"));
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestData, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
                 .andExpect(status().is5xxServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -156,5 +158,4 @@ class ContributionControllerTest {
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, body, CHECK_CONTRIBUTION_RULE_ENDPOINT_URL, false))
                 .andExpect(status().isBadRequest());
     }
-
 }

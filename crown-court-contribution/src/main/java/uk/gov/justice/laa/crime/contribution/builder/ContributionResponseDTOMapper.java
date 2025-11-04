@@ -2,10 +2,11 @@ package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.staticdata.enums.CorrespondenceType;
+
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -19,11 +20,9 @@ public class ContributionResponseDTOMapper {
         contributionResponse.setCorrespondenceType(processedCases.getCotyCorrespondenceType());
         contributionResponse.setUpliftCote(processedCases.getUpliftCoteId());
         contributionResponse.setReassessmentCoteId(processedCases.getReassessmentCoteId());
-        CorrespondenceType correspondenceType =
-                CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
+        CorrespondenceType correspondenceType = CorrespondenceType.getFrom(processedCases.getCotyCorrespondenceType());
         if (correspondenceType != null) {
             contributionResponse.setCorrespondenceTypeDesc(correspondenceType.getDescription());
         }
     }
-
 }

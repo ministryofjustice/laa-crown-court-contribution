@@ -25,5 +25,4 @@ public class ContributionRequestDTO {
     private BigDecimal monthlyContribs;
     private String removeContribs;
     private String meansResult;
-
 }

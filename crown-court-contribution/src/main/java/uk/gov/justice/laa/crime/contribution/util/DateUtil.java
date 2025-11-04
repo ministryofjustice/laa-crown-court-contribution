@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 public final class DateUtil {
 
     private DateUtil() {}
+
     public static LocalDate parse(final String date) {
         return date != null ? LocalDate.parse(date) : null;
     }

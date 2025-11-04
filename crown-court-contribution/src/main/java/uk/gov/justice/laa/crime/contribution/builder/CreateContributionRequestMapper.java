@@ -1,17 +1,19 @@
 package uk.gov.justice.laa.crime.contribution.builder;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
 
 import java.math.BigDecimal;
 
+import org.springframework.stereotype.Component;
+
 @Component
 @AllArgsConstructor
 public class CreateContributionRequestMapper {
-    public CreateContributionRequest map(CalculateContributionDTO calculateContributionDTO, BigDecimal appealContributionAmount) {
+    public CreateContributionRequest map(
+            CalculateContributionDTO calculateContributionDTO, BigDecimal appealContributionAmount) {
         CreateContributionRequest createContributionRequest = map(calculateContributionDTO);
         return createContributionRequest.withUpfrontContributions(appealContributionAmount);
     }
