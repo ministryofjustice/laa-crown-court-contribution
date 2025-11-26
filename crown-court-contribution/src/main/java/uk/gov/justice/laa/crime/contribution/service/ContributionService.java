@@ -144,7 +144,6 @@ public class ContributionService {
         return contributionResponse;
     }
 
-    @Transactional
     public CorrespondenceRuleAndTemplateInfo getCoteInfo(ContributionRequestDTO contributionRequestDTO) {
         return correspondenceRuleRepository
                 .getCoteInfo(
