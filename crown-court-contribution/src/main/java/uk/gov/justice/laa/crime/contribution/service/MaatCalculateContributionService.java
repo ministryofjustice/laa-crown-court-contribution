@@ -163,12 +163,10 @@ public class MaatCalculateContributionService {
     }
 
     public List<ApiContributionSummary> getContributionSummaries(final int repId) {
-        List<ContributionsSummaryDTO> contributionSummaryList = maatCourtDataService.getContributionsSummary(repId);
-        return contributionSummaryList != null
-                ? contributionSummaryList.stream()
-                        .map(contributionSummaryMapper::map)
-                        .toList()
-                : List.of();
+        return maatCourtDataService.getContributionsSummary(repId)
+                .stream()
+                .map(contributionSummaryMapper::map)
+                .toList();
     }
 
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(

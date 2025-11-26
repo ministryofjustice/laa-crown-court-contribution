@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
@@ -29,7 +30,7 @@ public class MaatCourtDataService {
                 findLatestContribution);
         List<Contribution> response = maatAPIClient.find(repId, findLatestContribution);
         log.debug(RESPONSE_STRING, response);
-        return response;
+        return Optional.ofNullable(response).orElse(List.of());
     }
 
     public Contribution createContribution(CreateContributionRequest createContributionRequest) {
@@ -50,14 +51,14 @@ public class MaatCourtDataService {
         log.debug("Request to get rep order CC outcome for repId: {}", repId);
         List<RepOrderCCOutcomeDTO> response = maatAPIClient.getRepOrderCCOutcomeByRepId(repId);
         log.debug(RESPONSE_STRING, response);
-        return response;
+        return Optional.ofNullable(response).orElse(List.of());
     }
 
     public List<ContributionsSummaryDTO> getContributionsSummary(Integer repId) {
         log.debug("Request to get contributions summary for repId: {}", repId);
         List<ContributionsSummaryDTO> response = maatAPIClient.getContributionsSummary(repId);
         log.debug(RESPONSE_STRING, response);
-        return response;
+        return Optional.ofNullable(response).orElse(List.of());
     }
 
     public ContributionCalcParametersDTO getContributionCalcParameters(String effectiveDate) {

@@ -1025,7 +1025,7 @@ class MaatCalculateContributionServiceTest {
 
     @Test
     void givenNoContributionSummaries_whenGetContributionSummariesIsInvoked_thenEmptyListIsReturned() {
-        when(maatCourtDataService.getContributionsSummary(any())).thenReturn(null);
+        when(maatCourtDataService.getContributionsSummary(any())).thenReturn(List.of());
 
         List<ApiContributionSummary> response =
                 maatCalculateContributionService.getContributionSummaries(TestModelDataBuilder.REP_ID);
