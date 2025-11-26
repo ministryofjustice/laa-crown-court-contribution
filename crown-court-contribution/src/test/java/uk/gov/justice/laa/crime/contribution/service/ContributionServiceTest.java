@@ -9,6 +9,7 @@ import static uk.gov.justice.laa.crime.contribution.common.Constants.FAIL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.FAILPORT;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.HARDSHIP_APPLICATION;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.INEL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.INIT;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.NONE;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
@@ -20,12 +21,12 @@ import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBu
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.MeansAssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
@@ -74,15 +75,9 @@ class ContributionServiceTest {
     @Mock
     private ContributionResponseDTOMapper contributionResponseDTOMapper;
 
-    private static Stream<Arguments> getAssessmentRequestForIojResult() {
-        return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, PASS, FULL, PASS), PASS),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), PASS));
-    }
-
     private static Stream<Arguments> getAssessmentRequestForMeansResult() {
         return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, PASS, FULL, PASS), FULL),
+                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, FULL, INEL, PASS), INEL),
                 Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), INIT.concat(PASS)),
                 Arguments.of(new AssessmentRequestDTO(PASS, null, null, null, null, PASS), NONE),
                 Arguments.of(new AssessmentRequestDTO(PASS, PASS, PASS, PASS, FULL, PASS), PASSPORT),
@@ -301,33 +296,19 @@ class ContributionServiceTest {
     }
 
     @ParameterizedTest()
-    @MethodSource("getAssessmentRequestForIojResult")
-    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnCorrectIojResultResponse(
-            AssessmentRequestDTO request, String expectedResult) {
-
-        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-
-        assertThat(response.getIojResult()).isEqualTo(expectedResult);
-    }
-
-    @ParameterizedTest()
     @MethodSource("getAssessmentRequestForMeansResult")
-    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnCorrectMeansResultResponse(
+    void givenAValidAssessmentRequest_whenGetMeansAssessmentResultIsInvoked_thenReturnCorrectMeansResultResponse(
             AssessmentRequestDTO request, String expectedResult) {
-
-        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-
-        assertThat(response.getMeansResult()).isEqualTo(expectedResult);
+        MeansAssessmentResult result = contributionService.getMeansAssessmentResult(request);
+        assertThat(result.getResult()).isEqualTo(expectedResult);
     }
 
     @ParameterizedTest()
     @MethodSource("getAssessmentRequestForNullMeansResult")
-    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnEmptyMeansResult(
+    void givenAValidAssessmentRequest_whenGetMeansAssessmentResultIsInvoked_thenReturnEmptyMeansResult(
             AssessmentRequestDTO request) {
-
-        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-
-        assertThat(response.getMeansResult()).isNull();
+        MeansAssessmentResult result = contributionService.getMeansAssessmentResult(request);
+        assertThat(result).isNull();
     }
 
     @ParameterizedTest()

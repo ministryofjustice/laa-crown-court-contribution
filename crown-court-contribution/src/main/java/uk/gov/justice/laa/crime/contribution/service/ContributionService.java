@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FAIL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,6 @@ import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
 import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.FinancialAssessmentDTO;
@@ -18,6 +18,7 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.MeansAssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,37 +64,44 @@ public class ContributionService {
                 : financialAssessments.get(0).getInitResult();
     }
 
-    public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
-        AssessmentResponseDTO response = new AssessmentResponseDTO();
-        response.setIojResult(ofNullable(request.getDecisionResult()).orElse(request.getIojResult()));
-
+    public MeansAssessmentResult getMeansAssessmentResult(final AssessmentRequestDTO request) {
         if (StringUtils.isNotBlank(request.getPassportResult())) {
             if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
-                response.setMeansResult(Constants.PASSPORT);
-            } else if (Constants.FAIL.equals(request.getPassportResult())) {
-                response.setMeansResult(Constants.FAILPORT);
+                return MeansAssessmentResult.PASSPORT;
+            } else if (FAIL.equals(request.getPassportResult())) {
+                return MeansAssessmentResult.FAILPORT;
             } else if (PASS.equals(request.getInitResult())
                     || PASS.equals(request.getFullResult())
                     || PASS.equals(request.getHardshipResult())) {
-                response.setMeansResult(PASS);
-            } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION)
+                return MeansAssessmentResult.PASS;
+            } else if (Set.of(FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION)
                             .contains(request.getInitResult())
-                    && (Constants.FAIL.equals(request.getFullResult()))
-                    && (Constants.FAIL.equals(
-                            ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
-                response.setMeansResult(Constants.FAIL);
+                    && (FAIL.equals(request.getFullResult()))
+                    && (FAIL.equals(
+                            ofNullable(request.getHardshipResult()).orElse(FAIL)))) {
+                return  MeansAssessmentResult.FAIL;
             }
-        } else {
-            if (StringUtils.isBlank(request.getFullResult())) {
-                response.setMeansResult(
-                        StringUtils.isBlank(request.getInitResult())
-                                ? Constants.NONE
-                                : Constants.INIT.concat(request.getInitResult()));
-            } else {
-                response.setMeansResult(request.getFullResult());
-            }
+            return null;
         }
-        return response;
+
+        if (StringUtils.isBlank(request.getFullResult())) {
+            if (StringUtils.isBlank(request.getInitResult())) {
+                return MeansAssessmentResult.NONE;
+            }
+            return switch (request.getInitResult()) {
+                case Constants.PASS -> MeansAssessmentResult.INIT_PASS;
+                case Constants.FAIL -> MeansAssessmentResult.INIT_FAIL;
+                default -> null;
+            };
+        }
+
+        return switch (request.getFullResult()) {
+            case Constants.PASS -> MeansAssessmentResult.PASS;
+            case Constants.FAIL -> MeansAssessmentResult.FAIL;
+            case Constants.INEL -> MeansAssessmentResult.INEL;
+            default -> null;
+        };
+
     }
 
     @Transactional
@@ -107,9 +114,9 @@ public class ContributionService {
                 .calcContribs(Constants.N)
                 .build();
 
-        AssessmentResponseDTO assessmentResponseDTO = getAssessmentResult(assessmentRequestDTO);
-        request.setIojResult(assessmentResponseDTO.getIojResult());
-        request.setMeansResult(assessmentResponseDTO.getMeansResult());
+        MeansAssessmentResult result = getMeansAssessmentResult(assessmentRequestDTO);
+        request.setIojResult(ofNullable(request.getDecisionResult()).orElse(request.getIojResult()));
+        request.setMeansResult(result.getResult());
 
         if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY)
                         .contains(request.getCaseType())
@@ -163,15 +170,15 @@ public class ContributionService {
     }
 
     public boolean hasCCOutcomeChanged(final int repId) {
-        List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId);
-        if (CollectionUtils.isNotEmpty(repOrderCCOutcomeList)) {
-            Optional<RepOrderCCOutcomeDTO> outcomeDTO =
-                    repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
-            return outcomeDTO.isPresent()
-                    && outcomeDTO.get().getOutcome() != null
+        List<RepOrderCCOutcomeDTO> outcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId);
+        if (!outcomeList.isEmpty()) {
+            Optional<RepOrderCCOutcomeDTO> outcome =
+                    outcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
+            return outcome.isPresent()
+                    && outcome.get().getOutcome() != null
                     && !CrownCourtOutcome.AQUITTED
                             .getCode()
-                            .equals(outcomeDTO.get().getOutcome());
+                            .equals(outcome.get().getOutcome());
         }
         return false;
     }
