@@ -1,12 +1,7 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
@@ -19,6 +14,13 @@ import uk.gov.justice.laa.crime.contribution.staticdata.enums.AppealContribution
 import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcomeType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

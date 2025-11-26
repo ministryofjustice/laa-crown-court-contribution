@@ -28,7 +28,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -77,9 +76,8 @@ public class ContributionService {
             } else if (Set.of(FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION)
                             .contains(request.getInitResult())
                     && (FAIL.equals(request.getFullResult()))
-                    && (FAIL.equals(
-                            ofNullable(request.getHardshipResult()).orElse(FAIL)))) {
-                return  MeansAssessmentResult.FAIL;
+                    && (FAIL.equals(ofNullable(request.getHardshipResult()).orElse(FAIL)))) {
+                return MeansAssessmentResult.FAIL;
             }
             return null;
         }
@@ -101,7 +99,6 @@ public class ContributionService {
             case Constants.INEL -> MeansAssessmentResult.INEL;
             default -> null;
         };
-
     }
 
     @Transactional
@@ -170,8 +167,7 @@ public class ContributionService {
     }
 
     public boolean hasCCOutcomeChanged(final int repId) {
-        return maatCourtDataService.getRepOrderCCOutcomeByRepId(repId)
-                .stream()
+        return maatCourtDataService.getRepOrderCCOutcomeByRepId(repId).stream()
                 .min(Comparator.comparing(RepOrderCCOutcomeDTO::getId))
                 .map(outcome -> outcome.getOutcome() != null
                         && !CrownCourtOutcome.AQUITTED.getCode().equals(outcome.getOutcome()))

@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
@@ -12,6 +11,7 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 

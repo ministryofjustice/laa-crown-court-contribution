@@ -4,18 +4,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.contribution.maat_api.CreateContributionRequest;
 import uk.gov.justice.laa.crime.contribution.client.MaatCourtDataApiClient;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class MaatCourtDataServiceTest {
@@ -63,8 +65,7 @@ class MaatCourtDataServiceTest {
     @Test
     void givenValidRepIdAndNoResults_whenGetRepOrderCCOutcomeByRepIdIsInvoked_thenEmptyListIsReturned() {
         when(maatCourtDataClient.getRepOrderCCOutcomeByRepId(TEST_REP_ID)).thenReturn(null);
-        List<RepOrderCCOutcomeDTO> result = maatCourtDataService.getRepOrderCCOutcomeByRepId(
-                TEST_REP_ID);
+        List<RepOrderCCOutcomeDTO> result = maatCourtDataService.getRepOrderCCOutcomeByRepId(TEST_REP_ID);
         assertThat(result).isEmpty();
     }
 
@@ -77,8 +78,7 @@ class MaatCourtDataServiceTest {
     @Test
     void givenValidRepIdAndNoResults_whenGetContributionsSummaryIsInvoked_thenEmptyListIsReturned() {
         when(maatCourtDataClient.getContributionsSummary(TEST_REP_ID)).thenReturn(null);
-        List<ContributionsSummaryDTO> result = maatCourtDataService.getContributionsSummary(
-                TEST_REP_ID);
+        List<ContributionsSummaryDTO> result = maatCourtDataService.getContributionsSummary(TEST_REP_ID);
         assertThat(result).isEmpty();
     }
 

@@ -436,9 +436,7 @@ class ContributionServiceTest {
     @ParameterizedTest
     @MethodSource("ccOutcomeScenarios")
     void givenVariousOutcomes_whenHasCCOutcomeChangedIsInvoked_thenResultMatchesExpectation(
-            List<RepOrderCCOutcomeDTO> outcomes,
-            boolean expected
-    ) {
+            List<RepOrderCCOutcomeDTO> outcomes, boolean expected) {
         when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID)).thenReturn(outcomes);
         boolean result = contributionService.hasCCOutcomeChanged(REP_ID);
         assertThat(result).isEqualTo(expected);
@@ -452,28 +450,26 @@ class ContributionServiceTest {
                 // --- Lowest ID has a null outcome ---
                 Arguments.of(
                         List.of(
-                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
-                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null)
-                        ),
-                        false
-                ),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null)),
+                        false),
                 // --- Lowest ID is ACQUITTED ---
                 Arguments.of(
                         List.of(
-                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
-                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.AQUITTED.getCode())
-                        ),
-                        false
-                ),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12345, CrownCourtOutcome.AQUITTED.getCode())),
+                        false),
                 // --- Lowest ID has a different (non-ACQUITTED) outcome → true ---
                 Arguments.of(
                         List.of(
-                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
-                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.ABANDONED.getCode())
-                        ),
-                        true
-                )
-        );
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12345, CrownCourtOutcome.ABANDONED.getCode())),
+                        true));
     }
 
     @Test
@@ -489,10 +485,7 @@ class ContributionServiceTest {
     @ParameterizedTest
     @MethodSource("invalidStatusChangeScenarios")
     void givenVariousInputs_whenHasApplicationStatusChangedIsInvoked_thenReturnsFalse(
-            RepOrderDTO repOrderDTO,
-            CaseType caseType,
-            String status
-    ) {
+            RepOrderDTO repOrderDTO, CaseType caseType, String status) {
         boolean result = contributionService.hasApplicationStatusChanged(repOrderDTO, caseType, status);
         assertThat(result).isFalse();
     }
@@ -506,8 +499,7 @@ class ContributionServiceTest {
                 // caseType not INDICTABLE → false
                 Arguments.of(getRepOrderDTO(REP_ID), CaseType.EITHER_WAY, RORS_STATUS),
                 // repOrderDTO is null → false
-                Arguments.of(null, CaseType.INDICTABLE, RORS_STATUS)
-        );
+                Arguments.of(null, CaseType.INDICTABLE, RORS_STATUS));
     }
 
     private static RepOrderDTO withNullRorsStatus(RepOrderDTO dto) {
