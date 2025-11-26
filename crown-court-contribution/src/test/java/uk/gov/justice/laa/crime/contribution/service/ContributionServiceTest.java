@@ -433,74 +433,47 @@ class ContributionServiceTest {
                 .isEqualTo(InitAssessmentResult.PASS.getResult());
     }
 
-    @Test
-    void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID)).thenReturn(List.of());
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
+    @ParameterizedTest
+    @MethodSource("ccOutcomeScenarios")
+    void givenVariousOutcomes_whenHasCCOutcomeChangedIsInvoked_thenResultMatchesExpectation(
+            List<RepOrderCCOutcomeDTO> outcomes,
+            boolean expected
+    ) {
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID)).thenReturn(outcomes);
+        boolean result = contributionService.hasCCOutcomeChanged(REP_ID);
+        assertThat(result).isEqualTo(expected);
     }
 
-    @Test
-    void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID)).thenReturn(Collections.emptyList());
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepId_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
-        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
-        outcomeList.add(
-                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.ABANDONED.getCode()));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any())).thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isTrue();
-    }
-
-    @Test
-    void givenValidRepIdAndEmptyOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
-        outcomeList.add(
-                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any())).thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepIdAndOutcomeIsAquitted_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
-        outcomeList.add(
-                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.AQUITTED.getCode()));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any())).thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepIdAndCaseTypeDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.APPEAL_CC, RORS_STATUS);
-
-        assertThat(hasApplicationStatusChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepIdAndRorsStatusMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
-
-        assertThat(hasApplicationStatusChanged).isFalse();
+    private static Stream<Arguments> ccOutcomeScenarios() {
+        return Stream.of(
+                // --- Empty outcome lists ---
+                Arguments.of(List.of(), false),
+                Arguments.of(Collections.emptyList(), false),
+                // --- Lowest ID has a null outcome ---
+                Arguments.of(
+                        List.of(
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null)
+                        ),
+                        false
+                ),
+                // --- Lowest ID is ACQUITTED ---
+                Arguments.of(
+                        List.of(
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.AQUITTED.getCode())
+                        ),
+                        false
+                ),
+                // --- Lowest ID has a different (non-ACQUITTED) outcome → true ---
+                Arguments.of(
+                        List.of(
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.ABANDONED.getCode())
+                        ),
+                        true
+                )
+        );
     }
 
     @Test
@@ -513,22 +486,32 @@ class ContributionServiceTest {
         assertThat(hasApplicationStatusChanged).isTrue();
     }
 
-    @Test
-    void givenInvalidRepId_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
-
-        assertThat(hasApplicationStatusChanged).isFalse();
+    @ParameterizedTest
+    @MethodSource("invalidStatusChangeScenarios")
+    void givenVariousInputs_whenHasApplicationStatusChangedIsInvoked_thenReturnsFalse(
+            RepOrderDTO repOrderDTO,
+            CaseType caseType,
+            String status
+    ) {
+        boolean result = contributionService.hasApplicationStatusChanged(repOrderDTO, caseType, status);
+        assertThat(result).isFalse();
     }
 
-    @Test
-    void givenValidRepIdAndRorsStatusIsNull_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.setRorsStatus(null);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
+    private static Stream<Arguments> invalidStatusChangeScenarios() {
+        return Stream.of(
+                // repOrderDTO has matching RORS status → false
+                Arguments.of(getRepOrderDTO(REP_ID), CaseType.INDICTABLE, RORS_STATUS),
+                // repOrderDTO has null RORS status → false
+                Arguments.of(withNullRorsStatus(getRepOrderDTO(REP_ID)), CaseType.INDICTABLE, RORS_STATUS),
+                // caseType not INDICTABLE → false
+                Arguments.of(getRepOrderDTO(REP_ID), CaseType.EITHER_WAY, RORS_STATUS),
+                // repOrderDTO is null → false
+                Arguments.of(null, CaseType.INDICTABLE, RORS_STATUS)
+        );
+    }
 
-        assertThat(hasApplicationStatusChanged).isFalse();
+    private static RepOrderDTO withNullRorsStatus(RepOrderDTO dto) {
+        dto.setRorsStatus(null);
+        return dto;
     }
 }
