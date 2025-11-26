@@ -170,17 +170,12 @@ public class ContributionService {
     }
 
     public boolean hasCCOutcomeChanged(final int repId) {
-        List<RepOrderCCOutcomeDTO> outcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId);
-        if (!outcomeList.isEmpty()) {
-            Optional<RepOrderCCOutcomeDTO> outcome =
-                    outcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
-            return outcome.isPresent()
-                    && outcome.get().getOutcome() != null
-                    && !CrownCourtOutcome.AQUITTED
-                            .getCode()
-                            .equals(outcome.get().getOutcome());
-        }
-        return false;
+        return maatCourtDataService.getRepOrderCCOutcomeByRepId(repId)
+                .stream()
+                .min(Comparator.comparing(RepOrderCCOutcomeDTO::getId))
+                .map(outcome -> outcome.getOutcome() != null
+                        && !CrownCourtOutcome.AQUITTED.getCode().equals(outcome.getOutcome()))
+                .orElse(false);
     }
 
     public boolean hasApplicationStatusChanged(RepOrderDTO repOrderDTO, CaseType caseType, String status) {
