@@ -6,21 +6,18 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.FAIL;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.FAILPORT;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.HARDSHIP_APPLICATION;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.INEL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.INIT;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.NONE;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.PASSPORT;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.TEMP;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
 
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentResults;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
@@ -77,74 +74,188 @@ class ContributionServiceTest {
 
     private static Stream<Arguments> getAssessmentRequestForMeansResult() {
         return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, FULL, INEL, PASS), INEL),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), INIT.concat(PASS)),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null, null, null, PASS), NONE),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, PASS, PASS, FULL, PASS), PASSPORT),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, FAIL, PASS, FULL, PASS), FAILPORT),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, PASS, PASS, PASS),
-                        PASS),
+                        AssessmentResults.builder()
+                                .passportResult("")
+                                .initResult(PASS)
+                                .fullResult(PASS)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.PASS),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, PASS, PASS),
-                        PASS),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FULL)
+                                .fullResult(INEL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.INEL),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, PASS),
-                        PASS),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FULL)
+                                .fullResult(PASS)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.PASS),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, FAIL),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, null),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(PASS)
+                                .fullResult(null)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.INIT_PASS),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FULL, FAIL, FAIL),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(null)
+                                .fullResult(null)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.NONE),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FULL, FAIL, null),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult("")
+                                .fullResult(null)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.NONE),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS,
-                                PASS,
-                                TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                HARDSHIP_APPLICATION,
-                                FAIL,
-                                FAIL),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(PASS)
+                                .fullResult("")
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.INIT_PASS),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS,
-                                PASS,
-                                TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                HARDSHIP_APPLICATION,
-                                FAIL,
-                                null),
-                        FAIL));
+                        AssessmentResults.builder()
+                                .passportResult(PASS)
+                                .initResult(FULL)
+                                .fullResult(PASS)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASSPORT),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL)
+                                .initResult(FULL)
+                                .fullResult(PASS)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.FAILPORT),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult("FAIL CONTINUE")
+                                .initResult(PASS)
+                                .fullResult(PASS)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASS),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult("FAIL CONTINUE")
+                                .initResult(FAIL)
+                                .fullResult(null)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASS),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult("FAIL CONTINUE")
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASS),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult("FAIL CONTINUE")
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(FAIL)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult("FAIL CONTINUE")
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult("FAIL CONTINUE")
+                                .initResult(HARDSHIP_APPLICATION)
+                                .fullResult(FAIL)
+                                .hardshipResult(FAIL)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult("FAIL CONTINUE")
+                                .initResult(HARDSHIP_APPLICATION)
+                                .fullResult(FAIL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.FAIL));
     }
 
     private static Stream<Arguments> getAssessmentRequestForNullMeansResult() {
         return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, FAIL, FAIL)),
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS,
-                        PASS,
-                        TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        HARDSHIP_APPLICATION,
-                        FAIL,
-                        TEMP)),
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, INIT, INIT)),
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, INIT, null)));
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult("INVALID")
+                        .fullResult(null)
+                        .hardshipResult(PASS)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult("INVALID")
+                        .fullResult("")
+                        .hardshipResult(PASS)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(null)
+                        .fullResult("INVALID")
+                        .hardshipResult(PASS)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult("FAIL CONTINUE")
+                        .initResult(INIT)
+                        .fullResult(FAIL)
+                        .hardshipResult(FAIL)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult("FAIL CONTINUE")
+                        .initResult(HARDSHIP_APPLICATION)
+                        .fullResult(FAIL)
+                        .hardshipResult(TEMP)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult("FAIL CONTINUE")
+                        .initResult(INIT)
+                        .fullResult(INIT)
+                        .hardshipResult(INIT)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult("FAIL CONTINUE")
+                        .initResult(INIT)
+                        .fullResult(INIT)
+                        .hardshipResult(null)
+                        .build()));
     }
 
     private static Stream<Arguments> inValidContributionRequest() {
@@ -298,15 +409,14 @@ class ContributionServiceTest {
     @ParameterizedTest()
     @MethodSource("getAssessmentRequestForMeansResult")
     void givenAValidAssessmentRequest_whenGetMeansAssessmentResultIsInvoked_thenReturnCorrectMeansResultResponse(
-            AssessmentRequestDTO request, String expectedResult) {
-        MeansAssessmentResult result = contributionService.getMeansAssessmentResult(request);
-        assertThat(result.getResult()).isEqualTo(expectedResult);
+            AssessmentResults results, MeansAssessmentResult expected) {
+        assertThat(contributionService.getMeansAssessmentResult(results)).isEqualTo(expected);
     }
 
     @ParameterizedTest()
     @MethodSource("getAssessmentRequestForNullMeansResult")
     void givenAValidAssessmentRequest_whenGetMeansAssessmentResultIsInvoked_thenReturnEmptyMeansResult(
-            AssessmentRequestDTO request) {
+            AssessmentResults request) {
         MeansAssessmentResult result = contributionService.getMeansAssessmentResult(request);
         assertThat(result).isNull();
     }

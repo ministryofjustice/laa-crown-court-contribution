@@ -6,10 +6,9 @@ import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentResults;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.FinancialAssessmentDTO;
@@ -63,37 +62,37 @@ public class ContributionService {
                 : financialAssessments.get(0).getInitResult();
     }
 
-    public MeansAssessmentResult getMeansAssessmentResult(final AssessmentRequestDTO request) {
-        if (StringUtils.isNotBlank(request.getPassportResult())) {
-            if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
+    public MeansAssessmentResult getMeansAssessmentResult(final AssessmentResults results) {
+        if (StringUtils.isNotBlank(results.passportResult())) {
+            if (Set.of(PASS, Constants.TEMP).contains(results.passportResult())) {
                 return MeansAssessmentResult.PASSPORT;
-            } else if (FAIL.equals(request.getPassportResult())) {
+            } else if (FAIL.equals(results.passportResult())) {
                 return MeansAssessmentResult.FAILPORT;
-            } else if (PASS.equals(request.getInitResult())
-                    || PASS.equals(request.getFullResult())
-                    || PASS.equals(request.getHardshipResult())) {
+            } else if (PASS.equals(results.initResult())
+                    || PASS.equals(results.fullResult())
+                    || PASS.equals(results.hardshipResult())) {
                 return MeansAssessmentResult.PASS;
             } else if (Set.of(FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION)
-                            .contains(request.getInitResult())
-                    && (FAIL.equals(request.getFullResult()))
-                    && (FAIL.equals(ofNullable(request.getHardshipResult()).orElse(FAIL)))) {
+                            .contains(results.initResult())
+                    && (FAIL.equals(results.fullResult()))
+                    && (FAIL.equals(ofNullable(results.hardshipResult()).orElse(FAIL)))) {
                 return MeansAssessmentResult.FAIL;
             }
             return null;
         }
 
-        if (StringUtils.isBlank(request.getFullResult())) {
-            if (StringUtils.isBlank(request.getInitResult())) {
+        if (StringUtils.isBlank(results.fullResult())) {
+            if (StringUtils.isBlank(results.initResult())) {
                 return MeansAssessmentResult.NONE;
             }
-            return switch (request.getInitResult()) {
+            return switch (results.initResult()) {
                 case Constants.PASS -> MeansAssessmentResult.INIT_PASS;
                 case Constants.FAIL -> MeansAssessmentResult.INIT_FAIL;
                 default -> null;
             };
         }
 
-        return switch (request.getFullResult()) {
+        return switch (results.fullResult()) {
             case Constants.PASS -> MeansAssessmentResult.PASS;
             case Constants.FAIL -> MeansAssessmentResult.FAIL;
             case Constants.INEL -> MeansAssessmentResult.INEL;
@@ -104,14 +103,19 @@ public class ContributionService {
     @Transactional
     public ContributionResponseDTO checkContributionsCondition(ContributionRequestDTO request) {
 
-        AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
+        AssessmentResults results = AssessmentResults.builder()
+                .passportResult(request.getPassportResult())
+                .initResult(request.getInitResult())
+                .fullResult(request.getFullResult())
+                .hardshipResult(request.getHardshipResult())
+                .build();
 
         ContributionResponseDTO contributionResponse = ContributionResponseDTO.builder()
                 .doContribs(Constants.N)
                 .calcContribs(Constants.N)
                 .build();
 
-        MeansAssessmentResult result = getMeansAssessmentResult(assessmentRequestDTO);
+        MeansAssessmentResult result = getMeansAssessmentResult(results);
         request.setIojResult(ofNullable(request.getDecisionResult()).orElse(request.getIojResult()));
         request.setMeansResult(result.getResult());
 
