@@ -52,10 +52,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionServiceTest {
+
     private static final String CONTRIBUTION_NO = "N";
     private static final String CONTRIBUTION_YES = "Y";
     private static final String RORS_STATUS = "rors-status";
     private static final String RORS_STATUS_CURR = "CURR";
+    public static final String FAIL_CONTINUE = "FAIL CONTINUE";
+    public static final String INVALID = "INVALID";
 
     @InjectSoftAssertions
     private SoftAssertions softly;
@@ -156,7 +159,7 @@ class ContributionServiceTest {
                         MeansAssessmentResult.FAILPORT),
                 Arguments.of(
                         AssessmentResults.builder()
-                                .passportResult("FAIL CONTINUE")
+                                .passportResult(FAIL_CONTINUE)
                                 .initResult(PASS)
                                 .fullResult(PASS)
                                 .hardshipResult(PASS)
@@ -164,7 +167,7 @@ class ContributionServiceTest {
                         MeansAssessmentResult.PASS),
                 Arguments.of(
                         AssessmentResults.builder()
-                                .passportResult("FAIL CONTINUE")
+                                .passportResult(FAIL_CONTINUE)
                                 .initResult(FAIL)
                                 .fullResult(null)
                                 .hardshipResult(PASS)
@@ -172,7 +175,7 @@ class ContributionServiceTest {
                         MeansAssessmentResult.PASS),
                 Arguments.of(
                         AssessmentResults.builder()
-                                .passportResult("FAIL CONTINUE")
+                                .passportResult(FAIL_CONTINUE)
                                 .initResult(FULL)
                                 .fullResult(FAIL)
                                 .hardshipResult(PASS)
@@ -180,7 +183,7 @@ class ContributionServiceTest {
                         MeansAssessmentResult.PASS),
                 Arguments.of(
                         AssessmentResults.builder()
-                                .passportResult("FAIL CONTINUE")
+                                .passportResult(FAIL_CONTINUE)
                                 .initResult(FULL)
                                 .fullResult(FAIL)
                                 .hardshipResult(FAIL)
@@ -188,7 +191,7 @@ class ContributionServiceTest {
                         MeansAssessmentResult.FAIL),
                 Arguments.of(
                         AssessmentResults.builder()
-                                .passportResult("FAIL CONTINUE")
+                                .passportResult(FAIL_CONTINUE)
                                 .initResult(FULL)
                                 .fullResult(FAIL)
                                 .hardshipResult(null)
@@ -196,7 +199,7 @@ class ContributionServiceTest {
                         MeansAssessmentResult.FAIL),
                 Arguments.of(
                         AssessmentResults.builder()
-                                .passportResult("FAIL CONTINUE")
+                                .passportResult(FAIL_CONTINUE)
                                 .initResult(HARDSHIP_APPLICATION)
                                 .fullResult(FAIL)
                                 .hardshipResult(FAIL)
@@ -204,7 +207,7 @@ class ContributionServiceTest {
                         MeansAssessmentResult.FAIL),
                 Arguments.of(
                         AssessmentResults.builder()
-                                .passportResult("FAIL CONTINUE")
+                                .passportResult(FAIL_CONTINUE)
                                 .initResult(HARDSHIP_APPLICATION)
                                 .fullResult(FAIL)
                                 .hardshipResult(null)
@@ -216,42 +219,42 @@ class ContributionServiceTest {
         return Stream.of(
                 Arguments.of(AssessmentResults.builder()
                         .passportResult(null)
-                        .initResult("INVALID")
+                        .initResult(INVALID)
                         .fullResult(null)
                         .hardshipResult(PASS)
                         .build()),
                 Arguments.of(AssessmentResults.builder()
                         .passportResult(null)
-                        .initResult("INVALID")
+                        .initResult(INVALID)
                         .fullResult("")
                         .hardshipResult(PASS)
                         .build()),
                 Arguments.of(AssessmentResults.builder()
                         .passportResult(null)
                         .initResult(null)
-                        .fullResult("INVALID")
+                        .fullResult(INVALID)
                         .hardshipResult(PASS)
                         .build()),
                 Arguments.of(AssessmentResults.builder()
-                        .passportResult("FAIL CONTINUE")
+                        .passportResult(FAIL_CONTINUE)
                         .initResult(INIT)
                         .fullResult(FAIL)
                         .hardshipResult(FAIL)
                         .build()),
                 Arguments.of(AssessmentResults.builder()
-                        .passportResult("FAIL CONTINUE")
+                        .passportResult(FAIL_CONTINUE)
                         .initResult(HARDSHIP_APPLICATION)
                         .fullResult(FAIL)
                         .hardshipResult(TEMP)
                         .build()),
                 Arguments.of(AssessmentResults.builder()
-                        .passportResult("FAIL CONTINUE")
+                        .passportResult(FAIL_CONTINUE)
                         .initResult(INIT)
                         .fullResult(INIT)
                         .hardshipResult(INIT)
                         .build()),
                 Arguments.of(AssessmentResults.builder()
-                        .passportResult("FAIL CONTINUE")
+                        .passportResult(FAIL_CONTINUE)
                         .initResult(INIT)
                         .fullResult(INIT)
                         .hardshipResult(null)
