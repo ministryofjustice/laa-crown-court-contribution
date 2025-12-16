@@ -53,12 +53,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionServiceTest {
 
-    private static final String CONTRIBUTION_NO = "N";
-    private static final String CONTRIBUTION_YES = "Y";
-    private static final String RORS_STATUS = "rors-status";
-    private static final String RORS_STATUS_CURR = "CURR";
-    public static final String FAIL_CONTINUE = "FAIL CONTINUE";
     public static final String INVALID = "INVALID";
+    private static final String CONTRIBUTION_YES = "Y";
+    private static final String CURR_RORS_STATUS = "CURR";
+    public static final String FAIL_CONTINUE = "FAIL CONTINUE";
 
     @InjectSoftAssertions
     private SoftAssertions softly;
@@ -289,7 +287,7 @@ class ContributionServiceTest {
                         FULL,
                         PASS,
                         BigDecimal.ZERO,
-                        CONTRIBUTION_NO,
+                        "N",
                         PASS)));
     }
 
@@ -588,9 +586,9 @@ class ContributionServiceTest {
     @Test
     void givenValidRepIdAndRorsStatusDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenTrueIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.setRorsStatus(RORS_STATUS_CURR);
+        repOrderDTO.setRorsStatus("EXAMPLE_STATUS");
         boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
+                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, CURR_RORS_STATUS);
 
         assertThat(hasApplicationStatusChanged).isTrue();
     }
@@ -606,17 +604,15 @@ class ContributionServiceTest {
     private static Stream<Arguments> invalidStatusChangeScenarios() {
         return Stream.of(
                 // repOrderDTO has matching RORS status → false
-                Arguments.of(getRepOrderDTO(REP_ID), CaseType.INDICTABLE, RORS_STATUS),
+                Arguments.of(
+                        RepOrderDTO.builder().rorsStatus(CURR_RORS_STATUS).build(),
+                        CaseType.INDICTABLE,
+                        CURR_RORS_STATUS),
                 // repOrderDTO has null RORS status → false
-                Arguments.of(withNullRorsStatus(getRepOrderDTO(REP_ID)), CaseType.INDICTABLE, RORS_STATUS),
+                Arguments.of(RepOrderDTO.builder().build(), CaseType.INDICTABLE, CURR_RORS_STATUS),
                 // caseType not INDICTABLE → false
-                Arguments.of(getRepOrderDTO(REP_ID), CaseType.EITHER_WAY, RORS_STATUS),
+                Arguments.of(RepOrderDTO.builder().rorsStatus("SUSPENDED").build(), CaseType.EITHER_WAY, "SUSPENDED"),
                 // repOrderDTO is null → false
-                Arguments.of(null, CaseType.INDICTABLE, RORS_STATUS));
-    }
-
-    private static RepOrderDTO withNullRorsStatus(RepOrderDTO dto) {
-        dto.setRorsStatus(null);
-        return dto;
+                Arguments.of(null, CaseType.INDICTABLE, "SUSPENDED"));
     }
 }
