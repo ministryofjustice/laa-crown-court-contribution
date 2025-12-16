@@ -77,6 +77,22 @@ class ContributionServiceTest {
         return Stream.of(
                 Arguments.of(
                         AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FAIL)
+                                .fullResult(null)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.INIT_FAIL),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(TEMP)
+                                .initResult(null)
+                                .fullResult(null)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.PASSPORT),
+                Arguments.of(
+                        AssessmentResults.builder()
                                 .passportResult("")
                                 .initResult(PASS)
                                 .fullResult(PASS)
@@ -215,6 +231,18 @@ class ContributionServiceTest {
 
     private static Stream<Arguments> getAssessmentRequestForNullMeansResult() {
         return Stream.of(
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(PASS)
+                        .fullResult(INIT)
+                        .hardshipResult(null)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(PASS)
+                        .fullResult(TEMP)
+                        .hardshipResult(null)
+                        .build()),
                 Arguments.of(AssessmentResults.builder()
                         .passportResult(null)
                         .initResult(INVALID)
