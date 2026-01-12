@@ -1,15 +1,14 @@
 package uk.gov.justice.laa.crime.contribution.service;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.FAIL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.contribution.builder.AssessmentRequestDTOBuilder;
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.common.Constants;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentResults;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.FinancialAssessmentDTO;
@@ -18,6 +17,7 @@ import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.projection.CorrespondenceRuleAndTemplateInfo;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.MeansAssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
@@ -27,10 +27,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,52 +62,62 @@ public class ContributionService {
                 : financialAssessments.get(0).getInitResult();
     }
 
-    public AssessmentResponseDTO getAssessmentResult(final AssessmentRequestDTO request) {
-        AssessmentResponseDTO response = new AssessmentResponseDTO();
-        response.setIojResult(ofNullable(request.getDecisionResult()).orElse(request.getIojResult()));
-
-        if (StringUtils.isNotBlank(request.getPassportResult())) {
-            if (Set.of(PASS, Constants.TEMP).contains(request.getPassportResult())) {
-                response.setMeansResult(Constants.PASSPORT);
-            } else if (Constants.FAIL.equals(request.getPassportResult())) {
-                response.setMeansResult(Constants.FAILPORT);
-            } else if (PASS.equals(request.getInitResult())
-                    || PASS.equals(request.getFullResult())
-                    || PASS.equals(request.getHardshipResult())) {
-                response.setMeansResult(PASS);
-            } else if (Set.of(Constants.FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION)
-                            .contains(request.getInitResult())
-                    && (Constants.FAIL.equals(request.getFullResult()))
-                    && (Constants.FAIL.equals(
-                            ofNullable(request.getHardshipResult()).orElse(Constants.FAIL)))) {
-                response.setMeansResult(Constants.FAIL);
+    public MeansAssessmentResult getMeansAssessmentResult(final AssessmentResults results) {
+        if (StringUtils.isNotBlank(results.passportResult())) {
+            if (Set.of(PASS, Constants.TEMP).contains(results.passportResult())) {
+                return MeansAssessmentResult.PASSPORT;
+            } else if (FAIL.equals(results.passportResult())) {
+                return MeansAssessmentResult.FAILPORT;
+            } else if (PASS.equals(results.initResult())
+                    || PASS.equals(results.fullResult())
+                    || PASS.equals(results.hardshipResult())) {
+                return MeansAssessmentResult.PASS;
+            } else if (Set.of(FAIL, Constants.FULL, Constants.HARDSHIP_APPLICATION)
+                            .contains(results.initResult())
+                    && (FAIL.equals(results.fullResult()))
+                    && (FAIL.equals(ofNullable(results.hardshipResult()).orElse(FAIL)))) {
+                return MeansAssessmentResult.FAIL;
             }
-        } else {
-            if (StringUtils.isBlank(request.getFullResult())) {
-                response.setMeansResult(
-                        StringUtils.isBlank(request.getInitResult())
-                                ? Constants.NONE
-                                : Constants.INIT.concat(request.getInitResult()));
-            } else {
-                response.setMeansResult(request.getFullResult());
-            }
+            return null;
         }
-        return response;
+
+        if (StringUtils.isBlank(results.fullResult())) {
+            if (StringUtils.isBlank(results.initResult())) {
+                return MeansAssessmentResult.NONE;
+            }
+            return switch (results.initResult()) {
+                case Constants.PASS -> MeansAssessmentResult.INIT_PASS;
+                case Constants.FAIL -> MeansAssessmentResult.INIT_FAIL;
+                default -> null;
+            };
+        }
+
+        return switch (results.fullResult()) {
+            case Constants.PASS -> MeansAssessmentResult.PASS;
+            case Constants.FAIL -> MeansAssessmentResult.FAIL;
+            case Constants.INEL -> MeansAssessmentResult.INEL;
+            default -> null;
+        };
     }
 
     @Transactional
     public ContributionResponseDTO checkContributionsCondition(ContributionRequestDTO request) {
 
-        AssessmentRequestDTO assessmentRequestDTO = AssessmentRequestDTOBuilder.build(request);
+        AssessmentResults results = AssessmentResults.builder()
+                .passportResult(request.getPassportResult())
+                .initResult(request.getInitResult())
+                .fullResult(request.getFullResult())
+                .hardshipResult(request.getHardshipResult())
+                .build();
 
         ContributionResponseDTO contributionResponse = ContributionResponseDTO.builder()
                 .doContribs(Constants.N)
                 .calcContribs(Constants.N)
                 .build();
 
-        AssessmentResponseDTO assessmentResponseDTO = getAssessmentResult(assessmentRequestDTO);
-        request.setIojResult(assessmentResponseDTO.getIojResult());
-        request.setMeansResult(assessmentResponseDTO.getMeansResult());
+        MeansAssessmentResult result = getMeansAssessmentResult(results);
+        request.setIojResult(ofNullable(request.getDecisionResult()).orElse(request.getIojResult()));
+        request.setMeansResult(result.getResult());
 
         if (Set.of(CaseType.INDICTABLE, CaseType.EITHER_WAY, CaseType.CC_ALREADY)
                         .contains(request.getCaseType())
@@ -140,7 +148,6 @@ public class ContributionService {
         return contributionResponse;
     }
 
-    @Transactional
     public CorrespondenceRuleAndTemplateInfo getCoteInfo(ContributionRequestDTO contributionRequestDTO) {
         return correspondenceRuleRepository
                 .getCoteInfo(
@@ -163,21 +170,14 @@ public class ContributionService {
     }
 
     public boolean hasCCOutcomeChanged(final int repId) {
-        List<RepOrderCCOutcomeDTO> repOrderCCOutcomeList = maatCourtDataService.getRepOrderCCOutcomeByRepId(repId);
-        if (CollectionUtils.isNotEmpty(repOrderCCOutcomeList)) {
-            Optional<RepOrderCCOutcomeDTO> outcomeDTO =
-                    repOrderCCOutcomeList.stream().min(Comparator.comparing(RepOrderCCOutcomeDTO::getId));
-            return outcomeDTO.isPresent()
-                    && outcomeDTO.get().getOutcome() != null
-                    && !CrownCourtOutcome.AQUITTED
-                            .getCode()
-                            .equals(outcomeDTO.get().getOutcome());
-        }
-        return false;
+        return maatCourtDataService.getRepOrderCCOutcomeByRepId(repId).stream()
+                .min(Comparator.comparing(RepOrderCCOutcomeDTO::getId))
+                .map(outcome -> outcome.getOutcome() != null
+                        && !CrownCourtOutcome.AQUITTED.getCode().equals(outcome.getOutcome()))
+                .orElse(false);
     }
 
     public boolean hasApplicationStatusChanged(RepOrderDTO repOrderDTO, CaseType caseType, String status) {
-        log.info("Get applicant details from Crime Apply datastore");
         return CaseType.INDICTABLE.equals(caseType)
                 && repOrderDTO != null
                 && repOrderDTO.getRorsStatus() != null

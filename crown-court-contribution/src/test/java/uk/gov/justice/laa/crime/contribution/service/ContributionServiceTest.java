@@ -6,26 +6,24 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.FAIL;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.FAILPORT;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.FULL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.HARDSHIP_APPLICATION;
+import static uk.gov.justice.laa.crime.contribution.common.Constants.INEL;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.INIT;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.NONE;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.PASS;
-import static uk.gov.justice.laa.crime.contribution.common.Constants.PASSPORT;
 import static uk.gov.justice.laa.crime.contribution.common.Constants.TEMP;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.REP_ID;
 import static uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder.getRepOrderDTO;
 
 import uk.gov.justice.laa.crime.contribution.builder.ContributionResponseDTOMapper;
 import uk.gov.justice.laa.crime.contribution.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentRequestDTO;
-import uk.gov.justice.laa.crime.contribution.dto.AssessmentResponseDTO;
+import uk.gov.justice.laa.crime.contribution.dto.AssessmentResults;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.repository.CorrespondenceRuleRepository;
+import uk.gov.justice.laa.crime.contribution.staticdata.enums.MeansAssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
@@ -54,10 +52,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionServiceTest {
-    private static final String CONTRIBUTION_NO = "N";
+
+    public static final String INVALID = "INVALID";
     private static final String CONTRIBUTION_YES = "Y";
-    private static final String RORS_STATUS = "rors-status";
-    private static final String RORS_STATUS_CURR = "CURR";
+    private static final String CURR_RORS_STATUS = "CURR";
+    public static final String FAIL_CONTINUE = "FAIL CONTINUE";
 
     @InjectSoftAssertions
     private SoftAssertions softly;
@@ -74,82 +73,218 @@ class ContributionServiceTest {
     @Mock
     private ContributionResponseDTOMapper contributionResponseDTOMapper;
 
-    private static Stream<Arguments> getAssessmentRequestForIojResult() {
-        return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, PASS, FULL, PASS), PASS),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), PASS));
-    }
-
     private static Stream<Arguments> getAssessmentRequestForMeansResult() {
         return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, null, PASS, FULL, PASS), FULL),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null, PASS, null, PASS), INIT.concat(PASS)),
-                Arguments.of(new AssessmentRequestDTO(PASS, null, null, null, null, PASS), NONE),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, PASS, PASS, FULL, PASS), PASSPORT),
-                Arguments.of(new AssessmentRequestDTO(PASS, PASS, FAIL, PASS, FULL, PASS), FAILPORT),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, PASS, PASS, PASS),
-                        PASS),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FAIL)
+                                .fullResult(null)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.INIT_FAIL),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, PASS, PASS),
-                        PASS),
+                        AssessmentResults.builder()
+                                .passportResult(TEMP)
+                                .initResult(null)
+                                .fullResult(null)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.PASSPORT),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, PASS),
-                        PASS),
+                        AssessmentResults.builder()
+                                .passportResult("")
+                                .initResult(PASS)
+                                .fullResult(PASS)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.PASS),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, FAIL),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FULL)
+                                .fullResult(INEL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.INEL),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FAIL, FAIL, null),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FULL)
+                                .fullResult(PASS)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.PASS),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FULL, FAIL, FAIL),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, FULL, FAIL, null),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(PASS)
+                                .fullResult(null)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.INIT_PASS),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS,
-                                PASS,
-                                TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                HARDSHIP_APPLICATION,
-                                FAIL,
-                                FAIL),
-                        FAIL),
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(null)
+                                .fullResult(null)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.NONE),
                 Arguments.of(
-                        new AssessmentRequestDTO(
-                                PASS,
-                                PASS,
-                                TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                                HARDSHIP_APPLICATION,
-                                FAIL,
-                                null),
-                        FAIL));
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult("")
+                                .fullResult(null)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.NONE),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(null)
+                                .initResult(PASS)
+                                .fullResult("")
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.INIT_PASS),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(PASS)
+                                .initResult(FULL)
+                                .fullResult(PASS)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASSPORT),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL)
+                                .initResult(FULL)
+                                .fullResult(PASS)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.FAILPORT),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL_CONTINUE)
+                                .initResult(PASS)
+                                .fullResult(PASS)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASS),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL_CONTINUE)
+                                .initResult(FAIL)
+                                .fullResult(null)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASS),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL_CONTINUE)
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(PASS)
+                                .build(),
+                        MeansAssessmentResult.PASS),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL_CONTINUE)
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(FAIL)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL_CONTINUE)
+                                .initResult(FULL)
+                                .fullResult(FAIL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL_CONTINUE)
+                                .initResult(HARDSHIP_APPLICATION)
+                                .fullResult(FAIL)
+                                .hardshipResult(FAIL)
+                                .build(),
+                        MeansAssessmentResult.FAIL),
+                Arguments.of(
+                        AssessmentResults.builder()
+                                .passportResult(FAIL_CONTINUE)
+                                .initResult(HARDSHIP_APPLICATION)
+                                .fullResult(FAIL)
+                                .hardshipResult(null)
+                                .build(),
+                        MeansAssessmentResult.FAIL));
     }
 
     private static Stream<Arguments> getAssessmentRequestForNullMeansResult() {
         return Stream.of(
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, FAIL, FAIL)),
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS,
-                        PASS,
-                        TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE,
-                        HARDSHIP_APPLICATION,
-                        FAIL,
-                        TEMP)),
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, INIT, INIT)),
-                Arguments.of(new AssessmentRequestDTO(
-                        PASS, PASS, TestModelDataBuilder.PASSPORT_RESULT_FAIL_CONTINUE, INIT, INIT, null)));
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(PASS)
+                        .fullResult(INIT)
+                        .hardshipResult(null)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(PASS)
+                        .fullResult(TEMP)
+                        .hardshipResult(null)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(INVALID)
+                        .fullResult(null)
+                        .hardshipResult(PASS)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(INVALID)
+                        .fullResult("")
+                        .hardshipResult(PASS)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(null)
+                        .initResult(null)
+                        .fullResult(INVALID)
+                        .hardshipResult(PASS)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(FAIL_CONTINUE)
+                        .initResult(INIT)
+                        .fullResult(FAIL)
+                        .hardshipResult(FAIL)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(FAIL_CONTINUE)
+                        .initResult(HARDSHIP_APPLICATION)
+                        .fullResult(FAIL)
+                        .hardshipResult(TEMP)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(FAIL_CONTINUE)
+                        .initResult(INIT)
+                        .fullResult(INIT)
+                        .hardshipResult(INIT)
+                        .build()),
+                Arguments.of(AssessmentResults.builder()
+                        .passportResult(FAIL_CONTINUE)
+                        .initResult(INIT)
+                        .fullResult(INIT)
+                        .hardshipResult(null)
+                        .build()));
     }
 
     private static Stream<Arguments> inValidContributionRequest() {
@@ -180,7 +315,7 @@ class ContributionServiceTest {
                         FULL,
                         PASS,
                         BigDecimal.ZERO,
-                        CONTRIBUTION_NO,
+                        "N",
                         PASS)));
     }
 
@@ -301,33 +436,18 @@ class ContributionServiceTest {
     }
 
     @ParameterizedTest()
-    @MethodSource("getAssessmentRequestForIojResult")
-    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnCorrectIojResultResponse(
-            AssessmentRequestDTO request, String expectedResult) {
-
-        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-
-        assertThat(response.getIojResult()).isEqualTo(expectedResult);
-    }
-
-    @ParameterizedTest()
     @MethodSource("getAssessmentRequestForMeansResult")
-    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnCorrectMeansResultResponse(
-            AssessmentRequestDTO request, String expectedResult) {
-
-        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-
-        assertThat(response.getMeansResult()).isEqualTo(expectedResult);
+    void givenAValidAssessmentRequest_whenGetMeansAssessmentResultIsInvoked_thenReturnCorrectMeansResultResponse(
+            AssessmentResults results, MeansAssessmentResult expected) {
+        assertThat(contributionService.getMeansAssessmentResult(results)).isEqualTo(expected);
     }
 
     @ParameterizedTest()
     @MethodSource("getAssessmentRequestForNullMeansResult")
-    void givenAValidAssessmentRequest_whenGetAssessmentResultIsInvoked_thenReturnEmptyMeansResult(
-            AssessmentRequestDTO request) {
-
-        AssessmentResponseDTO response = contributionService.getAssessmentResult(request);
-
-        assertThat(response.getMeansResult()).isNull();
+    void givenAValidAssessmentRequest_whenGetMeansAssessmentResultIsInvoked_thenReturnEmptyMeansResult(
+            AssessmentResults request) {
+        MeansAssessmentResult result = contributionService.getMeansAssessmentResult(request);
+        assertThat(result).isNull();
     }
 
     @ParameterizedTest()
@@ -452,102 +572,75 @@ class ContributionServiceTest {
                 .isEqualTo(InitAssessmentResult.PASS.getResult());
     }
 
-    @Test
-    void givenValidRepIdAndNullCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID)).thenReturn(null);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
+    @ParameterizedTest
+    @MethodSource("ccOutcomeScenarios")
+    void givenVariousOutcomes_whenHasCCOutcomeChangedIsInvoked_thenResultMatchesExpectation(
+            List<RepOrderCCOutcomeDTO> outcomes, boolean expected) {
+        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID)).thenReturn(outcomes);
+        boolean result = contributionService.hasCCOutcomeChanged(REP_ID);
+        assertThat(result).isEqualTo(expected);
     }
 
-    @Test
-    void givenValidRepIdAndEmptyCCOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(REP_ID)).thenReturn(Collections.emptyList());
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepId_whenHasCCOutcomeChangedIsInvoked_thenTrueIsReturn() {
-        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
-        outcomeList.add(
-                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.ABANDONED.getCode()));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any())).thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isTrue();
-    }
-
-    @Test
-    void givenValidRepIdAndEmptyOutcome_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
-        outcomeList.add(
-                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any())).thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepIdAndOutcomeIsAquitted_whenHasCCOutcomeChangedIsInvoked_thenFalseIsReturn() {
-        List<RepOrderCCOutcomeDTO> outcomeList = new ArrayList<>();
-        outcomeList.add(
-                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12346, CrownCourtOutcome.PART_CONVICTED.getCode()));
-        outcomeList.add(TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, CrownCourtOutcome.AQUITTED.getCode()));
-        when(maatCourtDataService.getRepOrderCCOutcomeByRepId(any())).thenReturn(outcomeList);
-        boolean hasCCOutcomeChanged = contributionService.hasCCOutcomeChanged(REP_ID);
-
-        assertThat(hasCCOutcomeChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepIdAndCaseTypeDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.APPEAL_CC, RORS_STATUS);
-
-        assertThat(hasApplicationStatusChanged).isFalse();
-    }
-
-    @Test
-    void givenValidRepIdAndRorsStatusMatch_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
-
-        assertThat(hasApplicationStatusChanged).isFalse();
+    private static Stream<Arguments> ccOutcomeScenarios() {
+        return Stream.of(
+                // --- Empty outcome lists ---
+                Arguments.of(List.of(), false),
+                Arguments.of(Collections.emptyList(), false),
+                // --- Lowest ID has a null outcome ---
+                Arguments.of(
+                        List.of(
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(12345, null)),
+                        false),
+                // --- Lowest ID is ACQUITTED ---
+                Arguments.of(
+                        List.of(
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12345, CrownCourtOutcome.AQUITTED.getCode())),
+                        false),
+                // --- Lowest ID has a different (non-ACQUITTED) outcome → true ---
+                Arguments.of(
+                        List.of(
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12346, CrownCourtOutcome.PART_CONVICTED.getCode()),
+                                TestModelDataBuilder.getRepOrderCCOutcomeDTO(
+                                        12345, CrownCourtOutcome.ABANDONED.getCode())),
+                        true));
     }
 
     @Test
     void givenValidRepIdAndRorsStatusDoNotMatch_whenHasApplicationStatusChangedIsInvoked_thenTrueIsReturn() {
         RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.setRorsStatus(RORS_STATUS_CURR);
+        repOrderDTO.setRorsStatus("EXAMPLE_STATUS");
         boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
+                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, CURR_RORS_STATUS);
 
         assertThat(hasApplicationStatusChanged).isTrue();
     }
 
-    @Test
-    void givenInvalidRepId_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
-
-        assertThat(hasApplicationStatusChanged).isFalse();
+    @ParameterizedTest
+    @MethodSource("invalidStatusChangeScenarios")
+    void givenVariousInputs_whenHasApplicationStatusChangedIsInvoked_thenReturnsFalse(
+            RepOrderDTO repOrderDTO, CaseType caseType, String status) {
+        boolean result = contributionService.hasApplicationStatusChanged(repOrderDTO, caseType, status);
+        assertThat(result).isFalse();
     }
 
-    @Test
-    void givenValidRepIdAndRorsStatusIsNull_whenHasApplicationStatusChangedIsInvoked_thenFalseIsReturn() {
-        RepOrderDTO repOrderDTO = getRepOrderDTO(REP_ID);
-        repOrderDTO.setRorsStatus(null);
-        boolean hasApplicationStatusChanged =
-                contributionService.hasApplicationStatusChanged(repOrderDTO, CaseType.INDICTABLE, RORS_STATUS);
-
-        assertThat(hasApplicationStatusChanged).isFalse();
+    private static Stream<Arguments> invalidStatusChangeScenarios() {
+        return Stream.of(
+                // repOrderDTO has matching RORS status → false
+                Arguments.of(
+                        RepOrderDTO.builder().rorsStatus(CURR_RORS_STATUS).build(),
+                        CaseType.INDICTABLE,
+                        CURR_RORS_STATUS),
+                // repOrderDTO has null RORS status → false
+                Arguments.of(RepOrderDTO.builder().build(), CaseType.INDICTABLE, CURR_RORS_STATUS),
+                // caseType not INDICTABLE → false
+                Arguments.of(RepOrderDTO.builder().rorsStatus("SUSPENDED").build(), CaseType.EITHER_WAY, "SUSPENDED"),
+                // repOrderDTO is null → false
+                Arguments.of(null, CaseType.INDICTABLE, "SUSPENDED"));
     }
 }

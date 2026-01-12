@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -63,7 +62,7 @@ public class AppealContributionService {
 
             Integer repId = calculateContributionDTO.getRepId();
             List<Contribution> currentContributionList = maatCourtDataService.findContribution(repId, true);
-            if (CollectionUtils.isNotEmpty(currentContributionList)) {
+            if (!currentContributionList.isEmpty()) {
                 Contribution currentContribution = currentContributionList.getFirst();
                 if (currentContribution.getUpfrontContributions() == null
                         || currentContribution.getUpfrontContributions().compareTo(appealContributionAmount) != 0) {

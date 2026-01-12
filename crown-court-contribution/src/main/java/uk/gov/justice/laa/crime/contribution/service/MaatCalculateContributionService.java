@@ -20,7 +20,6 @@ import uk.gov.justice.laa.crime.contribution.dto.CalculateContributionDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionCalcParametersDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionRequestDTO;
 import uk.gov.justice.laa.crime.contribution.dto.ContributionResponseDTO;
-import uk.gov.justice.laa.crime.contribution.dto.ContributionsSummaryDTO;
 import uk.gov.justice.laa.crime.contribution.dto.RepOrderDTO;
 import uk.gov.justice.laa.crime.contribution.model.Contribution;
 import uk.gov.justice.laa.crime.contribution.model.ContributionResult;
@@ -163,12 +162,9 @@ public class MaatCalculateContributionService {
     }
 
     public List<ApiContributionSummary> getContributionSummaries(final int repId) {
-        List<ContributionsSummaryDTO> contributionSummaryList = maatCourtDataService.getContributionsSummary(repId);
-        return contributionSummaryList != null
-                ? contributionSummaryList.stream()
-                        .map(contributionSummaryMapper::map)
-                        .toList()
-                : List.of();
+        return maatCourtDataService.getContributionsSummary(repId).stream()
+                .map(contributionSummaryMapper::map)
+                .toList();
     }
 
     public ApiMaatCalculateContributionResponse getCalculateContributionResponse(
