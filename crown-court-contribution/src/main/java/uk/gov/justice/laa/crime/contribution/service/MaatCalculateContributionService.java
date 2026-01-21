@@ -348,6 +348,10 @@ public class MaatCalculateContributionService {
                 apiCalculateContributionResponse.getMonthlyContributions(),
                 assessmentEffectiveDate);
 
+        log.info("TEST: Monthly contributions: " + apiCalculateContributionResponse.getMonthlyContributions());
+        log.info("TEST: Upfront contributions: " + apiCalculateContributionResponse.getUpfrontContributions());
+        log.info("TEST: Uplift applied: " + apiCalculateContributionResponse.getUpliftApplied());
+        
         return ContributionResult.builder()
                 .totalMonths(totalMonths)
                 .totalAnnualDisposableIncome(annualDisposableIncome)

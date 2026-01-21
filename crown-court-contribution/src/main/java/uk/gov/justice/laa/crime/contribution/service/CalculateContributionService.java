@@ -18,6 +18,7 @@ public class CalculateContributionService {
     public ApiCalculateContributionResponse calculateContribution(ApiCalculateContributionRequest request) {
         ApiCalculateContributionResponse response = new ApiCalculateContributionResponse();
         if (Boolean.TRUE.equals(request.getUpliftApplied())) {
+            log.info("TEST: Uplift true");
             BigDecimal monthlyContributions = CalculateContributionUtil.calculateUpliftedMonthlyAmount(
                     request.getAnnualDisposableIncome(),
                     request.getUpliftedIncomePercent(),

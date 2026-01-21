@@ -54,6 +54,10 @@ public class CompareContributionService {
 
     private static boolean areContributionRecordsIdentical(
             ContributionResult contributionResult, Contribution contribution) {
+        log.info("TEST: Calling areContributionRecordsIdentical");
+        log.info("TEST: Contribution cap: " + contributionResult.contributionCap());
+        log.info("TEST: Upfront amount: " + contributionResult.upfrontAmount());
+        log.info("TEST: Monthly amount: " + contributionResult.monthlyAmount());
         return contribution.getContributionCap().compareTo(contributionResult.contributionCap()) == 0
                 && contribution.getUpfrontContributions().compareTo(contributionResult.upfrontAmount()) == 0
                 && contribution.getMonthlyContributions().compareTo(contributionResult.monthlyAmount()) == 0
