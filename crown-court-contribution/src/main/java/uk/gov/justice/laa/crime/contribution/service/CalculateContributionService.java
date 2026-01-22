@@ -23,7 +23,6 @@ public class CalculateContributionService {
                     request.getUpliftedIncomePercent(),
                     request.getMinUpliftedMonthlyAmount());
             response.setMonthlyContributions(monthlyContributions);
-            response.setUpfrontContributions(BigDecimal.ZERO);
             response.setUpliftApplied(Constants.Y);
         } else {
             BigDecimal monthlyContributions = CalculateContributionUtil.calculateMonthlyContribution(

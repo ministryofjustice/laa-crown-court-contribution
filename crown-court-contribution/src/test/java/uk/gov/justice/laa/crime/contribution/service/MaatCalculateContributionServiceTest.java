@@ -579,6 +579,7 @@ class MaatCalculateContributionServiceTest {
     void givenUpliftCoteNotNullAndUpliftAppliedIsPresent_whenCalcContributionsIsInvoked_validResponseIsReturned() {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 9, 9));
+        calculateContributionDTO.setUpfrontContributions(BigDecimal.ZERO);
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .calcContribs(Constants.N)
                 .upliftCote(1)
