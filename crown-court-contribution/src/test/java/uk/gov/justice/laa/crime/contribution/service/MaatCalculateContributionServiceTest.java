@@ -577,8 +577,10 @@ class MaatCalculateContributionServiceTest {
 
     @Test
     void givenUpliftCoteNotNullAndUpliftAppliedIsPresent_whenCalcContributionsIsInvoked_validResponseIsReturned() {
+        BigDecimal upfrontContributions = BigDecimal.valueOf(25);
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 9, 9));
+        calculateContributionDTO.setUpfrontContributions(upfrontContributions);
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .calcContribs(Constants.N)
                 .upliftCote(1)
@@ -588,7 +590,7 @@ class MaatCalculateContributionServiceTest {
                 TestModelDataBuilder.getApiMaatCalculateContributionResponse();
 
         expectedResponse.setMonthlyContributions(BigDecimal.ONE);
-        expectedResponse.setUpfrontContributions(BigDecimal.ZERO);
+        expectedResponse.setUpfrontContributions(upfrontContributions);
         expectedResponse.setUpliftApplied(Constants.Y);
 
         ContributionResult expectedResult = ContributionResult.builder()
@@ -596,7 +598,7 @@ class MaatCalculateContributionServiceTest {
                 .monthlyAmount(BigDecimal.ONE)
                 .isUplift(true)
                 .effectiveDate(COMMITTAL_DATE)
-                .upfrontAmount(BigDecimal.ZERO)
+                .upfrontAmount(upfrontContributions)
                 .totalMonths(0)
                 .build();
 
@@ -683,11 +685,13 @@ class MaatCalculateContributionServiceTest {
     @Test
     void givenUpliftIsRemovedAndAnnualDisposableIncome_whenCalcContributionsIsInvoked_validResponseIsReturned() {
         BigDecimal contributionCap = BigDecimal.valueOf(12);
+        BigDecimal upfrontContributions = BigDecimal.valueOf(5);
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getContributionDTOForCalcContribs();
         calculateContributionDTO.setDateUpliftApplied(LocalDate.of(2023, 1, 9));
         calculateContributionDTO.setDateUpliftRemoved(LocalDate.of(2023, 2, 9));
         calculateContributionDTO.setContributionCap(contributionCap);
         calculateContributionDTO.setDisposableIncomeAfterCrownHardship(BigDecimal.valueOf(20000));
+        calculateContributionDTO.setUpfrontContributions(upfrontContributions);
 
         ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
                 .calcContribs(Constants.Y)
@@ -698,7 +702,7 @@ class MaatCalculateContributionServiceTest {
                 TestModelDataBuilder.getApiMaatCalculateContributionResponse();
 
         expectedResponse.setMonthlyContributions(contributionCap);
-        expectedResponse.setUpfrontContributions(contributionCap);
+        expectedResponse.setUpfrontContributions(upfrontContributions);
         expectedResponse.setUpliftApplied(Constants.N);
         expectedResponse.setTotalMonths(2);
         expectedResponse.setContributionCap(contributionCap);
@@ -709,7 +713,7 @@ class MaatCalculateContributionServiceTest {
                 .monthlyAmount(contributionCap)
                 .isUplift(false)
                 .effectiveDate(COMMITTAL_DATE)
-                .upfrontAmount(contributionCap)
+                .upfrontAmount(upfrontContributions)
                 .contributionCap(contributionCap)
                 .basedOn("Offence Type")
                 .totalMonths(2)
@@ -732,9 +736,9 @@ class MaatCalculateContributionServiceTest {
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(TestModelDataBuilder.getCalculateContributionResponse()
-                        .withMonthlyContributions(new BigDecimal(12))
+                        .withMonthlyContributions(contributionCap)
                         .withBasedOn(Constants.OFFENCE_TYPE)
-                        .withUpfrontContributions(new BigDecimal(12)));
+                        .withUpfrontContributions(upfrontContributions));
 
         ContributionResult result = maatCalculateContributionService.calculateContributions(
                 calculateContributionDTO, contributionResponseDTO);

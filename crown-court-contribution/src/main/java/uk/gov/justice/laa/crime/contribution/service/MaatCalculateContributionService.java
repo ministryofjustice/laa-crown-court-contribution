@@ -348,11 +348,17 @@ public class MaatCalculateContributionService {
                 apiCalculateContributionResponse.getMonthlyContributions(),
                 assessmentEffectiveDate);
 
+        var upfront = apiCalculateContributionResponse.getUpfrontContributions();
+        if (apiCalculateContributionResponse.getUpliftApplied() != null
+                && apiCalculateContributionResponse.getUpliftApplied().equals(Constants.Y)) {
+            upfront = calculateContributionDTO.getUpfrontContributions();
+        }
+
         return ContributionResult.builder()
                 .totalMonths(totalMonths)
                 .totalAnnualDisposableIncome(annualDisposableIncome)
                 .monthlyAmount(apiCalculateContributionResponse.getMonthlyContributions())
-                .upfrontAmount(apiCalculateContributionResponse.getUpfrontContributions())
+                .upfrontAmount(upfront)
                 .isUplift(Constants.Y.equals(apiCalculateContributionResponse.getUpliftApplied()))
                 .basedOn(apiCalculateContributionResponse.getBasedOn())
                 .effectiveDate(DateUtil.parse(effectiveDate))
