@@ -4,6 +4,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -468,7 +472,7 @@ class MaatCalculateContributionServiceTest {
                 ContributionResponseDTO.builder().calcContribs(Constants.N).build();
 
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
-                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+                .thenReturn(mock(ApiCalculateContributionRequest.class));
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
@@ -498,7 +502,7 @@ class MaatCalculateContributionServiceTest {
         ContributionResponseDTO contributionResponseDTO =
                 ContributionResponseDTO.builder().calcContribs(Constants.N).build();
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
-                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+                .thenReturn(mock(ApiCalculateContributionRequest.class));
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
         ContributionResult result = maatCalculateContributionService.calculateContributions(
@@ -535,7 +539,7 @@ class MaatCalculateContributionServiceTest {
         ContributionResponseDTO contributionResponseDTO =
                 ContributionResponseDTO.builder().calcContribs(Constants.N).build();
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
-                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+                .thenReturn(mock(ApiCalculateContributionRequest.class));
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(
                         TestModelDataBuilder.getCalculateContributionResponse().withBasedOn(Constants.MEANS));
@@ -564,7 +568,7 @@ class MaatCalculateContributionServiceTest {
         CalculateContributionDTO calculateContributionDTO = setupDataForCalculateContributionsTests();
 
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
-                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+                .thenReturn(mock(ApiCalculateContributionRequest.class));
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(TestModelDataBuilder.getCalculateContributionResponse());
@@ -611,7 +615,7 @@ class MaatCalculateContributionServiceTest {
                         .totalMonths(2)
                         .build());
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
-                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+                .thenReturn(mock(ApiCalculateContributionRequest.class));
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(TestModelDataBuilder.getCalculateContributionResponse()
@@ -670,7 +674,7 @@ class MaatCalculateContributionServiceTest {
                         .build());
 
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
-                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+                .thenReturn(mock(ApiCalculateContributionRequest.class));
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(
@@ -732,7 +736,7 @@ class MaatCalculateContributionServiceTest {
                         .build());
 
         when(calculateContributionRequestMapper.map(any(), any(), any(), any()))
-                .thenReturn(Mockito.mock(ApiCalculateContributionRequest.class));
+                .thenReturn(mock(ApiCalculateContributionRequest.class));
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(TestModelDataBuilder.getCalculateContributionResponse()
