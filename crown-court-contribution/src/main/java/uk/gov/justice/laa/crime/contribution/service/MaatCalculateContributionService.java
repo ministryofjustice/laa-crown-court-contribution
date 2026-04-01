@@ -177,6 +177,10 @@ public class MaatCalculateContributionService {
         Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream()
                 .filter(it -> it.getAssessmentType() == AssessmentType.INIT)
                 .findFirst();
+        Optional<ApiAssessment> passportAssessment = calculateContributionDTO.getAssessments().stream()
+                .filter(it -> it.getAssessmentType() == AssessmentType.PASSPORT)
+                .findFirst();
+
         String fullResult =
                 fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
 
@@ -191,6 +195,9 @@ public class MaatCalculateContributionService {
                         .caseType(calculateContributionDTO.getCaseType())
                         .effectiveDate(calculateContributionDTO.getEffectiveDate())
                         .iojResult(repOrderDTO.getIojResult())
+                        .passportResult(passportAssessment
+                                .map(assessment -> assessment.getResult().name())
+                                .orElse(null))
                         .monthlyContribs(calculateContributionDTO.getMonthlyContributions())
                         .fullResult(fullResult)
                         .initResult(initAssessment
