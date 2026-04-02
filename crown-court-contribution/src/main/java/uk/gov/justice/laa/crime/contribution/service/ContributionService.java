@@ -48,7 +48,9 @@ public class ContributionService {
                 .filter(passportAssessmentDTO -> Constants.Y.equals(passportAssessmentDTO.getReplaced()))
                 .toList());
         passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
-        return passportAssessments.isEmpty() ? null : passportAssessments.getFirst().getResult();
+        return passportAssessments.isEmpty()
+                ? null
+                : passportAssessments.getFirst().getResult();
     }
 
     protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {

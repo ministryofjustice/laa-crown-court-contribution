@@ -947,57 +947,45 @@ class MaatCalculateContributionServiceTest {
 
     @Test
     void givenDoContribsIsY_whenInvoked_thenDelegatesToPerformContributions() {
-        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
-                .id(1234)
-                .build();
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder().id(1234).build();
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
 
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .doContribs(Constants.Y)
-                .build();
+        ContributionResponseDTO contributionResponseDTO =
+                ContributionResponseDTO.builder().doContribs(Constants.Y).build();
 
         ApiMaatCalculateContributionResponse expectedResponse = new ApiMaatCalculateContributionResponse();
 
         MaatCalculateContributionService spyService = Mockito.spy(maatCalculateContributionService);
 
-        when(contributionService.checkContributionsCondition(any()))
-                .thenReturn(contributionResponseDTO);
+        when(contributionService.checkContributionsCondition(any())).thenReturn(contributionResponseDTO);
 
-        doReturn(expectedResponse).when(spyService)
+        doReturn(expectedResponse)
+                .when(spyService)
                 .performContributions(
-                        eq(calculateContributionDTO),
-                        eq(contributionResponseDTO),
-                        any(),
-                        eq(repOrderDTO));
+                        eq(calculateContributionDTO), eq(contributionResponseDTO), any(), eq(repOrderDTO));
 
         ApiMaatCalculateContributionResponse response =
                 spyService.getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
 
         assertThat(response).isSameAs(expectedResponse);
-        verify(spyService).performContributions(
-                eq(calculateContributionDTO),
-                eq(contributionResponseDTO),
-                any(),
-                eq(repOrderDTO));
+        verify(spyService)
+                .performContributions(
+                        eq(calculateContributionDTO), eq(contributionResponseDTO), any(), eq(repOrderDTO));
     }
 
     @Test
     void givenDoContribsIsN_whenInvoked_thenReturnsEmptyResponse() {
-        RepOrderDTO repOrderDTO = RepOrderDTO.builder()
-                .id(1234)
-                .build();
+        RepOrderDTO repOrderDTO = RepOrderDTO.builder().id(1234).build();
 
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
 
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .doContribs(Constants.N)
-                .build();
+        ContributionResponseDTO contributionResponseDTO =
+                ContributionResponseDTO.builder().doContribs(Constants.N).build();
 
         MaatCalculateContributionService spyService = Mockito.spy(maatCalculateContributionService);
 
-        when(contributionService.checkContributionsCondition(any()))
-                .thenReturn(contributionResponseDTO);
+        when(contributionService.checkContributionsCondition(any())).thenReturn(contributionResponseDTO);
 
         ApiMaatCalculateContributionResponse response =
                 spyService.getCalculateContributionResponse(calculateContributionDTO, repOrderDTO);
@@ -1037,24 +1025,21 @@ class MaatCalculateContributionServiceTest {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
         calculateContributionDTO.setMonthlyContributions(BigDecimal.ZERO);
 
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .calcContribs(Constants.Y)
-                .build();
+        ContributionResponseDTO contributionResponseDTO =
+                ContributionResponseDTO.builder().calcContribs(Constants.Y).build();
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(new ApiCalculateContributionResponse().withMonthlyContributions(BigDecimal.TEN));
 
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
-                .thenReturn(ContributionCalcParametersDTO.builder().totalMonths(2).build());
+                .thenReturn(
+                        ContributionCalcParametersDTO.builder().totalMonths(2).build());
 
         when(maatCalculateContributionResponseMapper.map(any(), any(), any()))
                 .thenReturn(new ApiMaatCalculateContributionResponse());
 
         maatCalculateContributionService.performContributions(
-                calculateContributionDTO,
-                contributionResponseDTO,
-                null,
-                null);
+                calculateContributionDTO, contributionResponseDTO, null, null);
 
         verify(calculateContributionService).calculateContribution(any());
     }
@@ -1064,24 +1049,21 @@ class MaatCalculateContributionServiceTest {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
         calculateContributionDTO.setMonthlyContributions(BigDecimal.ZERO);
 
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .id(1)
-                .build();
+        ContributionResponseDTO contributionResponseDTO =
+                ContributionResponseDTO.builder().id(1).build();
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(new ApiCalculateContributionResponse().withMonthlyContributions(BigDecimal.TEN));
 
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
-                .thenReturn(ContributionCalcParametersDTO.builder().totalMonths(2).build());
+                .thenReturn(
+                        ContributionCalcParametersDTO.builder().totalMonths(2).build());
 
         when(maatCalculateContributionResponseMapper.map(any(), any(), any()))
                 .thenReturn(new ApiMaatCalculateContributionResponse());
 
         maatCalculateContributionService.performContributions(
-                calculateContributionDTO,
-                contributionResponseDTO,
-                null,
-                null);
+                calculateContributionDTO, contributionResponseDTO, null, null);
 
         verify(calculateContributionService).calculateContribution(any());
     }
@@ -1091,23 +1073,21 @@ class MaatCalculateContributionServiceTest {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
         calculateContributionDTO.setMonthlyContributions(BigDecimal.TEN);
 
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .build();
+        ContributionResponseDTO contributionResponseDTO =
+                ContributionResponseDTO.builder().build();
 
         when(calculateContributionService.calculateContribution(any()))
                 .thenReturn(new ApiCalculateContributionResponse().withMonthlyContributions(BigDecimal.TEN));
 
         when(maatCourtDataService.getContributionCalcParameters(anyString()))
-                .thenReturn(ContributionCalcParametersDTO.builder().totalMonths(2).build());
+                .thenReturn(
+                        ContributionCalcParametersDTO.builder().totalMonths(2).build());
 
         when(maatCalculateContributionResponseMapper.map(any(), any(), any()))
                 .thenReturn(new ApiMaatCalculateContributionResponse());
 
         maatCalculateContributionService.performContributions(
-                calculateContributionDTO,
-                contributionResponseDTO,
-                null,
-                null);
+                calculateContributionDTO, contributionResponseDTO, null, null);
 
         verify(calculateContributionService).calculateContribution(any());
     }
@@ -1117,17 +1097,14 @@ class MaatCalculateContributionServiceTest {
         CalculateContributionDTO calculateContributionDTO = TestModelDataBuilder.getCalculateContributionDTO();
         calculateContributionDTO.setMonthlyContributions(BigDecimal.ZERO);
 
-        ContributionResponseDTO contributionResponseDTO = ContributionResponseDTO.builder()
-                .build();
+        ContributionResponseDTO contributionResponseDTO =
+                ContributionResponseDTO.builder().build();
 
         when(maatCalculateContributionResponseMapper.map(any(), any(), any()))
                 .thenReturn(new ApiMaatCalculateContributionResponse());
 
         maatCalculateContributionService.performContributions(
-                calculateContributionDTO,
-                contributionResponseDTO,
-                null,
-                null);
+                calculateContributionDTO, contributionResponseDTO, null, null);
 
         verify(calculateContributionService, never()).calculateContribution(any());
     }
@@ -1146,10 +1123,7 @@ class MaatCalculateContributionServiceTest {
                 .thenReturn(new ApiMaatCalculateContributionResponse());
 
         maatCalculateContributionService.performContributions(
-                calculateContributionDTO,
-                contributionResponseDTO,
-                Constants.INEL,
-                null);
+                calculateContributionDTO, contributionResponseDTO, Constants.INEL, null);
 
         verify(calculateContributionService, never()).calculateContribution(any());
     }

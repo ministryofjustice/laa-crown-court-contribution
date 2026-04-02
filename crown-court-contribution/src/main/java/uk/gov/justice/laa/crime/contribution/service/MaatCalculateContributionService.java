@@ -177,7 +177,8 @@ public class MaatCalculateContributionService {
 
         String crownCourtOutcome = getCrownCourtOutcome(calculateContributionDTO);
         String magCourtOutcome = (calculateContributionDTO.getMagCourtOutcome() != null)
-                ? calculateContributionDTO.getMagCourtOutcome().getOutcome() : null;
+                ? calculateContributionDTO.getMagCourtOutcome().getOutcome()
+                : null;
 
         ContributionResponseDTO contributionResponseDTO =
                 contributionService.checkContributionsCondition(ContributionRequestDTO.builder()
@@ -199,7 +200,8 @@ public class MaatCalculateContributionService {
         return new ApiMaatCalculateContributionResponse();
     }
 
-    private String getAssessmentResult(CalculateContributionDTO calculateContributionDTO, AssessmentType assessmentType) {
+    private String getAssessmentResult(
+            CalculateContributionDTO calculateContributionDTO, AssessmentType assessmentType) {
         return calculateContributionDTO.getAssessments().stream()
                 .filter(it -> it.getAssessmentType() == assessmentType)
                 .findFirst()
