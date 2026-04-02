@@ -48,7 +48,9 @@ public class ContributionService {
                 .filter(passportAssessmentDTO -> Constants.Y.equals(passportAssessmentDTO.getReplaced()))
                 .toList());
         passportAssessments.sort(Comparator.comparing(PassportAssessmentDTO::getId, Comparator.reverseOrder()));
-        return passportAssessments.isEmpty() ? null : passportAssessments.get(0).getResult();
+        return passportAssessments.isEmpty()
+                ? null
+                : passportAssessments.getFirst().getResult();
     }
 
     protected static String getInitialAssessmentResult(final RepOrderDTO repOrderDTO) {
@@ -59,7 +61,7 @@ public class ContributionService {
         financialAssessments.sort(Comparator.comparing(FinancialAssessmentDTO::getId, Comparator.reverseOrder()));
         return financialAssessments.isEmpty()
                 ? null
-                : financialAssessments.get(0).getInitResult();
+                : financialAssessments.getFirst().getInitResult();
     }
 
     public MeansAssessmentResult getMeansAssessmentResult(final AssessmentResults results) {

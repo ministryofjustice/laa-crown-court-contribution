@@ -171,17 +171,11 @@ public class MaatCalculateContributionService {
             final CalculateContributionDTO calculateContributionDTO, final RepOrderDTO repOrderDTO) {
         log.info("Start getCalculateContributionResponse");
 
-        Optional<ApiAssessment> fullAssessment = calculateContributionDTO.getAssessments().stream()
-                .filter(it -> it.getAssessmentType() == AssessmentType.FULL)
-                .findFirst();
-        Optional<ApiAssessment> initAssessment = calculateContributionDTO.getAssessments().stream()
-                .filter(it -> it.getAssessmentType() == AssessmentType.INIT)
-                .findFirst();
-        String fullResult =
-                fullAssessment.map(assessment -> assessment.getResult().name()).orElse(null);
+        String initResult = getAssessmentResult(calculateContributionDTO, AssessmentType.INIT);
+        String fullResult = getAssessmentResult(calculateContributionDTO, AssessmentType.FULL);
+        String passportedResult = getAssessmentResult(calculateContributionDTO, AssessmentType.PASSPORT);
 
         String crownCourtOutcome = getCrownCourtOutcome(calculateContributionDTO);
-
         String magCourtOutcome = (calculateContributionDTO.getMagCourtOutcome() != null)
                 ? calculateContributionDTO.getMagCourtOutcome().getOutcome()
                 : null;
@@ -191,11 +185,10 @@ public class MaatCalculateContributionService {
                         .caseType(calculateContributionDTO.getCaseType())
                         .effectiveDate(calculateContributionDTO.getEffectiveDate())
                         .iojResult(repOrderDTO.getIojResult())
+                        .passportResult(passportedResult)
                         .monthlyContribs(calculateContributionDTO.getMonthlyContributions())
                         .fullResult(fullResult)
-                        .initResult(initAssessment
-                                .map(assessment -> assessment.getResult().name())
-                                .orElse(null))
+                        .initResult(initResult)
                         .magCourtOutcome(magCourtOutcome)
                         .crownCourtOutcome(crownCourtOutcome)
                         .removeContribs(calculateContributionDTO.getRemoveContribs())
@@ -205,6 +198,15 @@ public class MaatCalculateContributionService {
             return performContributions(calculateContributionDTO, contributionResponseDTO, fullResult, repOrderDTO);
         }
         return new ApiMaatCalculateContributionResponse();
+    }
+
+    private String getAssessmentResult(
+            CalculateContributionDTO calculateContributionDTO, AssessmentType assessmentType) {
+        return calculateContributionDTO.getAssessments().stream()
+                .filter(it -> it.getAssessmentType() == assessmentType)
+                .findFirst()
+                .map(assessment -> assessment.getResult().name())
+                .orElse(null);
     }
 
     public static String getCrownCourtOutcome(CalculateContributionDTO calculateContributionDTO) {
