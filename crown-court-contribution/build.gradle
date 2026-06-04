@@ -4,9 +4,12 @@ plugins {
     id "org.sonarqube" version "7.2.3.7755"
     id "com.diffplug.spotless" version "8.0.0"
     id "info.solidsoft.pitest" version "1.19.0"
-    id "org.springframework.boot" version "3.5.13"
+    id "org.springframework.boot" version "3.5.14"
     id "io.spring.dependency-management" version "1.1.7"
 }
+
+// springboot tomcat version overide, can be removed when springboot is 3.5.15 or 4+
+ext['tomcat.version'] = '10.1.55'
 
 group = "uk.gov.justice.laa.crime"
 
@@ -35,7 +38,7 @@ configurations {
 repositories {
     mavenCentral()
     maven {
-        url 'https://central.sonatype.com/repository/maven-snapshots/'
+        url = 'https://central.sonatype.com/repository/maven-snapshots/'
     }
 }
 
